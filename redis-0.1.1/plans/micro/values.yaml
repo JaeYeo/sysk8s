@@ -1,9 +1,14 @@
 ## Configure resource requests and limits
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
 ##
-resources:
-  requests:
-    memory: 96Mi
 
-persistence:
-  enabled: false
+master:
+  resources:
+    requests:
+      memory: 96Mi
+
+master:
+  persistence:
+    enabled: false
+
+architecture : standalone

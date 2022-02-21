@@ -1,6 +1,13 @@
 ## Configure resource requests and limits
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
 ##
-resources:
-  requests:
-    memory: 96Mi
+master:
+  resources:
+    requests:
+      memory: 96Mi
+
+replica:
+  resources:
+    requests:
+      memory: 96Mi
+
