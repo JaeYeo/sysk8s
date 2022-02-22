@@ -1,6 +1,6 @@
 name: enterprise
 id: ba6078798-70a1-4674-af90-aba364dd6a56
-description: "Enterprise plan"
+description: "Enterprise plan, 1 master and 3 replications"
 displayName: Enterprise
 
 bindable: true
