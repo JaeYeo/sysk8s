@@ -1,0 +1,15 @@
+## Configure resource requests and limits
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+##
+kubeVersion: 1.20-11
+
+master:
+  resources:
+    requests:
+      memory: 96Mi
+
+replica:
+  resources:
+    requests:
+      memory: 96Mi
+
