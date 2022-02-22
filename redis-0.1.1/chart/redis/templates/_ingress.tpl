@@ -34,9 +34,6 @@ Usage:
 {{ include "common.ingress.supportsPathType" . }}
 */}}
 {{- define "common.ingress.supportsPathType" -}}
-{{- if (semverCompare "<1.18-0" (include "common.capabilities.kubeVersion" .)) -}}
-{{- print "false" -}}
-{{- else -}}
 {{- print "true" -}}
 {{- end -}}
 {{- end -}}
@@ -47,9 +44,6 @@ Usage:
 {{ include "common.ingress.supportsIngressClassname" . }}
 */}}
 {{- define "common.ingress.supportsIngressClassname" -}}
-{{- if semverCompare "<1.18-0" (include "common.capabilities.kubeVersion" .) -}}
-{{- print "false" -}}
-{{- else -}}
 {{- print "true" -}}
 {{- end -}}
 {{- end -}}
