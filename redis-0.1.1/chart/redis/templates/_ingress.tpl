@@ -36,7 +36,6 @@ Usage:
 {{- define "common.ingress.supportsPathType" -}}
 {{- print "true" -}}
 {{- end -}}
-{{- end -}}
 
 {{/*
 Returns true if the ingressClassname field is supported
@@ -45,7 +44,6 @@ Usage:
 */}}
 {{- define "common.ingress.supportsIngressClassname" -}}
 {{- print "true" -}}
-{{- end -}}
 {{- end -}}
 
 {{/*
