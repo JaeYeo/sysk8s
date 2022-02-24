@@ -7,15 +7,9 @@ credential:
         name: {{ printf "%s-master" (include "common.names.fullname" .) }} 
         key: {{ .Values.master.service.ports.redis }}
   - name: PORT2
-    valueFrom:
-      serviceRef:
-        name: {{ printf "%s-master" (include "common.names.fullname" .) }} 
-        jsonpath: '{ .spec.ports[?(@.name=="redis")].port }'
+    value: {{ .Values.master.containerPorts.redis | quote }}
   - name: PORT3
-    valueFrom:
-      serviceRef:
-        name: {{ printf "%s-master" (include "common.names.fullname" .) }} 
-        key: "6321"
+    value: {{ .Values.master.service.ports.redis }}
   - name: REDIS_PASSWORD
     valueFrom:
       secretKeyRef:
