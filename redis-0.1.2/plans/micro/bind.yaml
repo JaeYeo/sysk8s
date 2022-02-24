@@ -11,6 +11,11 @@ credential:
       serviceRef:
         name: {{ printf "%s-master" (include "common.names.fullname" .) }} 
         jsonpath: '{ .spec.ports[?(@.name=="redis")].port }'
+  - name: PORT3
+    valueFrom:
+      serviceRef:
+        name: {{ printf "%s-master" (include "common.names.fullname" .) }} 
+        key: "6321"
   - name: REDIS_PASSWORD
     valueFrom:
       secretKeyRef:
