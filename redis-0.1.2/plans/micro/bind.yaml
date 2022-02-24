@@ -5,7 +5,12 @@ credential:
     valueFrom:
       serviceRef:
         name: {{ printf "%s-master" (include "common.names.fullname" .) }} 
-        key: {{ .Values.master.containerPorts.redis }} 
+        key: {{ .Values.master.service.ports.redis }}
+  - name: PORT2
+    valueFrom:
+      serviceRef:
+        name: {{ printf "%s-master" (include "common.names.fullname" .) }} 
+        jsonpath: '{ .spec.ports[?(@.name=="redis")].port }'
   - name: REDIS_PASSWORD
     valueFrom:
       secretKeyRef:

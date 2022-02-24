@@ -5,7 +5,7 @@ credential:
     valueFrom:
       serviceRef:
         name: {{ printf "%s-master" (include "common.names.fullname" .) }} 
-        key: {{ .Values.master.containerPorts.redis }} 
+        key: {{ .Values.master.service.ports.redis }}
   - name: REDIS_PASSWORD
     valueFrom:
       secretKeyRef:
