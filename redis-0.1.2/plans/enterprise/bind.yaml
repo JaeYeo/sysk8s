@@ -9,5 +9,5 @@ credential:
   - name: REDIS_PASSWORD
     valueFrom:
       secretKeyRef:
-        name: {{ printf "%s-master" (include "common.names.fullname" .) }} 
+        name: {{ template "redis.secretName" . }} 
         key: redis-password
