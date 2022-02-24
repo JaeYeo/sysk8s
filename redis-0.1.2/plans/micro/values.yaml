@@ -4,9 +4,6 @@
 
 kubeVersion: 1.20-11 
 
-nameOverride: {{ template "common.names.fullname" . }}
-fullnameOverride: redis-{{ .Release.Namespace }}-{{ template "common.names.fullname" . }}
-
 master:
   resources:
     requests:
