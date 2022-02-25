@@ -5,7 +5,7 @@ credential:
     valueFrom:
       serviceRef:
         name: {{ printf "%s-master" (include "common.names.fullname" .) }} 
-        key: {{ .Values.master.service.ports.redis }}
+        jsonpath: '{ .spec.ports[?(@.name=="tcp-redis")].port }'
   - name: PORT2
     value: {{ .Values.master.containerPorts.redis | quote }}
   - name: PORT3
