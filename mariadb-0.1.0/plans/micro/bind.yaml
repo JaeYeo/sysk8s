@@ -1,0 +1,18 @@
+credential:
+  - name: HOST
+    value: {{ include "mariadb.primary.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+  - name: PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "mariadb.primary.fullname" . }} 
+        jsonpath: '{ .spec.ports[?(@.name=="mysql")].port }'
+  - name: MARIADB_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: {{ template "mariadb.secretName" . }} 
+        key: mariadb-password 
+  - name: MARIADB_ROOT_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: {{ template "mariadb.secretName" . }} 
+        key: mariadb-root-password 

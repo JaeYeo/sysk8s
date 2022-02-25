@@ -1,0 +1,6 @@
+name: enterprise
+id: 23ea8030-95fe-11ec-b909-0242ac120003
+description: "Enterprise plan, 2 slave"
+displayName: Enterprise
+
+bindable: true
