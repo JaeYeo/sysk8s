@@ -6,10 +6,6 @@ credential:
       serviceRef:
         name: {{ printf "%s-master" (include "common.names.fullname" .) }} 
         jsonpath: '{ .spec.ports[?(@.name=="tcp-redis")].port }'
-  - name: PORT2
-    value: {{ .Values.master.containerPorts.redis | quote }}
-  - name: PORT3
-    value: {{ .Values.master.service.ports.redis }}
   - name: REDIS_PASSWORD
     valueFrom:
       secretKeyRef:
