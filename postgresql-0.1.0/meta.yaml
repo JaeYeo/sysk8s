@@ -1,0 +1,12 @@
+name: postgresql 
+version: 0.1.0
+id: b1c10cda-9612-11ec-b909-0242ac120001
+description: "Postgresql by Helm Broker. "
+displayName: "Postgresql"
+tags: database, sysmasterk8s 
+providerDisplayName: bitnami
+longDescription: "https://github.com/bitnami/charts/tree/master/bitnami/postgresql/#installing-the-chart"
+documentationURL: https://github.com/bitnami/bitnami-docker-postgresql
+supportURL: https://bitnami.com/support
+imageURL: https://bitnami.com/assets/stacks/postgresql/img/postgresql-stack-220x234.png
+bindable: true

@@ -1,0 +1,13 @@
+credential:
+  - name: HOST
+    value: {{ include "postgresql.primary.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+  - name: PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include ""postgresql.primary.fullname"" . }} 
+        jsonpath: '{ .spec.ports[?(@.name=="tcp-postgresql")].port }'
+  - name: POSTGRES_POSTGRES_PASSWORD 
+    valueFrom:
+      secretKeyRef:
+        name: {{ template "postgresql.secretName" . }} 
+        key: postgres-password 
