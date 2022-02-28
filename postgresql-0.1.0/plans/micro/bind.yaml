@@ -4,7 +4,7 @@ credential:
   - name: PORT
     valueFrom:
       serviceRef:
-        name: {{ include ""postgresql.primary.fullname"" . }} 
+        name: {{ include "postgresql.primary.fullname" . }} 
         jsonpath: '{ .spec.ports[?(@.name=="tcp-postgresql")].port }'
   - name: POSTGRES_POSTGRES_PASSWORD 
     valueFrom:
