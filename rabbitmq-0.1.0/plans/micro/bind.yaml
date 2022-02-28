@@ -1,0 +1,15 @@
+credential:
+  - name: HOST
+    value: {{ include "rabbitmq.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+  - name: PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "rabbitmq.fullname" . }} 
+        jsonpath: '{ .spec.ports[?(@.name=="amqp")].port }'
+  - name: RABBITMQ_USERNAME
+    value: {{ .Values.auth.username | quote }}
+  - name: RABBITMQ_PASSWORD 
+    valueFrom:
+      secretKeyRef:
+        name: {{ template "rabbitmq.secretPasswordName" . }} 
+        key: rabbitmq-password 

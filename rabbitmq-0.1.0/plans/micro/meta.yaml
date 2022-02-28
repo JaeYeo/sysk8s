@@ -1,0 +1,6 @@
+name: micro
+id: 19dec6c2-9839-11ec-b909-0242ac120002
+description: "Rabbitmq micro plan, standalone."
+displayName: Micro
+
+bindable: true
