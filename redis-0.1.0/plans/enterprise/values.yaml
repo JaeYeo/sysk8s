@@ -1,0 +1,20 @@
+## Configure resource requests and limits
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+##
+kubeVersion: 1.20-11
+
+architecture : replication 
+
+master:
+  resources:
+    requests:
+      memory: 1Gi 
+      cpu: 500m
+
+replica:
+  replicaCount: 3
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: 500m
+

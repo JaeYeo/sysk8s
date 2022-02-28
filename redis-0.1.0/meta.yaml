@@ -1,0 +1,12 @@
+name: redis
+version: 0.1.0
+id: 862c3fe4-9857-11ec-b909-0242ac120001
+description: "Redis by Helm Broker. "
+displayName: "Redis"
+tags: redis, keyvalue, database, sysmasterk8s 
+providerDisplayName: bitnami
+longDescription: "https://github.com/bitnami/charts/tree/master/bitnami/redis/#installing-the-chart"
+documentationURL: https://github.com/bitnami/bitnami-docker-redis
+supportURL: https://bitnami.com/support
+imageURL: https://bitnami.com/assets/stacks/redis/img/redis-stack-220x234.png
+bindable: true

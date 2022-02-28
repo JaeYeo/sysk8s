@@ -1,0 +1,6 @@
+name: micro
+id: 862c3fe4-9857-11ec-b909-0242ac120002
+description: "Redis micro plan which uses the in-memory persistence, standalone."
+displayName: Micro
+
+bindable: true

@@ -1,0 +1,13 @@
+credential:
+  - name: HOST
+    value: {{ printf "%s-master" (include "common.names.fullname" .) }}.{{ .Release.Namespace }}.svc.cluster.local
+  - name: PORT
+    valueFrom:
+      serviceRef:
+        name: {{ printf "%s-master" (include "common.names.fullname" .) }} 
+        jsonpath: '{ .spec.ports[?(@.name=="tcp-redis")].port }'
+  - name: REDIS_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: {{ template "redis.secretName" . }} 
+        key: redis-password
