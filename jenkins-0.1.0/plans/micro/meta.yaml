@@ -1,0 +1,6 @@
+name: micro
+id: 486bfbe2-9841-11ec-b909-0242ac120002
+description: "Jenkins micro plan, standalone."
+displayName: Micro
+
+bindable: true

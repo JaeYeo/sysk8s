@@ -1,0 +1,13 @@
+name: jenkins 
+version: 0.1.0
+id: 486bfbe2-9841-11ec-b909-0242ac120001
+description: "jenkins by Helm Broker. "
+displayName: "jenkins"
+tags: jenkins, ci, cd, sysmasterk8s 
+providerDisplayName: bitnami
+longDescription: "https://github.com/bitnami/charts/tree/master/bitnami/jenkins/#installing-the-chart"
+documentationURL: https://github.com/bitnami/bitnami-docker-jenkins
+supportURL: https://bitnami.com/support
+imageURL: https://bitnami.com/assets/stacks/jenkins/img/jenkins-stack-220x234.png
+
+bindable: true

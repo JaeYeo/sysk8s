@@ -1,0 +1,6 @@
+credential:
+  - name: JENKINS_PASSWORD 
+    valueFrom:
+      secretKeyRef:
+        name: {{ template "common.names.fullname" . }} 
+        key: jenkins-password 
