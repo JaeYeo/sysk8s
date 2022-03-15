@@ -7,7 +7,7 @@ Find more information about the Postgresql chart in the chart's [documentation](
 
 ## Details
 
-The mariadb addon contains two plans:
+The postgresql addon contains two plans:
 - micro
 - entrerpise
 
