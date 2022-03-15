@@ -13,5 +13,7 @@ credential:
       secretKeyRef:
         name: {{ template "rabbitmq.secretPasswordName" . }} 
         key: rabbitmq-password 
+{{- if .Values.ingress.enabled }}
   - name: INGRESS_HOSTNAME
     value: {{ .Values.ingress.hostname }}
+{{- end }}
