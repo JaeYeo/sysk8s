@@ -1,0 +1,10 @@
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ServiceInstance
+metadata:
+  name: jenkins-01
+  namespace: jenkins
+spec:
+  serviceClassExternalName: jenkins 
+  servicePlanExternalName: micro 
+  parameters:
+    fullnameOverride: jenkins-01 
