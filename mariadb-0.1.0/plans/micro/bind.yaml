@@ -6,8 +6,11 @@ credential:
       serviceRef:
         name: {{ include "mariadb.primary.fullname" . }} 
         jsonpath: '{ .spec.ports[?(@.name=="mysql")].port }'
-  - name: MARIADB_ROOT_PASSWORD
+  - name: ROOT_PASSWORD
     valueFrom:
       secretKeyRef:
         name: {{ template "mariadb.secretName" . }} 
         key: mariadb-root-password 
+  - name: DATABASE 
+    value: {{ .Values.auth.database | quote }} 
+  
