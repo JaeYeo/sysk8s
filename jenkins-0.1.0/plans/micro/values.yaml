@@ -12,3 +12,6 @@ resources:
     memory: 2Gi
     cpu: 1000m
 
+service:
+  type: NodePort
+
