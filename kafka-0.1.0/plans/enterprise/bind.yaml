@@ -1,0 +1,11 @@
+credential:
+  - name: COMSUMERS_HOST
+    value: {{ include "kafka.fullname" . }}.{{ .Release.Namespace }}.svc..{{ .Values.clusterDomain }}
+  - name: PRODUCER_HOST
+    value: {{ include "kafka.fullname" . }}-0.{{ include "kafka.fullname" . }}-headless.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}
+
+  - name: PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "kafka.fullname" . }} 
+        jsonpath: '{ .spec.ports[?(@.name=="tcp-client")].port }'

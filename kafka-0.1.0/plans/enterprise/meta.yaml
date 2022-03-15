@@ -1,0 +1,6 @@
+name: enterprise
+id: f4103372-a431-11ec-b909-0242ac120003
+description: "Enterprise plan"
+displayName: Enterprise
+
+bindable: true

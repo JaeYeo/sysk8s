@@ -1,0 +1,12 @@
+name: kafka 
+version: 0.1.0
+id: f4103372-a431-11ec-b909-0242ac120001
+description: "kafka by Helm Broker. "
+displayName: "kafka"
+tags: kafka, zookeeper, streaming, producer,  consumer, sysmasterk8s
+providerDisplayName: bitnami
+longDescription: "https://github.com/bitnami/charts/tree/master/bitnami/kafka/#installing-the-chart"
+documentationURL: https://github.com/bitnami/bitnami-docker-kafka
+supportURL: https://bitnami.com/support
+imageURL: https://bitnami.com/assets/stacks/kafka/img/kafka-stack-220x234.png 
+bindable: true

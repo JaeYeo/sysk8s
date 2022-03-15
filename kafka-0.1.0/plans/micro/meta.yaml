@@ -1,0 +1,6 @@
+name: micro
+id: f4103372-a431-11ec-b909-0242ac120002
+description: "Kafka micro plan, standalone."
+displayName: Micro
+
+bindable: true
