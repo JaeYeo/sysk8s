@@ -1,6 +1,4 @@
 credential:
-  - name: INGRESS_HOSTNAME
-    value: {{ .Values.ingress.hostname }} 
   - name: JENKINS_USER 
     value: {{ .Values.jenkinsUser | quote }}
   - name: JENKINS_PASSWORD 
@@ -8,3 +6,7 @@ credential:
       secretKeyRef:
         name: {{ template "common.names.fullname" . }} 
         key: jenkins-password 
+{{- if .Values.ingress.enabled }}
+  - name: INGRESS_HOSTNAME
+    value: {{ .Values.ingress.hostname }} 
+{{- end }}
