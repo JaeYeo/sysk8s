@@ -136,7 +136,10 @@ func (svc *provisionService) Provision(ctx context.Context, osbCtx OsbContext, r
 
 	//releaseName := createReleaseName(addon.Name, addonPlan.Name, iID)
 	// 2022-03 releaseName too long, use fullnameOverride param as relaseName if exists.
-	releaseName := createReleaseName(addon.Name, addonPlan.Name, iID, requestedProvisioningParameters.Data )
+	releaseName := createReleaseName2(addon.Name, addonPlan.Name, iID, requestedProvisioningParameters.Data )
+
+	//svc.log.Infof("releaseName:  %s", releaseName)
+
 
 	i := internal.Instance{
 		ID:                     iID,
@@ -327,15 +330,12 @@ func createReleaseName(name internal.AddonName, planName internal.AddonPlanName,
 
 // 2022-03
 // releaseName is too long, use fullnameOverride in chartValues
-func createReleaseName(name internal.AddonName, planName internal.AddonPlanName, iID internal.InstanceID, chartvalues internal.ChartValues ) internal.ReleaseName {
+func createReleaseName2(name internal.AddonName, planName internal.AddonPlanName, iID internal.InstanceID, chartvalues internal.ChartValues ) internal.ReleaseName {
 
 
-	if fullnameOverride, ok := chartvalues["fullnameOverride"]; ok 
-	{
-		return fullnameOverride
-	}
-	else
-	{
+	if fullnameOverride, ok := chartvalues["fullnameOverride"]; ok {
+		return internal.ReleaseName(fmt.Sprint(fullnameOverride))
+	} else {
 		// max name length 53 = 36(GUID) + 4(pre + special char) + 12 (6 for name, 6 for plan) + 1 extra char
 		releaseName := fmt.Sprintf(
 			"%s-%s-%s",
