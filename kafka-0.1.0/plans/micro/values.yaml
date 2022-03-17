@@ -3,6 +3,9 @@
 ##
 
 kubeVersion: 1.20-11 
+common:
+  capabilities:
+    kubeVersion: 1.20-11
 
 replicaCount: 1 
 
