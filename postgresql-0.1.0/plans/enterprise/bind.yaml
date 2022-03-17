@@ -6,7 +6,7 @@ credential:
       serviceRef:
         name: {{ include "postgresql.primary.fullname" . }} 
         jsonpath: '{ .spec.ports[?(@.name=="tcp-postgresql")].port }'
-  - name: POSTGRES_PASSWORD 
+  - name: POSTGRESQL_POSTGRES_PASSWORD 
     valueFrom:
       secretKeyRef:
         name: {{ template "postgresql.secretName" . }} 
