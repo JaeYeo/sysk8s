@@ -1,6 +1,6 @@
 credential:
   - name: COMSUMERS_HOST
-    value: {{ include "common.names.fullname" . }}.{{ .Release.Namespace }}.svc..{{ .Values.clusterDomain }}
+    value: {{ include "common.names.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}
   - name: PRODUCER_HOST
     value: {{ include "common.names.fullname" . }}-0.{{ include "common.names.fullname" . }}-headless.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}
 
