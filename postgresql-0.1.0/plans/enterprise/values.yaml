@@ -13,6 +13,8 @@ primary:
     limits:
       memory: 4Gi
       cpu: 2000m
+  service:
+    type: NodePort
 
 readReplicas:
   resources:
