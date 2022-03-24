@@ -5,6 +5,9 @@ kubeVersion: 1.20-11
 
 replicaCount: 3 
 
+service:
+  type: NodePort
+
 resources:
   requests:
     memory: 1Gi 
@@ -12,8 +15,3 @@ resources:
   limits:
     memory: 2Gi
     cpu: 1000m
-
-service:
-  type: NodePort
-
-
