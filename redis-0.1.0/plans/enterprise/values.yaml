@@ -10,6 +10,8 @@ master:
     requests:
       memory: 1Gi 
       cpu: 500m
+  service:
+    type: NodePort
 
 replica:
   replicaCount: 3
