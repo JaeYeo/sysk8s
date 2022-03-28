@@ -1,0 +1,16 @@
+spring:
+  profiles.active: dev
+logging:
+  pattern:
+    console: "%d %-5level %logger : %msg%n"
+  level:
+    com.infranics.backendserviceproxy: debug
+    org.springframework: info
+    org.springframework.core: info
+    io.fabric8: debug
+env:
+  rancher:
+    endpoint: "https://k8s.console.dev.sm-k8s.com/v3"
+    auth: "token-7dpdj:8z72khbqq46wd4rvxtwtqppxvq8xp2csjtnxcsptvfcswxhgmnx49x"
+    tempClusterId: "c-f2kgc"
+
