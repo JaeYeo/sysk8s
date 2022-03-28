@@ -17,3 +17,15 @@ credential:
   - name: INGRESS_HOSTNAME
     value: {{ .Values.ingress.hostname }}
 {{- end }}
+{{- if (eq .Values.service.type "NodePort") }}
+  - name: NODE_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "rabbitmq.fullname" . }} 
+        jsonpath: '{ .spec.ports[?(@.name=="amqp")].nodePort }'
+{{- end }}
+  - name: CLUSTER_IP
+    valueFrom:
+      serviceRef:
+        name: {{ include "rabbitmq.fullname" . }}
+        jsonpath: '{ .spec.clusterIP }'
