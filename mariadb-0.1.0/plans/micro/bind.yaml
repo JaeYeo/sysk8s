@@ -13,11 +13,13 @@ credential:
         key: mariadb-root-password 
   - name: DATABASE 
     value: {{ .Values.auth.database | quote }} 
+{{- if (eq .Values.primary.service.type "NodePort") }}
   - name: NODE_PORT
     valueFrom:
       serviceRef:
         name: {{ include "mariadb.primary.fullname" . }} 
         jsonpath: '{ .spec.ports[?(@.name=="mysql")].nodePort }'
+{{- end }}
   - name: CLUSTER_IP
     valueFrom:
       serviceRef:
