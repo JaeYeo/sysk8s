@@ -11,3 +11,13 @@ credential:
       secretKeyRef:
         name: {{ template "redis.secretName" . }} 
         key: redis-password
+  - name: NODE_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ printf "%s-master" (include "common.names.fullname" .) }} 
+        jsonpath: '{ .spec.ports[?(@.name=="tcp-redis")].nodePort }'
+  - name: CLUSTERIP
+    valueFrom:
+      serviceRef:
+        name: {{ printf "%s-master" (include "common.names.fullname" .) }} 
+        jsonpath: '{ .spec.clusterIP }'
