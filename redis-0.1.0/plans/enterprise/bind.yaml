@@ -16,7 +16,7 @@ credential:
       serviceRef:
         name: {{ printf "%s-master" (include "common.names.fullname" .) }} 
         jsonpath: '{ .spec.ports[?(@.name=="tcp-redis")].nodePort }'
-  - name: CLUSTERIP
+  - name: CLUSTER_IP
     valueFrom:
       serviceRef:
         name: {{ printf "%s-master" (include "common.names.fullname" .) }} 
