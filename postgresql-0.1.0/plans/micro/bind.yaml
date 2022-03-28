@@ -13,11 +13,13 @@ credential:
         key: postgres-password 
   - name: DATABASE
     value: {{ .Values.auth.database | quote }}
+{{- if (eq .Values.primary.service.type "NodePort") }}
   - name: NODE_PORT
     valueFrom:
       serviceRef:
         name: {{ include "postgresql.primary.fullname" . }} 
         jsonpath: '{ .spec.ports[?(@.name=="tcp-postgresql")].nodePort }'
+{{- end }}
   - name: CLUSTER_IP
     valueFrom:
       serviceRef:
