@@ -3,6 +3,7 @@
 ##
 
 kubeVersion: 1.20-11 
+podLabels: { "app":"monitoring-collector", "platform":"platform_service", "taskse":"service_catalog", "taskcl":"backend_service" }
 
 replicaCount: 1 
 
@@ -12,6 +13,18 @@ service:
 zookeeper:
   service:
     type: NodePort
+
+externalAccess:
+  service:
+    type: NodePort
+  autoDiscovery:
+    enabled: true
+
+serviceAccount:
+  create: true
+
+rbac:
+  create: true
 
 resources:
   requests:
