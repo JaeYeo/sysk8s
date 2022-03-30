@@ -11,6 +11,7 @@ service:
   type: NodePort
 
 zookeeper:
+  podLabels: { "app":"monitoring-collector", "platform":"platform_service", "taskse":"service_catalog", "taskcl":"backend_service" }
   service:
     type: NodePort
 
