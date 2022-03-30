@@ -6,7 +6,7 @@ kubeVersion: 1.20-11
 architecture : replication 
 
 master:
-  podLabels: { "app":"monitoring-collector", "platform":"platform_service", "taskse":"service_catalog", "taskcl":"backend_service" }
+  podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
   resources:
     requests:
       memory: 1Gi 
@@ -15,7 +15,7 @@ master:
     type: NodePort
 
 replica:
-  podLabels: { "app":"monitoring-collector", "platform":"platform_service", "taskse":"service_catalog", "taskcl":"backend_service" }
+  podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
   replicaCount: 3
   resources:
     requests:
