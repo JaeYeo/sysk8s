@@ -24,6 +24,13 @@ externalAccess:
     type: NodePort
   autoDiscovery:
     enabled: true
+    resources:
+      requests:
+        memory: 200Mi
+        cpu: 100m
+      limits:
+        memory: 1Gi
+        cpu: 500m
 
 serviceAccount:
   create: true
