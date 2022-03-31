@@ -8,15 +8,18 @@ podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "ta
 
 replicaCount: 1 
 
-service:
-  type: NodePort
-
 zookeeper:
   podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
-  service:
-    type: NodePort
+  resources:
+    requests:
+      memory: 200Mi
+      cpu: 100m
+    limits:
+      memory: 1Gi
+      cpu: 500m
 
 externalAccess:
+  enabled: true
   service:
     type: NodePort
   autoDiscovery:
