@@ -8,32 +8,18 @@ credential:
       serviceRef:
         name: {{ include "common.names.fullname" . }} 
         jsonpath: '{ .spec.ports[?(@.name=="tcp-client")].port }'
-{{- if (eq .Values.service.type "NodePort") }}
-  - name: NODE_PORT
+{{- $replicaCount := .Values.replicaCount | int }}
+{{- range $i, $e := until $replicaCount }}
+{{- if Values.externalAccess.enabled }}
+  - name:  {{ printf "NODE_PORT_%d"  $i | trunc 63 | trimSuffix "-" }} 
     valueFrom:
       serviceRef:
-        name: {{ include "common.names.fullname" . }} 
+        name: {{ printf "%s-%d-external" (include "common.names.fullname" $) $i | trunc 63 | trimSuffix "-" }} 
         jsonpath: '{ .spec.ports[?(@.name=="tcp-client")].nodePort }'
 {{- end }}
-  - name: CLUSTER_IP
+  - name:  {{ printf "CLUSTER_IP_%d"  $i | trunc 63 | trimSuffix "-" }} 
     valueFrom:
       serviceRef:
-        name: {{ include "common.names.fullname" . }} 
+        name: {{ printf "%s-%d-external" (include "common.names.fullname" $) $i | trunc 63 | trimSuffix "-" }} 
         jsonpath: '{ .spec.clusterIP }'
-  - name: ZOOKEEPER_PORT
-    valueFrom:
-      serviceRef:
-        name: {{ include "common.names.fullname" . }}-zookeeper 
-        jsonpath: '{ .spec.ports[?(@.name=="tcp-client")].port }'
-{{- if (eq .Values.zookeeper.service.type "NodePort") }}
-  - name: ZOOKEEPER_NODE_PORT
-    valueFrom:
-      serviceRef:
-        name: {{ include "common.names.fullname" . }}-zookeeper
-        jsonpath: '{ .spec.ports[?(@.name=="tcp-client")].nodePort }'
 {{- end }}
-  - name: ZOOKEEPER_CLUSTER_IP
-    valueFrom:
-      serviceRef:
-        name: {{ include "common.names.fullname" . }}-zookeeper 
-        jsonpath: '{ .spec.clusterIP }'
