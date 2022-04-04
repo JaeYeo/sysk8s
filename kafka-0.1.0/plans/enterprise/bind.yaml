@@ -8,18 +8,21 @@ credential:
       serviceRef:
         name: {{ include "common.names.fullname" . }} 
         jsonpath: '{ .spec.ports[?(@.name=="tcp-client")].port }'
+{{- if .Values.externalAccess.enabled }}
 {{- $replicaCount := .Values.replicaCount | int }}
 {{- range $i, $e := until $replicaCount }}
-{{- if Values.externalAccess.enabled }}
   - name:  {{ printf "NODE_PORT_%d"  $i | trunc 63 | trimSuffix "-" }} 
     valueFrom:
       serviceRef:
         name: {{ printf "%s-%d-external" (include "common.names.fullname" $) $i | trunc 63 | trimSuffix "-" }} 
-        jsonpath: '{ .spec.ports[?(@.name=="tcp-client")].nodePort }'
-{{- end }}
+        jsonpath: '{ .spec.ports[?(@.name=="tcp-kafka")].nodePort }'
   - name:  {{ printf "CLUSTER_IP_%d"  $i | trunc 63 | trimSuffix "-" }} 
     valueFrom:
       serviceRef:
         name: {{ printf "%s-%d-external" (include "common.names.fullname" $) $i | trunc 63 | trimSuffix "-" }} 
         jsonpath: '{ .spec.clusterIP }'
 {{- end }}
+{{- end }}
+  - name: EXTERNAL_ACCESS_HOST 
+    value: {{ .Values.externalAccess.service.domain }} 
+

@@ -15,7 +15,7 @@ credential:
     valueFrom:
       serviceRef:
         name: {{ printf "%s-%d-external" (include "common.names.fullname" $) $i | trunc 63 | trimSuffix "-" }} 
-        jsonpath: '{ .spec.ports[?(@.name=="tcp-client")].nodePort }'
+        jsonpath: '{ .spec.ports[?(@.name=="tcp-kafka")].nodePort }'
   - name:  {{ printf "CLUSTER_IP_%d"  $i | trunc 63 | trimSuffix "-" }} 
     valueFrom:
       serviceRef:
