@@ -1,14 +1,12 @@
 ## Configure resource requests and limits
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
 ##
-kubeVersion: 1.20-11
+
+kubeVersion: 1.20-11 
 
 podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
 
 replicaCount: 3 
-
-service:
-  type: NodePort
 
 zookeeper:
   podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
@@ -24,8 +22,9 @@ externalAccess:
   enabled: true
   service:
     type: NodePort
+    domain: "112.175.114.177"
   autoDiscovery:
-    enabled: true
+    enabled: true 
     resources:
       requests:
         memory: 200Mi
@@ -42,13 +41,8 @@ rbac:
 
 resources:
   requests:
-    memory: 200Mi
-    cpu: 100m
+    memory: 500Mi
+    cpu: 250m
   limits:
     memory: 1Gi
     cpu: 500m
-
-
-
-
-
