@@ -10,7 +10,7 @@ credential:
         jsonpath: '{ .spec.ports[?(@.name=="tcp-client")].port }'
 {{- $replicaCount := .Values.replicaCount | int }}
 {{- range $i, $e := until $replicaCount }}
-{{- if Values.externalAccess.enabled }}
+{{- if .Values.externalAccess.enabled }}
   - name:  {{ printf "NODE_PORT_%d"  $i | trunc 63 | trimSuffix "-" }} 
     valueFrom:
       serviceRef:
@@ -23,3 +23,6 @@ credential:
         name: {{ printf "%s-%d-external" (include "common.names.fullname" $) $i | trunc 63 | trimSuffix "-" }} 
         jsonpath: '{ .spec.clusterIP }'
 {{- end }}
+  - name: EXTERNAL_ACCESS_HOST 
+    value: {{ .Values.externalAccess.service.domain }} 
+
