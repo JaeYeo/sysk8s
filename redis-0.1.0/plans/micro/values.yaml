@@ -12,6 +12,10 @@ master:
     requests:
       memory: 200Mi
       cpu: 100m
+    limits:
+      memory: 400Mi 
+      cpu: 200m
+ 
   service:
     type: NodePort
 

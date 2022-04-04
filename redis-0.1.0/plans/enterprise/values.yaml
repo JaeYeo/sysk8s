@@ -9,16 +9,19 @@ master:
   podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
   resources:
     requests:
-      memory: 1Gi 
-      cpu: 500m
-  service:
-    type: NodePort
+      memory: 200Mi
+      cpu: 100m
+    limits:
+      memory: 400Mi
+      cpu: 200m
 
 replica:
   podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
   replicaCount: 3
   resources:
     requests:
-      memory: 1Gi
-      cpu: 500m
-
+      memory: 200Mi
+      cpu: 100m
+    limits:
+      memory: 400Mi
+      cpu: 200m
