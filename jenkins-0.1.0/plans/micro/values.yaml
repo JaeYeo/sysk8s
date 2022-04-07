@@ -17,3 +17,5 @@ resources:
 service:
   type: NodePort
 
+persistence:
+  size: 8Gi

@@ -14,6 +14,8 @@ master:
     limits:
       memory: 400Mi
       cpu: 200m
+  persistence:
+    size: 8G
 
 replica:
   podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
@@ -25,3 +27,6 @@ replica:
     limits:
       memory: 400Mi
       cpu: 200m
+  persistence:
+    size: 8G
+

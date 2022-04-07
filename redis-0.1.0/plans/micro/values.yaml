@@ -15,6 +15,9 @@ master:
     limits:
       memory: 400Mi 
       cpu: 200m
+
+  persistence:
+    size: 8G
  
   service:
     type: NodePort

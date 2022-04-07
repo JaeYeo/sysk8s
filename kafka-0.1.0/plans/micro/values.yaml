@@ -12,11 +12,13 @@ zookeeper:
   podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
   resources:
     requests:
-      memory: 200Mi
-      cpu: 100m
+      memory: 500Mi
+      cpu: 250m
     limits:
       memory: 1Gi
       cpu: 500m
+  persistence:
+    size: 8Gi
 
 externalAccess:
   enabled: true
@@ -30,8 +32,8 @@ externalAccess:
         memory: 200Mi
         cpu: 100m
       limits:
-        memory: 1Gi
-        cpu: 500m
+        memory: 400Mi 
+        cpu: 200m
 
 serviceAccount:
   create: true
@@ -46,3 +48,9 @@ resources:
   limits:
     memory: 1Gi
     cpu: 500m
+
+persistence:
+  size: 8Gi
+
+
+

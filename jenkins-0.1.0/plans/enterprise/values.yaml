@@ -8,12 +8,15 @@ podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "ta
 
 resources:
   requests:
-    memory: 2Gi
-    cpu: 1000m
-  limits:
     memory: 4Gi
     cpu: 2000m
+  limits:
+    memory: 8Gi
+    cpu: 4000m
 
 service:
   type: NodePort
+
+persistence:
+  size: 32Gi
 

@@ -5,7 +5,7 @@ kubeVersion: 1.20-11
 
 podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
 
-replicaCount: 3 
+replicaCount: 2 
 
 service:
   type: NodePort
@@ -13,8 +13,12 @@ service:
 
 resources:
   requests:
-    memory: 1Gi 
-    cpu: 500m
+    memory: 400Mi 
+    cpu: 200m
   limits:
-    memory: 2Gi
-    cpu: 1000m
+    memory: 800Mi 
+    cpu: 400m
+
+persistence:
+  size: 16Gi
+
