@@ -1,5 +1,5 @@
-helm install helm-broker charts/helm-broker \
- --namespace helm-broker --create-namespace \
+helm upgrade helm-broker charts/helm-broker \
+ --namespace helm-broker \
  --set global.containerRegistry.path="registry.systeer.com/" \
  --set global.helm_broker.dir="rancher/" \
  --set global.helm_broker.version=0.3 \

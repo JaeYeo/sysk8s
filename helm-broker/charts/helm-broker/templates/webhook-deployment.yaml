@@ -7,6 +7,8 @@ metadata:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     release: "{{ .Release.Name }}"
     heritage: "{{ .Release.Service }}"
+    taskcl: "backend_service"
+    taskse: "service_catalog"
 spec:
   replicas: 1
   strategy: {{ toYaml .Values.webhook.strategy | nindent 4 }}
@@ -22,6 +24,8 @@ spec:
         release: "{{ .Release.Name }}"
         releaseRevision: "{{ .Release.Revision }}"
         heritage: "{{ .Release.Service }}"
+        taskcl: "backend_service"
+        taskse: "service_catalog"
       {{ if .Values.webhook.annotations }}
       annotations:
 {{ toYaml .Values.webhook.annotations | indent 8 }}

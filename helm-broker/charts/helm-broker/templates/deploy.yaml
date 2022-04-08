@@ -7,6 +7,8 @@ metadata:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     release: "{{ .Release.Name }}"
     heritage: "{{ .Release.Service }}"
+    taskcl: "backend_service"
+    taskse: "service_catalog"
 spec:
   replicas: 1
   selector:
@@ -23,6 +25,8 @@ spec:
         chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
         release: "{{ .Release.Name }}"
         heritage: "{{ .Release.Service }}"
+        taskcl: "backend_service"
+        taskse: "service_catalog"
     spec:
       serviceAccountName: {{ template "fullname" . }}
       containers:
