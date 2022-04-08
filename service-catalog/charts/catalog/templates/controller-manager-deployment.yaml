@@ -9,6 +9,7 @@ metadata:
     heritage: "{{ .Release.Service }}"
     taskcl: "backend_service"
     taskse: "service_catalog"
+    platform: "platform_service"
 spec:
   replicas: {{ .Values.controllerManager.replicas }}
   strategy: {{ toYaml .Values.controllerManager.strategy | nindent 4 }}
@@ -33,6 +34,7 @@ spec:
         heritage: "{{ .Release.Service }}"
         taskcl: "backend_service"
         taskse: "service_catalog"
+        platform: "platform_service"
     spec:
 {{- with .Values.securityContext }}
       securityContext:

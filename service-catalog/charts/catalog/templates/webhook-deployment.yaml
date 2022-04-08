@@ -9,6 +9,7 @@ metadata:
     heritage: "{{ .Release.Service }}"
     taskcl: "backend_service"
     taskse: "service_catalog"
+    platform: "platform_service"
 spec:
   replicas: 1
   strategy: {{ toYaml .Values.webhook.strategy | nindent 4 }}
@@ -29,6 +30,7 @@ spec:
         heritage: "{{ .Release.Service }}"
         taskcl: "backend_service"
         taskse: "service_catalog"
+        platform: "platform_service"
       {{- if .Values.webhook.annotations }}
       annotations:
 {{ toYaml .Values.webhook.annotations | indent 8 }}
