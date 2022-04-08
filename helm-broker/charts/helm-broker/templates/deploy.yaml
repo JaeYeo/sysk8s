@@ -9,6 +9,7 @@ metadata:
     heritage: "{{ .Release.Service }}"
     taskcl: "backend_service"
     taskse: "service_catalog"
+    platform: "platform_service"
 spec:
   replicas: 1
   selector:
@@ -27,6 +28,7 @@ spec:
         heritage: "{{ .Release.Service }}"
         taskcl: "backend_service"
         taskse: "service_catalog"
+        platform: "platform_service"
     spec:
       serviceAccountName: {{ template "fullname" . }}
       containers:
