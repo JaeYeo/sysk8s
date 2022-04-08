@@ -9,9 +9,6 @@ metadata:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     release: "{{ .Release.Name }}"
     heritage: "{{ .Release.Service }}"
-  annotations:
-    "helm.sh/hook": pre-delete
-    "helm.sh/hook-delete-policy": hook-succeeded,before-hook-creation
 
 ---
 kind: ClusterRole
@@ -24,9 +21,6 @@ metadata:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     release: "{{ .Release.Name }}"
     heritage: "{{ .Release.Service }}"
-  annotations:
-    "helm.sh/hook": pre-delete
-    "helm.sh/hook-delete-policy": hook-succeeded,before-hook-creation
 rules:
   - apiGroups: ["apps"]
     resources: ["deployments"]
@@ -60,9 +54,6 @@ metadata:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     release: "{{ .Release.Name }}"
     heritage: "{{ .Release.Service }}"
-  annotations:
-    "helm.sh/hook": pre-delete
-    "helm.sh/hook-delete-policy": hook-succeeded,before-hook-creation
 subjects:
   - kind: ServiceAccount
     name: clean-job-account
@@ -90,18 +81,12 @@ spec:
   template:
     metadata:
       labels:
-        {{- if .Values.podLabels }}
-        {{- tpl (toYaml .Values.podLabels) $ | nindent 8 }}
-        {{- end }}
         cleaner-job: "true"
         app: {{ template "fullname" . }}-clean-job
         chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
         release: "{{ .Release.Name }}"
         heritage: "{{ .Release.Service }}"
     spec:
-      {{- if .Values.priorityClassName }}
-      priorityClassName: {{ .Values.priorityClassName | quote }}
-      {{- end }}
 {{- with .Values.securityContext }}
       securityContext:
 {{ toYaml . | indent 8 }}
@@ -124,14 +109,3 @@ spec:
           - {{ template "fullname" . }}-controller-manager
           - --webhook-configurations
           - {{ template "fullname" . }}-webhook {{ template "fullname" . }}-validating-webhook
-{{- with .Values.affinity }}
-      affinity: {{- tpl (toYaml .) $ | nindent 8 }}
-{{- end }}
-{{- with .Values.nodeSelector }}
-      nodeSelector:
-{{ toYaml . | indent 8 }}
-{{- end }}
-{{- with .Values.tolerations }}
-      tolerations:
-{{ toYaml . | indent 8 }}
-{{- end }}

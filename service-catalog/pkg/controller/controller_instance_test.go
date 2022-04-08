@@ -624,8 +624,6 @@ func TestReconcileServiceInstanceWithParameters(t *testing.T) {
 			sharedInformers.ClusterServiceBrokers().Informer().GetStore().Add(getTestClusterServiceBroker())
 			sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(getTestClusterServiceClass())
 			sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
-			credentials := getTestServiceBinding()
-			sharedInformers.ServiceBindings().Informer().GetStore().Add(credentials)
 
 			for _, s := range tc.secrets {
 				fakeKubeClient.PrependReactor("get", "secrets", func(action clientgotesting.Action) (bool, runtime.Object, error) {
@@ -741,8 +739,7 @@ func TestReconcileServiceInstanceWithParameters(t *testing.T) {
 			})
 
 			actions = fakeCatalogClient.Actions()
-			assertNumberOfActions(t, actions, 2)
-			assertUpdate(t, actions[1], credentials)
+			assertNumberOfActions(t, actions, 1)
 			updatedServiceInstance = assertUpdateStatus(t, actions[0], instance)
 			assertServiceInstanceOperationSuccessWithParameters(t,
 				updatedServiceInstance,

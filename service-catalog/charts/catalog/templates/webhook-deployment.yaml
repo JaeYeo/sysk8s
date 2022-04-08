@@ -12,7 +12,8 @@ metadata:
     platform: "platform_service"
 spec:
   replicas: 1
-  strategy: {{ toYaml .Values.webhook.strategy | nindent 4 }}
+  strategy:
+    type: {{ .Values.webhook.updateStrategy }}
   minReadySeconds: {{ .Values.webhook.minReadySeconds }}
   selector:
     matchLabels:
@@ -20,9 +21,6 @@ spec:
   template:
     metadata:
       labels:
-        {{- if .Values.podLabels }}
-        {{- tpl (toYaml .Values.podLabels) $ | nindent 8 }}
-        {{- end }}
         app: {{ template "fullname" . }}-webhook
         chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
         release: "{{ .Release.Name }}"
@@ -31,7 +29,7 @@ spec:
         taskcl: "backend_service"
         taskse: "service_catalog"
         platform: "platform_service"
-      {{- if .Values.webhook.annotations }}
+      {{ if .Values.webhook.annotations }}
       annotations:
 {{ toYaml .Values.webhook.annotations | indent 8 }}
       {{- end }}
@@ -96,17 +94,10 @@ spec:
           successThreshold: 1
           timeoutSeconds: 5
         {{- end }}
-{{- with .Values.affinity }}
-      affinity: {{- tpl (toYaml .) $ | nindent 8 }}
-{{- end }}
-      {{- if or .Values.webhook.nodeSelector .Values.nodeSelector }}
+      {{ if .Values.webhook.nodeSelector }}
       nodeSelector:
-{{ toYaml (mustMerge .Values.webhook.nodeSelector .Values.nodeSelector) | indent 8 }}
-      {{- end }}
-{{- with .Values.tolerations }}
-      tolerations:
-{{ toYaml . | indent 8 }}
-{{- end }}
+{{ toYaml .Values.webhook.nodeSelector | indent 8 }}
+      {{ end }}
       volumes:
       - name: service-catalog-webhook-cert
         secret:
