@@ -145,49 +145,13 @@ public class Rancher {
 	}
 
 
-	static public String makeProvisioningWithClusterBrokerJson(String serviceName,
-															   String namespace,
-															   String clusterClassName,
-															   String clusterPlanName,
-															   String[] parameters)
-	{
-		/* ----------------
-		apiVersion: servicecatalog.k8s.io/v1beta1
-		kind: ServiceInstance
-		metadata:
-		  name: redis-01
-		  namespace: redis
-		spec:
-		  clusterServiceClassExternalName: redis
-		  clusterServicePlanExternalName: micro
-		  parameters:
-			fullnameOverride: redis-01
-		--------------------*/
-
-		String rawJsonCustomResourceObj =
-				"{\"apiVersion\":\"servicecatalog.k8s.io/v1beta1\"," +
-						"\"kind\":\"ServiceInstance\"," +
-						"\"metadata\": " +
-						"{\"name\": \""+serviceName+"\"," +
-						" \"namespace\": \""+namespace+"\"}," +
-						"\"spec\": " +
-						"{\"clusterServiceClassExternalName\": \""+clusterClassName+"\"," +
-						" \"clusterServicePlanExternalName\": \""+clusterPlanName+"\"," +
-						" \"parameters\": { \"fullnameOverride\": \""+parameters[0]+"\" }" +
-						"}" +
-				"}";
-
-
-		return rawJsonCustomResourceObj;
-	}
-
-
 	static public String makeProvisioningRedisWithClusterBrokerJson(String serviceName,
 															   	String namespace,
 															   	String clusterClassName,
 															   	String clusterPlanName,
 															   	String password,
-																String redisPort)
+																String redisPort,
+																String imageRegistry)
 	{
 		/* ----------------
 		apiVersion: servicecatalog.k8s.io/v1beta1
@@ -203,6 +167,7 @@ public class Rancher {
 			global:
 			  redis:
 				password: master77!!
+			  imageRegistry: "registry.systeer.com"
 			master:
 			  service:
 				ports:
@@ -221,7 +186,9 @@ public class Rancher {
 						"{\"clusterServiceClassExternalName\": \""+clusterClassName+"\"," +
 						" \"clusterServicePlanExternalName\": \""+clusterPlanName+"\"," +
 						" \"parameters\": { \"fullnameOverride\": \""+serviceName+"\", " +
-											"\"global\": { \"redis\": { \"password\": \""+password+"\"}}," +
+											"\"global\": { \"redis\": { \"password\": \""+password+"\"}" +
+								(imageRegistry==null?"":",\"imageRegistry\": \""+imageRegistry+"\"") +
+														"}," +
 											"\"master\": { \"service\": { \"ports\": { \"redis\": \""+redisPort+"\"}}}" +
 										"}" +
 						"}" +
@@ -236,7 +203,8 @@ public class Rancher {
 																	String namespaceClassName,
 																	String namespacePlanName,
 																	String password,
-																	String redisPort)
+																	String redisPort,
+																    String imageRegistry)
 	{
 		/* ----------------
 		apiVersion: servicecatalog.k8s.io/v1beta1
@@ -252,6 +220,7 @@ public class Rancher {
 			global:
 			  redis:
 				password: master77!!
+			  imageRegistry: "registry.systeer.com"
 			master:
 			  service:
 				ports:
@@ -268,7 +237,9 @@ public class Rancher {
 						"{\"serviceClassExternalName\": \""+namespaceClassName+"\"," +
 						" \"servicePlanExternalName\": \""+namespacePlanName+"\"," +
 						" \"parameters\": { \"fullnameOverride\": \""+serviceName+"\", " +
-											"\"global\": { \"redis\": { \"password\": \""+password+"\"}}," +
+											"\"global\": { \"redis\": { \"password\": \""+password+"\"}" +
+								(imageRegistry==null?"":",\"imageRegistry\": \""+imageRegistry+"\"") +
+														"}," +
 										    "\"master\": { \"service\": { \"ports\": { \"redis\": \""+redisPort+"\"}}}" +
 										"}" +
 						"}" +
@@ -280,12 +251,13 @@ public class Rancher {
 
 
 	static public String makeProvisioningMariadbWithClusterBrokerJson(String serviceName,
-																	String namespace,
-																	String namespaceClassName,
-																	String namespacePlanName,
-																	String password,
-																	String database,
-																	String port)
+																	  String namespace,
+																	  String namespaceClassName,
+																	  String namespacePlanName,
+																	  String password,
+																	  String database,
+																	  String port,
+																	  String imageRegistry)
 	{
 		/* ----------------
 		apiVersion: servicecatalog.k8s.io/v1beta1
@@ -305,7 +277,10 @@ public class Rancher {
 			  service:
 				ports:
 				  mysql: 3308
+	        global:
+      		  imageRegistry: "registry.systeer.com"
 		--------------------*/
+
 
 		String rawJsonCustomResourceObj =
 				"{\"apiVersion\":\"servicecatalog.k8s.io/v1beta1\"," +
@@ -319,6 +294,7 @@ public class Rancher {
 						" \"parameters\": { \"fullnameOverride\": \""+serviceName+"\", " +
 											"\"auth\": { \"rootPassword\": \""+password+"\",\"database\": \""+database+"\"}," +
 										    "\"primary\": { \"service\": { \"ports\": { \"mysql\": \""+port+"\"}}}" +
+						(imageRegistry==null?"":",\"global\": {\"imageRegistry\": \""+imageRegistry+"\"}") +
 										"}" +
 						"}" +
 				"}";
@@ -329,12 +305,13 @@ public class Rancher {
 
 
 	static public String makeProvisioningMariadbWithNamespaceBrokerJson(String serviceName,
-																	String namespace,
-																	String namespaceClassName,
-																	String namespacePlanName,
-																	String password,
-																	String database,
-																	String port)
+																		String namespace,
+																		String namespaceClassName,
+																		String namespacePlanName,
+																		String password,
+																		String database,
+																		String port,
+																		String imageRegistry)
 	{
 		/* ----------------
 		apiVersion: servicecatalog.k8s.io/v1beta1
@@ -354,6 +331,8 @@ public class Rancher {
 			  service:
 				ports:
 				  mysql: 3308
+	        global:
+      		  imageRegistry: "registry.systeer.com"
 		--------------------*/
 
 		String rawJsonCustomResourceObj =
@@ -368,6 +347,7 @@ public class Rancher {
 						" \"parameters\": { \"fullnameOverride\": \""+serviceName+"\", " +
 											"\"auth\": { \"rootPassword\": \""+password+"\",\"database\": \""+database+"\"}," +
 										    "\"primary\": { \"service\": { \"ports\": { \"mysql\": \""+port+"\"}}}" +
+						(imageRegistry==null?"":",\"global\": {\"imageRegistry\": \""+imageRegistry+"\"}") +
 										"}" +
 						"}" +
 				"}";
@@ -376,12 +356,13 @@ public class Rancher {
 	}
 
 	static public String makeProvisioningPostgresqlWithClusterBrokerJson(String serviceName,
-																	String namespace,
-																	String namespaceClassName,
-																	String namespacePlanName,
-																	String password,
-																	String database,
-																	String port)
+																		 String namespace,
+																		 String namespaceClassName,
+																		 String namespacePlanName,
+																		 String password,
+																		 String database,
+																		 String port,
+																		 String imageRegistry)
 	{
 		/* ----------------
 		apiVersion: servicecatalog.k8s.io/v1beta1
@@ -402,7 +383,7 @@ public class Rancher {
 				service:
 				  ports:
 					postgresql: 5433
-
+      		  imageRegistry: "registry.systeer.com"
 		--------------------*/
 
 		String rawJsonCustomResourceObj =
@@ -416,7 +397,9 @@ public class Rancher {
 						" \"clusterServicePlanExternalName\": \""+namespacePlanName+"\"," +
 						" \"parameters\": { \"fullnameOverride\": \""+serviceName+"\", " +
 											"\"auth\": { \"postgresPassword\": \""+password+"\",\"database\": \""+database+"\"}," +
-										    "\"global\": { \"postgresql\": {\"service\": { \"ports\": { \"postgresql\": \""+port+"\"}}}}" +
+										    "\"global\": { \"postgresql\": {\"service\": { \"ports\": { \"postgresql\": \""+port+"\"}}}"+
+									(imageRegistry==null?"":",\"imageRegistry\": \""+imageRegistry+"\"") +
+														"}" +
 										"}" +
 						"}" +
 				"}";
@@ -428,12 +411,13 @@ public class Rancher {
 
 
 	static public String makeProvisioningPostgresqlWithNamespaceBrokerJson(String serviceName,
-																	String namespace,
-																	String namespaceClassName,
-																	String namespacePlanName,
-																	String password,
-																	String database,
-																	String port)
+																		   String namespace,
+																		   String namespaceClassName,
+																		   String namespacePlanName,
+																		   String password,
+																		   String database,
+																		   String port,
+																		   String imageRegistry)
 	{
 		/* ----------------
 		apiVersion: servicecatalog.k8s.io/v1beta1
@@ -454,7 +438,7 @@ public class Rancher {
 				service:
 				  ports:
 					postgresql: 5433
-
+      		  imageRegistry: "registry.systeer.com"
 		--------------------*/
 
 		String rawJsonCustomResourceObj =
@@ -468,7 +452,9 @@ public class Rancher {
 						" \"servicePlanExternalName\": \""+namespacePlanName+"\"," +
 						" \"parameters\": { \"fullnameOverride\": \""+serviceName+"\", " +
 											"\"auth\": { \"postgresPassword\": \""+password+"\",\"database\": \""+database+"\"}," +
-										    "\"global\": { \"postgresql\": {\"service\": { \"ports\": { \"postgresql\": \""+port+"\"}}}}" +
+										    "\"global\": { \"postgresql\": {\"service\": { \"ports\": { \"postgresql\": \""+port+"\"}}}" +
+									(imageRegistry==null?"":",\"imageRegistry\": \""+imageRegistry+"\"") +
+														"}" +
 										"}" +
 						"}" +
 				"}";
@@ -479,12 +465,13 @@ public class Rancher {
 
 
 	static public String makeProvisioningRabbitmqWithClusterBrokerJson(String serviceName,
-																	String namespace,
-																	String namespaceClassName,
-																	String namespacePlanName,
-																	String password,
-																	String port,
-																    String ingressHostname)
+																	   String namespace,
+																	   String namespaceClassName,
+																	   String namespacePlanName,
+																	   String password,
+																	   String port,
+																	   String ingressHostname,
+																	   String imageRegistry)
 	{
 		/* ----------------
 		apiVersion: servicecatalog.k8s.io/v1beta1
@@ -505,7 +492,8 @@ public class Rancher {
 			ingress:
 			  enabled: true
 			  hostname: rabbitmq.spaasta.com
-
+			global:
+			  imageRegistry: "registry.systeer.com"
 		--------------------*/
 
 		String rawJsonCustomResourceObj =
@@ -521,6 +509,7 @@ public class Rancher {
 											"\"auth\": { \"password\": \""+password+"\"}," +
 										    "\"service\": { \"type\": \"NodePort\", \"port\": \""+port+"\"}," +
 											"\"ingress\": { \"enabled\": \"true\", \"hostname\": \""+ingressHostname+"\"}"+
+					(imageRegistry==null?"":",\"global\": {\"imageRegistry\": \""+imageRegistry+"\"}") +
 										"}" +
 						"}" +
 				"}";
@@ -534,7 +523,8 @@ public class Rancher {
 																		 String namespacePlanName,
 																		 String password,
 																		 String port,
-																		 String ingressHostname)
+																		 String ingressHostname,
+																		 String imageRegistry)
 	{
 		/* ----------------
 		apiVersion: servicecatalog.k8s.io/v1beta1
@@ -555,6 +545,8 @@ public class Rancher {
 			ingress:
 			  enabled: true
 			  hostname: rabbitmq.spaasta.com
+			global:
+			  imageRegistry: "registry.systeer.com"
 		--------------------*/
 
 		String rawJsonCustomResourceObj =
@@ -570,6 +562,7 @@ public class Rancher {
 											"\"auth\": { \"password\": \""+password+"\"}," +
 											"\"service\": { \"type\": \"NodePort\", \"port\": \""+port+"\"}," +
 											"\"ingress\": { \"enabled\": \"true\", \"hostname\": \""+ingressHostname+"\"}"+
+					(imageRegistry==null?"":",\"global\": {\"imageRegistry\": \""+imageRegistry+"\"}") +
 										"}" +
 						"}" +
 				"}";
@@ -578,11 +571,12 @@ public class Rancher {
 	}
 
 	static public String makeProvisioningJenkinsWithClusterBrokerJson(String serviceName,
-																		String namespace,
-																		String namespaceClassName,
-																		String namespacePlanName,
-																		String password,
-																		String ingressHostname)
+																	  String namespace,
+																	  String namespaceClassName,
+																	  String namespacePlanName,
+																	  String password,
+																	  String ingressHostname,
+																	  String imageRegistry)
 	{
 		/* ----------------
 		apiVersion: servicecatalog.k8s.io/v1beta1
@@ -599,7 +593,8 @@ public class Rancher {
 			ingress:
 			  enabled: true
 			  hostname: jenkins2.spaasta.com
-
+			global:
+			  imageRegistry: "registry.systeer.com"
 		--------------------*/
 
 		String rawJsonCustomResourceObj =
@@ -614,6 +609,7 @@ public class Rancher {
 						" \"parameters\": { \"fullnameOverride\": \""+serviceName+"\", " +
 											"\"jenkinsPassword\": \""+password+"\"," +
 											"\"ingress\": { \"enabled\": \"true\", \"hostname\": \""+ingressHostname+"\"}"+
+					(imageRegistry==null?"":",\"global\": {\"imageRegistry\": \""+imageRegistry+"\"}") +
 										"}" +
 						"}" +
 				"}";
@@ -625,11 +621,12 @@ public class Rancher {
 
 
 	static public String makeProvisioningJenkinsWithNamespaceBrokerJson(String serviceName,
-																		 String namespace,
-																		 String namespaceClassName,
-																		 String namespacePlanName,
-																		 String password,
-																		 String ingressHostname)
+																		String namespace,
+																		String namespaceClassName,
+																		String namespacePlanName,
+																		String password,
+																		String ingressHostname,
+																		String imageRegistry)
 	{
 		/* ----------------
 		apiVersion: servicecatalog.k8s.io/v1beta1
@@ -646,7 +643,8 @@ public class Rancher {
 			ingress:
 			  enabled: true
 			  hostname: jenkins2.spaasta.com
-
+			global:
+			  imageRegistry: "registry.systeer.com"
 		--------------------*/
 
 		String rawJsonCustomResourceObj =
@@ -661,6 +659,7 @@ public class Rancher {
 						" \"parameters\": { \"fullnameOverride\": \""+serviceName+"\", " +
 											"\"jenkinsPassword\": \""+password+"\"," +
 											"\"ingress\": { \"enabled\": \"true\", \"hostname\": \""+ingressHostname+"\"}"+
+					(imageRegistry==null?"":",\"global\": {\"imageRegistry\": \""+imageRegistry+"\"}") +
 										"}" +
 						"}" +
 				"}";
@@ -670,9 +669,11 @@ public class Rancher {
 
 
 	static public String makeProvisioningKafkaWithClusterBrokerJson(String serviceName,
-																	  String namespace,
-																	  String namespaceClassName,
-																	  String namespacePlanName)
+																	String namespace,
+																	String namespaceClassName,
+																	String namespacePlanName,
+																	String external_access_ip,
+																	String imageRegistry)
 
 	{
 		/* ----------------
@@ -686,9 +687,14 @@ public class Rancher {
 		  clusterServicePlanExternalName: micro
 		  parameters:
 			fullnameOverride: kafka-03
-
-
-
+			externalAccess:
+			  service:
+				domain: "112.175.114.177"
+			global:
+			  imageRegistry: "registry.systeer.com"
+			zookeeper:
+			  global:
+				imageRegistry: "registry.systeer.com"
 		--------------------*/
 
 		String rawJsonCustomResourceObj =
@@ -700,7 +706,10 @@ public class Rancher {
 						"\"spec\": " +
 						"{\"clusterServiceClassExternalName\": \""+namespaceClassName+"\"," +
 						" \"clusterServicePlanExternalName\": \""+namespacePlanName+"\"," +
-						" \"parameters\": { \"fullnameOverride\": \""+serviceName+"\" " +
+						" \"parameters\": { \"fullnameOverride\": \""+serviceName+"\", " +
+						                   "\"externalAccess\": { \"service\" :{ \"domain\": \""+external_access_ip+"\"}}" +
+					(imageRegistry==null?"":",\"global\": {\"imageRegistry\": \""+imageRegistry+"\"}") +
+					(imageRegistry==null?"":",\"zookeeper\": { \"global\": {\"imageRegistry\": \""+imageRegistry+"\"}}") +
 						"}" +
 				"}";
 
@@ -710,9 +719,11 @@ public class Rancher {
 
 
 	static public String makeProvisioningKafkaWithNamespaceBrokerJson(String serviceName,
-																		String namespace,
-																		String namespaceClassName,
-																		String namespacePlanName)
+																	  String namespace,
+																	  String namespaceClassName,
+																	  String namespacePlanName,
+																	  String external_access_ip,
+																	  String imageRegistry)
 	{
 		/* ----------------
 		apiVersion: servicecatalog.k8s.io/v1beta1
@@ -725,9 +736,14 @@ public class Rancher {
 		  servicePlanExternalName: micro
 		  parameters:
 			fullnameOverride: kafka-03
-
-
-
+			externalAccess:
+			  service:
+				domain: "112.175.114.177"
+			global:
+			  imageRegistry: "registry.systeer.com"
+			zookeeper:
+			  global:
+				imageRegistry: "registry.systeer.com"
 		--------------------*/
 
 		String rawJsonCustomResourceObj =
@@ -739,7 +755,10 @@ public class Rancher {
 						"\"spec\": " +
 						"{\"serviceClassExternalName\": \""+namespaceClassName+"\"," +
 						" \"servicePlanExternalName\": \""+namespacePlanName+"\"," +
-						" \"parameters\": { \"fullnameOverride\": \""+serviceName+"\" " +
+						" \"parameters\": { \"fullnameOverride\": \""+serviceName+"\", " +
+						                   "\"externalAccess\": { \"service\" :{ \"domain\": \""+external_access_ip+"\"}}" +
+					(imageRegistry==null?"":",\"global\": {\"imageRegistry\": \""+imageRegistry+"\"}") +
+					(imageRegistry==null?"":",\"zookeeper\": { \"global\": {\"imageRegistry\": \""+imageRegistry+"\"}}") +
 						"}" +
 				"}";
 
@@ -815,8 +834,5 @@ public class Rancher {
 		headers.add("Authorization", encodedAuth);
 		return headers;
 	}
-
-
-
 
 }

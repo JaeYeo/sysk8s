@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.ByteArrayInputStream;
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 
 
@@ -116,74 +117,6 @@ public class BackendserviceproxyController {
 		}
 
 	}
-
-	@ResponseBody
-	@RequestMapping("/provisioning")
-	public String provisioning(Model model) {
-		System.out.println("request /provisioning");
-
-		try {
-
-			String kube_config = rancherConfig.getRancher().GetKubeConfig();
-
-			// create cluster testing
-
-			Config config = Config.fromKubeconfig(kube_config);
-
-			KubernetesClient k8s = new DefaultKubernetesClient(config);
-
-			String serviceName = "redis-01";
-			String namespace = "redis";
-			String clusterClassName = "redis";
-			String clusterPlanName = "micro";
-			String[] parameters = {"redis-01"};
-
-			String rawJsonCustomResourceObj = Rancher.makeProvisioningWithClusterBrokerJson(serviceName, namespace,clusterClassName,clusterPlanName,parameters);
-			k8s.load(new ByteArrayInputStream(rawJsonCustomResourceObj.getBytes())).createOrReplace();
-
-			return "success:provisioning "+serviceName + " in " +namespace ;
-		}
-		catch (Exception e)
-		{
-			return "fail:"+e.toString();
-		}
-
-	}
-	@ResponseBody
-	@RequestMapping("/deprovisioning")
-	public String deprovisioning(Model model) {
-		System.out.println("request /deprovisioning");
-
-		try {
-
-			String kube_config = rancherConfig.getRancher().GetKubeConfig();
-
-			// create cluster testing
-
-			Config config = Config.fromKubeconfig(kube_config);
-
-			KubernetesClient k8s = new DefaultKubernetesClient(config);
-
-			String serviceName = "redis-01";
-			String namespace = "redis";
-
-			// delete할때는 아래 내용이 필요없다. 필요하면 수정하시요.
-			String clusterClassName = "redis";
-			String clusterPlanName = "micro";
-			String[] parameters = {"redis-01"};
-
-			String rawJsonCustomResourceObj = Rancher.makeProvisioningWithClusterBrokerJson(serviceName, namespace,clusterClassName,clusterPlanName,parameters);
-			k8s.load(new ByteArrayInputStream(rawJsonCustomResourceObj.getBytes())).delete();
-
-			return "success:deprovisioning "+serviceName + " in " +namespace ;
-		}
-		catch (Exception e)
-		{
-			return "fail:"+e.toString();
-		}
-
-	}
-
 
 	@ResponseBody
 	@RequestMapping("/list")
@@ -385,7 +318,7 @@ public class BackendserviceproxyController {
 			String password = "master77!!";
 			String redisPort = "6380";
 
-			String rawJsonCustomResourceObj = Rancher.makeProvisioningRedisWithClusterBrokerJson(serviceName, namespace,clusterClassName,clusterPlanName,password, redisPort);
+			String rawJsonCustomResourceObj = Rancher.makeProvisioningRedisWithClusterBrokerJson(serviceName, namespace,clusterClassName,clusterPlanName,password, redisPort,null);
 			k8s.load(new ByteArrayInputStream(rawJsonCustomResourceObj.getBytes())).createOrReplace();
 
 			return "success:provisioning "+serviceName + " in " +namespace +" with password="+password+" and redisPort="+redisPort ;
@@ -487,6 +420,63 @@ public class BackendserviceproxyController {
 		}
 
 	}
+
+	@ResponseBody
+	@RequestMapping("/ips")
+	public String ips(Model model) {
+		System.out.println("request /ips");
+
+		try {
+
+			String kube_config = rancherConfig.getRancher().GetKubeConfig();
+
+			// create cluster testing
+
+			Config config = Config.fromKubeconfig(kube_config);
+
+			KubernetesClient k8s = new DefaultKubernetesClient(config);
+
+
+			String internal_ips = "";
+			String external_ips = "";
+
+			NodeList node_list = k8s.nodes().list();
+
+			//System.out.println(node_list);
+
+			for( Node node : node_list.getItems())
+			{
+
+				List<NodeAddress> address_list = node.getStatus().getAddresses();
+
+				for(NodeAddress item :  address_list)
+				{
+
+					System.out.println(item.getType() + ":" + item.getAddress());
+
+
+					if(item.getType().equalsIgnoreCase("InternalIP"))
+					{
+						internal_ips = internal_ips + item.getAddress() + ",";
+					}
+					else if(item.getType().equalsIgnoreCase("ExternalIP"))
+					{
+						external_ips = external_ips + item.getAddress() + ",";
+					}
+
+				}
+
+			}
+
+			return "success:INTERNAL-IP:"+internal_ips + ";EXTERNAL-IP: " +external_ips ;
+		}
+		catch (Exception e)
+		{
+			return "fail:"+e.toString();
+		}
+
+	}
+
 
 
 }
