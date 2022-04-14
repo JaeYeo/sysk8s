@@ -44,6 +44,10 @@ spec:
             value: "{{ .Values.broker.metricsPort }}"
           - name: APP_CONFIG_FILE_NAME
             value: /etc/config/helm-broker/config.yaml
+{{- if .Values.imageRegistry }}
+          - name: IMAGE_REGISTRY
+            value: "{{ .Values.imageRegistry}}"
+{{- end}}
         resources:
 {{ toYaml .Values.broker.resources | indent 10 }}
         volumeMounts:
@@ -92,6 +96,10 @@ spec:
             value: "{{ .Values.ctrl.documentationEnabled }}"
           - name: APP_UPLOAD_SERVICE_URL
             value: "{{ .Values.ctrl.uploadServiceURL }}"
+{{- if .Values.imageRegistry }}
+          - name: IMAGE_REGISTRY
+            value: "{{ .Values.imageRegistry}}"
+{{- end}}
         volumeMounts:
         - mountPath: /tmp
           name: tmp-empty-dir

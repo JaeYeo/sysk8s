@@ -1,6 +1,7 @@
 package broker
 
 import (
+	"os"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -134,12 +135,19 @@ func (svc *provisionService) Provision(ctx context.Context, osbCtx OsbContext, r
 		return nil, &osb.HTTPStatusCodeError{StatusCode: http.StatusBadRequest, ErrorMessage: strPtr(fmt.Sprintf("addon does not contain requested plan (planID: %s): %v", err, addonPlanID))}
 	}
 
+	///////////////////////////////////////////////////////////////////////////////////
 	//releaseName := createReleaseName(addon.Name, addonPlan.Name, iID)
 	// 2022-03 releaseName too long, use fullnameOverride param as relaseName if exists.
 	releaseName := createReleaseName2(addon.Name, addonPlan.Name, iID, requestedProvisioningParameters.Data )
 
 	//svc.log.Infof("releaseName:  %s", releaseName)
 
+	// 2022-04 update imageRegistry on req if need
+	updateChartValues(req)
+
+	svc.log.Infof("Updated provisioning %+v", req)
+
+	///////////////////////////////////////////////////////////////////////////////////
 
 	i := internal.Instance{
 		ID:                     iID,
@@ -344,6 +352,28 @@ func createReleaseName2(name internal.AddonName, planName internal.AddonPlanName
 			iID)
 
 		return internal.ReleaseName(releaseName)
+	}
+}
+
+// 2022-04
+// update ImageRepository if need
+// helmbroker :no charvalue : no => no 
+// helmborker :no charvvalue: yes => no
+// helmborker :yes charvvalue: yes => no
+// helmbroker :yes chartvalue: no => update
+func updateChartValues(req *osb.ProvisionRequest) {
+
+
+	if env_imageRegistry, env_ok := os.LookupEnv("IMAGE_REGISTRY"); !env_ok {
+		return
+	} else if _, global_ok := req.Parameters["global"]; global_ok {
+		if _, img_ok := req.Parameters["global"].(map[string]interface{})["imageRegistry"]; img_ok {
+			return
+		} else {
+			req.Parameters["global"].(map[string]interface{})["imageRegistry"] = env_imageRegistry
+		}
+       	} else {
+		req.Parameters["global"].(map[string]interface{})["imageRegistry"] = env_imageRegistry
 	}
 }
 
