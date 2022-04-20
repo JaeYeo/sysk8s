@@ -373,6 +373,9 @@ func updateChartValues(req *osb.ProvisionRequest) {
 			req.Parameters["global"].(map[string]interface{})["imageRegistry"] = env_imageRegistry
 		}
        	} else {
+
+		req.Parameters["global"] = make(map[string]interface{})
+
 		req.Parameters["global"].(map[string]interface{})["imageRegistry"] = env_imageRegistry
 	}
 }
