@@ -386,23 +386,6 @@ func updateChartValues(req *osb.ProvisionRequest) {
 
 	}
 
-	// check zookeeper dependency
-	if _, zookeeper_ok := req.Parameters["zookeeper"]; zookeeper_ok {
-		if  _, z_global_ok := req.Parameters["zookeeper"].(map[string]interface{})["global"]; z_global_ok { 
-
-			if  _, z_img_ok := req.Parameters["zookeeper"].(map[string]interface{})["global"].(map[string]interface{})["imageRegistry"]; z_img_ok {
-				return
-			} else {
-				req.Parameters["zookeeper"].(map[string]interface{})["global"].(map[string]interface{})["imageRegistry"] = env_imageRegistry
-			}
-		} else {
-
-			req.Parameters["zookeeper"].(map[string]interface{})["global"] = make(map[string]interface{})
-
-			req.Parameters["zookeeper"].(map[string]interface{})["global"].(map[string]interface{})["imageRegistry"] = env_imageRegistry
-		}
-	}
-
 }
 
 
