@@ -26,3 +26,21 @@ credential:
   - name: EXTERNAL_ACCESS_HOST 
     value: {{ .Values.externalAccess.service.domain }} 
 
+{{- if (eq .Values.zookeeper.service.type "NodePort") }}
+  - name: ZOOKEEPER_CLIENT_NODE_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ printf "%s-zookeeper" (include "common.names.fullname" .) }}
+        jsonpath: '{ .spec.ports[?(@.name=="tcp-client")].nodePort }'
+  - name: ZOOKEEPER_FOLLOWER_NODE_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ printf "%s-zookeeper" (include "common.names.fullname" .) }}
+        jsonpath: '{ .spec.ports[?(@.name=="tcp-follower")].nodePort }'
+  - name: ZOOKEEPER_ELECTION_NODE_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ printf "%s-zookeeper" (include "common.names.fullname" .) }}
+        jsonpath: '{ .spec.ports[?(@.name=="tcp-election")].nodePort }'
+{{- end }}
+

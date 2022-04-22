@@ -10,6 +10,7 @@ replicaCount: 2
 
 zookeeper:
   podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
+  replicaCount: 2 
   resources:
     requests:
       memory: 1Gi 
@@ -19,6 +20,8 @@ zookeeper:
       cpu: 1000m
   persistence:
     size: 8Gi
+  service:
+    type: NodePort
 
 externalAccess:
   enabled: true

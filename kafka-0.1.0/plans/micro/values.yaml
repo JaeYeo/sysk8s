@@ -19,6 +19,8 @@ zookeeper:
       cpu: 500m
   persistence:
     size: 8Gi
+  service:
+    type: NodePort
 
 externalAccess:
   enabled: true
