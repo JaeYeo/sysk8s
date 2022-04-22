@@ -364,9 +364,15 @@ func createReleaseName2(name internal.AddonName, planName internal.AddonPlanName
 func updateChartValues(req *osb.ProvisionRequest) {
 
 
-	if env_imageRegistry, env_ok := os.LookupEnv("IMAGE_REGISTRY"); !env_ok {
+	env_imageRegistry, env_ok := os.LookupEnv("IMAGE_REGISTRY")
+
+	if !env_ok {
 		return
-	} else if _, global_ok := req.Parameters["global"]; global_ok {
+	}
+
+	// check glboal
+	if _, global_ok := req.Parameters["global"]; global_ok {
+
 		if _, img_ok := req.Parameters["global"].(map[string]interface{})["imageRegistry"]; img_ok {
 			return
 		} else {
@@ -377,7 +383,26 @@ func updateChartValues(req *osb.ProvisionRequest) {
 		req.Parameters["global"] = make(map[string]interface{})
 
 		req.Parameters["global"].(map[string]interface{})["imageRegistry"] = env_imageRegistry
+
 	}
+
+	// check zookeeper dependency
+	if _, zookeeper_ok := req.Parameters["zookeeper"]; zookeeper_ok {
+		if  _, z_global_ok := req.Parameters["zookeeper"].(map[string]interface{})["global"]; z_global_ok { 
+
+			if  _, z_img_ok := req.Parameters["zookeeper"].(map[string]interface{})["global"].(map[string]interface{})["imageRegistry"]; z_img_ok {
+				return
+			} else {
+				req.Parameters["zookeeper"].(map[string]interface{})["global"].(map[string]interface{})["imageRegistry"] = env_imageRegistry
+			}
+		} else {
+
+			req.Parameters["zookeeper"].(map[string]interface{})["global"] = make(map[string]interface{})
+
+			req.Parameters["zookeeper"].(map[string]interface{})["global"].(map[string]interface{})["imageRegistry"] = env_imageRegistry
+		}
+	}
+
 }
 
 

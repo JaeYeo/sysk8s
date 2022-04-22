@@ -9,6 +9,5 @@ helm install helm-broker charts/helm-broker \
  --set etcd-stateful.etcd.image="registry.systeer.com/rancher/etcd" \
  --set etcd-stateful.etcd.imageTag="v3.3.9" \
  --set etcd-stateful.tlsSetup.image="registry.systeer.com/rancher/etcd-tls-setup" \
- --set etcd-stateful.tlsSetup.imageTag="0.3.367" \
- --set imageRegistry="registry.systeer.com"
+ --set etcd-stateful.tlsSetup.imageTag="0.3.367"
 
