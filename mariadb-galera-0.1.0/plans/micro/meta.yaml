@@ -1,0 +1,6 @@
+name: micro
+id: 2b829eaa-c5cd-11ec-9d64-0242ac120002
+description: "Mariadb-galera micro plan"
+displayName: Micro
+
+bindable: true

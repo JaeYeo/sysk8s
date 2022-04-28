@@ -1,0 +1,28 @@
+credential:
+  - name: HOST
+    value: {{ include "common.names.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}
+  - name: PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }} 
+        jsonpath: '{ .spec.ports[?(@.name=="mysql")].port }'
+  - name: MARIADB_ROOT_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: {{ template "common.names.fullname" . }} 
+        key: mariadb-root-password 
+  - name: DATABASE 
+    value: {{ .Values.db.name | quote }} 
+{{- if (eq .Values.service.type "NodePort") }}
+  - name: NODE_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }} 
+        jsonpath: '{ .spec.ports[?(@.name=="mysql")].nodePort }'
+{{- end }}
+  - name: CLUSTER_IP
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }} 
+        jsonpath: '{ .spec.clusterIP }'
+
