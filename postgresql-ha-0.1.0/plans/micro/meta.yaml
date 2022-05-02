@@ -1,0 +1,6 @@
+name: micro
+id: faefad00-c752-11ec-9d64-0242ac120002
+description: "Postgresql-HA micro plan."
+displayName: Micro
+
+bindable: true

@@ -1,0 +1,27 @@
+credential:
+  - name: HOST
+    value: {{ include "postgresql-ha.pgpool" . }}.{{ .Release.Namespace }}.svc.cluster.local
+  - name: PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "postgresql-ha.pgpool" . }} 
+        jsonpath: '{ .spec.ports[?(@.name=="postgresql")].port }'
+  - name: POSTGRESQL_POSTGRES_PASSWORD 
+    valueFrom:
+      secretKeyRef:
+        name: {{ include "postgresql-ha.postgresql" . }} 
+        key: postgresql-password 
+  - name: DATABASE
+    value: {{ .Values.auth.database | quote }}
+{{- if (eq .Values.primary.service.type "NodePort") }}
+  - name: NODE_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "postgresql-ha.pgpool" . }} 
+        jsonpath: '{ .spec.ports[?(@.name=="postgresql")].nodePort }'
+{{- end }}
+  - name: CLUSTER_IP
+    valueFrom:
+      serviceRef:
+        name: {{ include "postgresql-ha.pgpool" . }} 
+        jsonpath: '{ .spec.clusterIP }'
