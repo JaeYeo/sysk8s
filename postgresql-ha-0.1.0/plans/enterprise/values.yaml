@@ -8,8 +8,8 @@ postgresql:
   podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
   resources:
     requests:
-      memory: 3Gi
-      cpu: 1500m
+      memory: 4Gi
+      cpu: 2000m
     limits:
       memory: 6Gi
       cpu: 3000m
@@ -19,8 +19,8 @@ pgpool:
   podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
   resources:
     requests:
-      memory: 3Gi
-      cpu: 1500m
+      memory: 4Gi
+      cpu: 2000m
     limits:
       memory: 6Gi
       cpu: 3000m
@@ -30,7 +30,7 @@ pgpool:
     enabled: false
     failureThreshold: 50
     initialDelaySeconds: 300
-    periodSeconds: 120
+    periodSeconds: 300 
   customLivenessProbe:
     tcpSocket:
       port: postgresql
@@ -38,7 +38,7 @@ pgpool:
     enabled: false
     failureThreshold: 50
     initialDelaySeconds: 300
-    periodSeconds: 120
+    periodSeconds: 300 
   customReadinessProbe:
     tcpSocket:
       port: postgresql

@@ -30,7 +30,7 @@ pgpool:
     enabled: false
     failureThreshold: 50
     initialDelaySeconds: 300 
-    periodSeconds: 120
+    periodSeconds: 300
   customLivenessProbe:
     tcpSocket:
       port: postgresql
@@ -38,7 +38,7 @@ pgpool:
     enabled: false
     failureThreshold: 50
     initialDelaySeconds: 300 
-    periodSeconds: 120
+    periodSeconds: 300
   customReadinessProbe:
     tcpSocket:
       port: postgresql
