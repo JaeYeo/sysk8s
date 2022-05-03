@@ -12,8 +12,8 @@ credential:
         name: {{ include "postgresql-ha.postgresql" . }} 
         key: postgresql-password 
   - name: DATABASE
-    value: {{ .Values.auth.database | quote }}
-{{- if (eq .Values.primary.service.type "NodePort") }}
+    value: {{ .Values.postgresql.database | quote }}
+{{- if (eq .Values.service.type "NodePort") }}
   - name: NODE_PORT
     valueFrom:
       serviceRef:
