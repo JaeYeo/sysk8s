@@ -24,7 +24,7 @@ pgpool:
     limits:
       memory: 4Gi
       cpu: 2000m
-  numInitChildren: 30 
+  numInitChildren: 512 
   livenessProbe:
     enabled: false
   customLivenessProbe:
