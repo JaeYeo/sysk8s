@@ -25,13 +25,20 @@ pgpool:
       memory: 4Gi
       cpu: 2000m
   numInitChildren: 512 
+  reservedConnections: 10 
   livenessProbe:
     enabled: false
+    failureThreshold: 50
+    initialDelaySeconds: 300 
+    periodSeconds: 120
   customLivenessProbe:
     tcpSocket:
       port: postgresql
   readinessProbe:
     enabled: false
+    failureThreshold: 50
+    initialDelaySeconds: 300 
+    periodSeconds: 120
   customReadinessProbe:
     tcpSocket:
       port: postgresql
