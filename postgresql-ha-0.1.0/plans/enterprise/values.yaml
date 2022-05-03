@@ -8,29 +8,33 @@ postgresql:
   podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
   resources:
     requests:
-      memory: 4Gi
-      cpu: 2000m
+      memory: 3Gi
+      cpu: 1500m
     limits:
-      memory: 8Gi
-      cpu: 4000m
+      memory: 6Gi
+      cpu: 3000m
   pgHbaTrustAll: true
 
 pgpool:
   podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
   resources:
     requests:
-      memory: 4Gi
-      cpu: 2000m
+      memory: 3Gi
+      cpu: 1500m
     limits:
-      memory: 8Gi
-      cpu: 4000m
-  numInitChildren: 100
+      memory: 6Gi
+      cpu: 3000m
+  numInitChildren: 600 
   livenessProbe:
-    initialDelaySeconds: 120
     enabled: false
   customLivenessProbe:
     tcpSocket:
-      port: postgresql    
+      port: postgresql
+  readinessProbe:
+    enabled: false
+  customReadinessProbe:
+    tcpSocket:
+      port: postgresql
 
 persistence:
   size: 16Gi

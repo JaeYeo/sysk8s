@@ -24,13 +24,17 @@ pgpool:
     limits:
       memory: 4Gi
       cpu: 2000m
-  numInitChildren: 100
+  numInitChildren: 300  
   livenessProbe:
-    initialDelaySeconds: 120
     enabled: false
   customLivenessProbe:
     tcpSocket:
-      port: postgresql    
+      port: postgresql
+  readinessProbe:
+    enabled: false
+  customReadinessProbe:
+    tcpSocket:
+      port: postgresql
 
 persistence:
   size: 8Gi
