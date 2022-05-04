@@ -1,6 +1,6 @@
 credential:
   - name: HOST
-    value: {{ include "postgresql-ha.pgpool" . }}.{{ .Release.Namespace }}.svc.cluster.local
+    value: {{ include "postgresql-ha.pgpool" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}
   - name: PORT
     valueFrom:
       serviceRef:

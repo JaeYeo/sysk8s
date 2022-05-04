@@ -1,6 +1,6 @@
 credential:
   - name: HOST
-    value: {{ printf "%s-master" (include "common.names.fullname" .) }}.{{ .Release.Namespace }}.svc.cluster.local
+    value: {{ printf "%s-master" (include "common.names.fullname" .) }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}
   - name: PORT
     valueFrom:
       serviceRef:

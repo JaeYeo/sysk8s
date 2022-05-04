@@ -1,6 +1,6 @@
 credential:
   - name: HOST
-    value: {{ include "mariadb.primary.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+    value: {{ include "mariadb.primary.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}
   - name: PORT
     valueFrom:
       serviceRef:
