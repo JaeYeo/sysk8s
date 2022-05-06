@@ -10,7 +10,7 @@ credential:
     valueFrom:
       secretKeyRef:
         name: {{ include "mongodb.fullname" . }} 
-        key: postgres-password 
+        key: mongodb-root-password 
   - name: DATABASE
     value: {{ .Values.auth.database | quote }}
 {{- if (eq .Values.service.type "NodePort") }}
