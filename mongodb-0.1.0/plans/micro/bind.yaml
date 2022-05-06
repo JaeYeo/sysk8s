@@ -18,7 +18,7 @@ credential:
     valueFrom:
       serviceRef:
         name: {{ include "mongodb.fullname" . }} 
-        jsonpath: '{ .spec.ports[?(@.name=="mongodb")].port }'
+        jsonpath: '{ .spec.ports[?(@.name=="mongodb")].nodePort }'
 {{- end }}
   - name: CLUSTER_IP
     valueFrom:
