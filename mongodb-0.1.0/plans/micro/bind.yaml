@@ -1,0 +1,28 @@
+{{- $portName := .Values.service.portName }}
+credential:
+  - name: HOST
+    value: {{ include "mongodb.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}
+  - name: PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "mongodb.fullname" . }} 
+        jsonpath: '{ .spec.ports[?(@.name==$portName)].port }'
+  - name: MONGODB_ROOT_PASSWORD 
+    valueFrom:
+      secretKeyRef:
+        name: {{ include "mongodb.fullname" . }} 
+        key: postgres-password 
+  - name: DATABASE
+    value: {{ .Values.auth.database | quote }}
+{{- if (eq .Values.service.type "NodePort") }}
+  - name: NODE_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "mongodb.fullname" . }} 
+        jsonpath: '{ .spec.ports[?(@.name==$portName)].nodePort }'
+{{- end }}
+  - name: CLUSTER_IP
+    valueFrom:
+      serviceRef:
+        name: {{ include "mongodb.fullname" . }} 
+        jsonpath: '{ .spec.clusterIP }'

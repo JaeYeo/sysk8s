@@ -1,0 +1,6 @@
+name: micro
+id: 9a7d0cc8-cb68-11ec-9d64-0242ac120002
+description: "MongoDB micro plan"
+displayName: Micro
+
+bindable: true
