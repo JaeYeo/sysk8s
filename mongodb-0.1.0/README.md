@@ -3,11 +3,11 @@
 ## Overview
 
 The MongoDB It wraps the official stable [MongoDB chart](https://github.com/helm/charts/tree/master/stable/mongodb).
-Find more information about the Mongodb chart in the chart's [documentation](chart/postgresql/README.md).
+Find more information about the Mongodb chart in the chart's [documentation](chart/mongodb/README.md).
 
 ## Details
 
-The postgresql addon contains two plans:
+The mongodb addon contains two plans:
 - micro
 - entrerpise
 
