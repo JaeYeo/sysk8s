@@ -5,7 +5,7 @@ credential:
     valueFrom:
       serviceRef:
         name: {{ include "mongodb.fullname" . }} 
-        jsonpath: {{ printf "{ .spec.ports[?(@.name==%s)].port }" .Values.service.portName }}
+        jsonpath: '{ .spec.ports[?(@.name==mongodb)].port }'
   - name: MONGODB_ROOT_PASSWORD 
     valueFrom:
       secretKeyRef:
@@ -18,7 +18,7 @@ credential:
     valueFrom:
       serviceRef:
         name: {{ include "mongodb.fullname" . }} 
-        jsonpath: {{ printf "{ .spec.ports[?(@.name==%s)].port }" .Values.service.portName }}
+        jsonpath: '{ .spec.ports[?(@.name==mongodb)].port }'
 {{- end }}
   - name: CLUSTER_IP
     valueFrom:
