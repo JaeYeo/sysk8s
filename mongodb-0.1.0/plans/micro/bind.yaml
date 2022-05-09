@@ -29,10 +29,7 @@ credential:
 {{- end }}
 {{- if .Values.auth.password }}
   - name: MONGODB_PASSWORD 
-    valueFrom:
-      secretKeyRef:
-        name: {{ include "mongodb.fullname" . }} 
-        key: mongodb-password 
+    value: {{ .Values.auth.password | quote }}
 {{- end }}
 {{- if .Values.auth.database }}
   - name: DATABASE
