@@ -23,18 +23,18 @@ credential:
       serviceRef:
         name: {{ include "mongodb.fullname" . }} 
         jsonpath: '{ .spec.clusterIP }'
-{{- if .Values.auth.username -}}
+{{- if .Values.auth.username }}
   - name: MONGODB_USERNAME
     value: {{ .Values.auth.username | quote }}
 {{- end }}
-{{- if .Values.auth.password -}}
+{{- if .Values.auth.password }}
   - name: MONGODB_PASSWORD 
     valueFrom:
       secretKeyRef:
         name: {{ include "mongodb.fullname" . }} 
         key: mongodb-password 
 {{- end }}
-{{- if .Values.auth.database -}}
+{{- if .Values.auth.database }}
   - name: DATABASE
     value: {{ .Values.auth.database | quote }}
 {{- end }}
