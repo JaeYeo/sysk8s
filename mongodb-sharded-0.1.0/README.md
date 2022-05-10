@@ -1,13 +1,13 @@
-# Postgresql
+# Mongodb-sharded
 
 ## Overview
 
-The MongoDB It wraps the official stable [MongoDB chart](https://github.com/helm/charts/tree/master/stable/mongodb).
-Find more information about the Mongodb chart in the chart's [documentation](chart/mongodb/README.md).
+The MongoDB-sharded It wraps the official stable [MongoDB-sharded chart](https://github.com/helm/charts/tree/master/stable/mongodb-sharded).
+Find more information about the Mongodb-sharded chart in the chart's [documentation](chart/mongodb-sharded/README.md).
 
 ## Details
 
-The mongodb addon contains two plans:
+The mongodb-sharded addon contains two plans:
 - micro
 - entrerpise
 
