@@ -1,0 +1,43 @@
+## Configure resource requests and limits
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+##
+
+kubeVersion: 1.20-11 
+
+mongos:
+  podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
+  resources:
+    requests:
+      memory: 4Gi
+      cpu: 2000m
+    limits:
+      memory: 6Gi
+      cpu: 3000m
+
+configsvr:
+  podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
+  resources:
+    requests:
+      memory: 4Gi
+      cpu: 2000m
+    limits:
+      memory: 6Gi
+      cpu: 3000m
+  persistence:
+    size: 16Gi
+
+shardsvr:
+  dataNode:
+    podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
+    resources:
+      requests:
+        memory: 4Gi
+        cpu: 2000m
+      limits:
+        memory: 6Gi
+        cpu: 3000m
+  persistence:
+    size: 16Gi
+
+service:
+  type: NodePort

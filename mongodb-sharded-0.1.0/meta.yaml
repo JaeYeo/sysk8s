@@ -1,0 +1,12 @@
+name: mongodb-sharded 
+version: 0.1.0
+id: e25f9826-cf5a-11ec-9d64-0242ac120001
+description: "MongoDB-sharded by Helm Broker. "
+displayName: "MongoDB-sharded"
+tags: nosql, database, sysmasterk8s 
+providerDisplayName: bitnami
+longDescription: "https://github.com/bitnami/charts/tree/master/bitnami/mongodb-shared/#installing-the-chart"
+documentationURL: https://github.com/bitnami/bitnami-docker-mongodb-shared
+supportURL: https://bitnami.com/support
+imageURL: https://bitnami.com/assets/stacks/mongodb/img/mongodb-stack-220x234.png 
+bindable: true

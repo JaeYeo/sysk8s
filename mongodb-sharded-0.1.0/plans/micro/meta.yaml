@@ -1,0 +1,6 @@
+name: micro
+id: e25f9826-cf5a-11ec-9d64-0242ac120002
+description: "MongoDB-sharded micro plan"
+displayName: Micro
+
+bindable: true
