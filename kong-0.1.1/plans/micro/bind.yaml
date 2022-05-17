@@ -1,0 +1,40 @@
+credential:
+  - name: HOST
+    value: {{ include "mongodb.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}
+  - name: PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "mongodb.fullname" . }} 
+        jsonpath: '{ .spec.ports[?(@.name=="mongodb")].port }'
+  - name: MONGODB_ROOT_PASSWORD 
+    valueFrom:
+      secretKeyRef:
+        name: {{ include "mongodb.fullname" . }} 
+        key: mongodb-root-password 
+{{- if (eq .Values.service.type "NodePort") }}
+  - name: NODE_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "mongodb.fullname" . }} 
+        jsonpath: '{ .spec.ports[?(@.name=="mongodb")].nodePort }'
+{{- end }}
+  - name: CLUSTER_IP
+    valueFrom:
+      serviceRef:
+        name: {{ include "mongodb.fullname" . }} 
+        jsonpath: '{ .spec.clusterIP }'
+{{- if .Values.auth.username }}
+  - name: MONGODB_USERNAME
+    value: {{ .Values.auth.username | quote }}
+{{- end }}
+{{- if .Values.auth.password }}
+  - name: MONGODB_PASSWORD 
+    valueFrom:
+      secretKeyRef:
+        name: {{ include "mongodb.fullname" . }} 
+        key: mongodb-passwords 
+{{- end }}
+{{- if .Values.auth.database }}
+  - name: DATABASE
+    value: {{ .Values.auth.database | quote }}
+{{- end }}

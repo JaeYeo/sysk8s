@@ -1,0 +1,10 @@
+apiVersion: configuration.konghq.com/v1
+kind: KongConsumer
+metadata:
+  name: adminapi-consumer
+  namespace: kong
+  annotations:
+    kubernetes.io/ingress.class: kong
+username: Knoldus
+credentials:
+  - adminapi-consumer-secre

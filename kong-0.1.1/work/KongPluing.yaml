@@ -1,0 +1,13 @@
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: admin-api-auth
+  namespace: kong
+config:
+  key_names:
+    - apikey
+  key_in_header: true
+  key_in_query: true
+  hide_credentials: true
+plugin: key-auth
+disabled: false
