@@ -1,0 +1,12 @@
+name: mysql 
+version: 0.1.0
+id: d4a54ba4-dcc0-11ec-9d64-0242ac120001
+description: "Mysql by Helm Broker. "
+displayName: "Mysql"
+tags: database, sysmasterk8s 
+providerDisplayName: bitnami
+longDescription: "https://github.com/bitnami/charts/tree/master/bitnami/mysql/#installing-the-chart"
+documentationURL: https://github.com/bitnami/bitnami-docker-mysql 
+supportURL: https://bitnami.com/support
+imageURL: https://bitnami.com/assets/stacks/mysql/img/mysql-stack-220x234.png 
+bindable: true
