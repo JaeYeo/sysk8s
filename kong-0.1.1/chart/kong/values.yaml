@@ -437,6 +437,8 @@ service:
 ## ref: https://kubernetes.io/docs/user-guide/ingress/
 ##
 ingress:
+  ## 2022-05 adminapi-auth
+
   ## @param ingress.enabled Enable ingress controller resource
   ##
   enabled: false

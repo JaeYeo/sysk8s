@@ -34,12 +34,11 @@ kong:
 
 service:
   exposeAdmin: true
-  type: NodePort
+  #  type: NodePort
 
 ingress:
   enabled: true
-  ingressClassName: kong
-  hostname: konga.spaasta.com
+  hostname: kong2.spaasta.com
 
 postgresql:
   primary:
@@ -53,6 +52,6 @@ postgresql:
         cpu: 4000m
     persistence:
       size: 8Gi
-    service:
-      type: NodePort
+      #  service:
+      #type: NodePort
 

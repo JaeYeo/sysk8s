@@ -4,43 +4,54 @@
 
 kubeVersion: 1.20-11 
 
-podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
-
-kong: 
+migration:
+  podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
   resources:
     requests:
-      memory: 2Gi
-      cpu: 1000m
-    limits:
       memory: 4Gi
       cpu: 2000m
+    limits:
+      memory: 8Gi
+      cpu: 4000m
+
+kong: 
+  podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
+  resources:
+    requests:
+      memory: 4Gi
+      cpu: 2000m
+    limits:
+      memory: 8Gi
+      cpu: 4000m
   livenessProbe:
     failureThreshold: 50
-    initialDelaySeconds: 300
-    periodSeconds: 300
+    initialDelaySeconds: 120
+    periodSeconds: 120
   readinessProbe:
     failureThreshold: 50
-    initialDelaySeconds: 300
-    periodSeconds: 300
-  startupProbe:
-    failureThreshold: 50
-    initialDelaySeconds: 300
-    periodSeconds: 300
+    initialDelaySeconds: 120
+    periodSeconds: 120
 
 service:
   exposeAdmin: true
   type: NodePort
+
+ingress:
+  enabled: true
+  hostname: kong2.spaasta.com
 
 postgresql:
   primary:
     podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
     resources:
       requests:
-        memory: 2Gi
-        cpu: 1000m
-      limits:
         memory: 4Gi
         cpu: 2000m
+      limits:
+        memory: 8Gi
+        cpu: 4000m
     persistence:
       size: 8Gi
+    service:
+      type: NodePort
 
