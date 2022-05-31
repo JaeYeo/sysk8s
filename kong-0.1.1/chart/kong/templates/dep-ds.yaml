@@ -105,6 +105,10 @@ spec:
           args: {{- include "common.tplvalues.render" (dict "value" .Values.kong.args "context" $) | nindent 12 }}
           {{- end }}
           env:
+            {{- if .Values.adminPassword }}
+            - name: KONG_ADMIN_PASSWORD
+              value: {{ .Values.adminPassword | quote }} 
+            {{- end }}
             - name: BITNAMI_DEBUG
               value: {{ ternary "true" "false" (or .Values.image.debug .Values.diagnosticMode.enabled) | quote }}
             {{- if .Values.service.exposeAdmin }}
@@ -215,6 +219,14 @@ spec:
           {{- end }}
           {{- if not .Values.kong.lifecycleHooks }}
           lifecycle:
+          {{- if .Values.adminPassword }}
+            postStart:
+              exec:
+                command:
+                  - /bin/sh
+                  - -c
+                  - echo "admin:$(/usr/bin/openssl passwd -apr1 ${KONG_ADMIN_PASSWORD})" >> /opt/bitnami/kong/server/.htpasswd
+          {{- end }}
             preStop:
               exec:
                 command:

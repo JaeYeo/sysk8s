@@ -33,12 +33,22 @@ kong:
     periodSeconds: 120
 
 service:
-  exposeAdmin: true
-  #  type: NodePort
+  exposeAdmin: true 
+  type: NodePort
 
 ingress:
   enabled: true
   hostname: kong2.spaasta.com
+
+konga:
+  service:
+    type: NodePort
+
+  ingress:
+    enabled: true
+    hosts:
+      - host: konga2.spaasta.com
+        paths: ['']
 
 postgresql:
   primary:

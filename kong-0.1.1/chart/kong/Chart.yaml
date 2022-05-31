@@ -14,6 +14,10 @@ dependencies:
     name: cassandra
     repository: https://charts.bitnami.com/bitnami
     version: 9.x.x
+  - condition: konga.enabled
+    name: konga
+    repository: "file://home/ubuntu/helm-broker/konga/charts/konga"
+    version: 1.0.0
 description: Kong is an open source Microservice API gateway and platform designed for managing microservices requests of high-availability, fault-tolerance, and distributed systems.
 engine: gotpl
 home: https://github.com/bitnami/charts/tree/master/bitnami/kong

@@ -822,6 +822,15 @@ cassandra:
     existingSecret: ""
     existingSecretPasswordKey: ""
 
+
+
+## @section Konga Parameters
+##
+adminPassword: ""
+konga:
+  enabled: true
+
+
 ## @section Metrics Parameters
 ##
 
