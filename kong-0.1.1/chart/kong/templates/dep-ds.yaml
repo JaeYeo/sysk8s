@@ -225,7 +225,9 @@ spec:
                 command:
                   - /bin/sh
                   - -c
-                  - echo "admin:$(/usr/bin/openssl passwd -apr1 ${KONG_ADMIN_PASSWORD})" >> /opt/bitnami/kong/server/.htpasswd
+                  - echo "admin:$(/usr/bin/openssl passwd -apr1 ${KONG_ADMIN_PASSWORD})" >> /opt/bitnami/kong/server/.htpasswd ;
+                  - sed -i 's/server_name kong_admin;/server_name kong_admin;\n    auth_basic "admin basic auth";\n    auth_basic_user_file \/opt\/bitnami\/kong\/server\/.htpasswd;/g' /opt/bitnami/kong/server/nginx-kong.conf;
+                  - ls -al >>/opt/bitnami/kong/server/result.txt;
           {{- end }}
             preStop:
               exec:

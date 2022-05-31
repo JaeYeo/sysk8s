@@ -1,0 +1,18 @@
+#!/bin/bash
+
+
+
+if [[ -f "/opt/bitnami/kong/server/nginx_updated" ]]
+then
+    echo "nginx.conf was updated"
+else
+    if [[ -f "/opt/bitnami/kong/server/nginx-kong.conf" ]]
+    then
+        sed -i 's/server_name kong_admin;/server_name kong_admin;\n    auth_basic "admin basic auth";\n    auth_basic_user_file \/opt\/bitnami\/kong\/server\/.htpasswd;/g' /opt/bitnami/kong/server/nginx-kong.conf
+        echo "updated" >> /opt/bitnami/kong/server/nginx_updated
+	/opt/bitnami/kong/openresty/nginx/sbin/nginx -s reload -p /opt/bitnami/kong/server -c nginx.conf
+        echo "nginx.conf is updated"
+    else
+        echo "no nginx.conf"
+    fi
+fi
