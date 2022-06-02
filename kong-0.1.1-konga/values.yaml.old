@@ -1,0 +1,37 @@
+
+
+service:
+  type: NodePort 
+
+ingress:
+  enabled: true 
+  hosts:
+    - host: konga3.spaasta.com 
+      paths: [''] 
+
+config:
+  node_env: "production"
+  konga_node_data: |-
+    module.exports = [
+        {
+            "username": "admin",
+            "email": "myadmin@some.domain",
+            "firstName": "Admin",
+            "lastName": "Administrator",
+            "node_id": "http://kong-02.kong2.svc.cluster.local.:8001",
+            "admin": true,
+            "active" : true,
+            "password": "master"
+        }
+    ]
+  konga_user_data: |-
+    module.exports = [
+        {
+            "name": "Kong Seed",
+            "type": "basic_auth",
+            "kong_admin_url": "http://kong-02.kong2.svc.cluster.local.:8001",
+            "username": "admin",
+            "password": "master"
+        }
+    ]
+
