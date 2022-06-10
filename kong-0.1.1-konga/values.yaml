@@ -1,4 +1,6 @@
 
+global:
+  imageRegistry: "registry.systeer.com"
 
 service:
   type: NodePort 
@@ -9,4 +11,7 @@ ingress:
     - host: konga3.spaasta.com 
       paths: [''] 
 
+kongAdminPassword: ""
+kongAdminUrl: ""
+kongaAdminPassword: ""
 

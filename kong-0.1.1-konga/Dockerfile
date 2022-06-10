@@ -6,6 +6,7 @@ WORKDIR /app
 
 RUN apk upgrade --update \
     && apk add bash git ca-certificates \
+    && npm config set strict-ssl false \
     && npm install -g bower \
     && npm --unsafe-perm --production install \
     && apk del git \

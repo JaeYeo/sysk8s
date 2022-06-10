@@ -27,6 +27,11 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: KONGA_SEED_USER_DATA_SOURCE_FILE
+              value: /data/userdb.data
+            - name: KONGA_SEED_KONG_NODE_DATA_SOURCE_FILE 
+              value: /data/kong_node.data
           ports:
             - name: http
               containerPort: 1337
@@ -45,9 +50,16 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
+            - name: data
+              mountPath: /data
 {{- if .Values.extraVolumeMounts }}
 {{ toYaml .Values.extraVolumeMounts | nindent 12 }}
 {{- end }}
+      volumes:
+        - name: data
+          configMap:
+            name: {{ include "konga.fullname" . }}-data-config 
+            defaultMode: 0755
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

@@ -143,6 +143,14 @@ var defaultModel = _.merge(_.cloneDeep(require('../base/Model')), {
             "jwt_key": orig.jwt_key,
             "jwt_secret": orig.jwt_secret,
           }
+/**
+ * 	2022, add basic_auth for sysk8s
+ */
+        case 'basic_auth':
+          return {
+            "username": orig.username,
+            "password": orig.password,
+	  }
         default:
           throw Error('Unimplemented')
       }

@@ -8,16 +8,21 @@ global:
   imageRegistry: ""
 
 image:
-  repository: pantsel/konga
-  tag: latest
+  repository: registry.systeer.com/pantsel/konga
+  tag: 0.16.1 
   pullPolicy: IfNotPresent
 
 nameOverride: ""
 fullnameOverride: ""
 
+kongAdminPassword: ""
+kongAdminUrl: ""
+kongaAdminPassword: ""
+
 service:
   type: ClusterIP
   port: 80
+
 
 
 # Konga default configuration

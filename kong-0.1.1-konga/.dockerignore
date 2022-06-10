@@ -121,3 +121,10 @@ nbproject
 /config/mssqlconfig.js
 /www/
 /seeds/
+
+kongdata
+install_konga.sh
+test.sh
+build_image.sh
+.env_example
+values.yaml
