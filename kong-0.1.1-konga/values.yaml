@@ -11,7 +11,8 @@ ingress:
     - host: konga3.spaasta.com 
       paths: [''] 
 
-kongAdminPassword: ""
-kongAdminUrl: ""
-kongaAdminPassword: ""
+kongaAdminPassword: "master"
 
+kongName: "kong-02"
+kongAdminPassword: "master"
+kongAdminHttp: 8001

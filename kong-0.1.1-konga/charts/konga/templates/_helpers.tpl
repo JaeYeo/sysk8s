@@ -38,4 +38,19 @@ Return the proper konga image name
 {{ include "common.images.image" (dict "imageRoot" .Values.image "global" .Values.global) }}
 {{- end -}}
 
+{{/*
+2022-06 for kong
+
+Auxiliary function to get the right value for enabled konga.
+
+Usage:
+{{ include "common.konga.values.enabled" (dict "context" $) }}
+*/}}
+{{- define "common.konga.values.enabled" -}}
+  {{- if .subchart -}}
+    {{- printf "%v" .context.Values.konga.enabled -}}
+  {{- else -}}
+    {{- printf "%v" (not .context.Values.enabled) -}}
+  {{- end -}}
+{{- end -}}
 

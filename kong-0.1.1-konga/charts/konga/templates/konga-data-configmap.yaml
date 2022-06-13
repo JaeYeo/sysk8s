@@ -8,6 +8,7 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 data:
+{{- if .Values.kongaAdminPassword }}
   userdb.data: |-
     module.exports = [
         {     
@@ -15,20 +16,24 @@ data:
             "email": "myadmin@some.domain",
             "firstName": "Admin",
             "lastName": "Administrator",
-            "node_id": "http://kong-02.kong2.svc.cluster.local.:8001",
             "admin": true,
             "active" : true,
-            "password": "master",
+            "password": "{{ .Values.kongaAdminPassword }}",
         }
     ]
+{{- end }}
+{{- if .Values.kongAdminPassword }}
   kong_node.data: |-
     module.exports = [
         {
             "name": "Kong",
             "type": "basic_auth",
-            "kong_admin_url": "http://kong-02.kong2.svc.cluster.local.:8001",
             "active" : "true",
             "username": "admin",
-            "password": "master",
+            "password": "{{ .Values.kongAdminPassword }}",
+{{- if .Values.kongName }}
+            "kong_admin_url": "http://{{ .Values.kongName }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.kongAdminHttp }}",
+{{- end -}}
         }
     ]
+{{- end }}

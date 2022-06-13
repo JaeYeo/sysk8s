@@ -28,10 +28,14 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
+{{- if .Values.kongaAdminPassword }}
             - name: KONGA_SEED_USER_DATA_SOURCE_FILE
               value: /data/userdb.data
+{{- end }}
+{{- if .Values.kongAdminPassword }}
             - name: KONGA_SEED_KONG_NODE_DATA_SOURCE_FILE 
               value: /data/kong_node.data
+{{- end }}
           ports:
             - name: http
               containerPort: 1337
