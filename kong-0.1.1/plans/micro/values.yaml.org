@@ -33,14 +33,34 @@ kong:
     periodSeconds: 120
 
 service:
-  exposeAdmin: true
+  exposeAdmin: true 
   type: NodePort
 
 ingress:
   enabled: true
   hostname: kong2.spaasta.com
 
+adminPassword: "master"
+
+konga:
+  kongAdminPassword: "master"
+  kongAdminUrl: "http://kong-02.kong2.svc.cluster.local.:8001"
+  kongaAdminPassword: "master"
+
+  service:
+    type: NodePort
+
+  ingress:
+    enabled: true
+    hosts:
+      - host: konga2.spaasta.com
+        paths: ['']
+
 postgresql:
+  auth:
+    password: 'master77!!' 
+    postgresPassword: 'master77!!'
+
   primary:
     podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
     resources:
@@ -52,6 +72,6 @@ postgresql:
         cpu: 4000m
     persistence:
       size: 8Gi
-    service:
-      type: NodePort
+      #  service:
+      #type: NodePort
 

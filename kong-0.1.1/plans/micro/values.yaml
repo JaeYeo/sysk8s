@@ -25,12 +25,12 @@ kong:
       cpu: 4000m
   livenessProbe:
     failureThreshold: 50
-    initialDelaySeconds: 120
-    periodSeconds: 120
+    initialDelaySeconds: 180
+    periodSeconds: 180 
   readinessProbe:
     failureThreshold: 50
-    initialDelaySeconds: 120
-    periodSeconds: 120
+    initialDelaySeconds: 180
+    periodSeconds: 180
 
 service:
   exposeAdmin: true 
@@ -44,7 +44,9 @@ adminPassword: "master"
 
 konga:
   kongAdminPassword: "master"
-  kongAdminUrl: "http://kong-02.kong2.svc.cluster.local.:8001"
+  kongName: "kong-02"
+  kongAdminHttp: 8001
+
   kongaAdminPassword: "master"
 
   service:

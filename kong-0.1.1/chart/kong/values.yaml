@@ -830,6 +830,12 @@ adminPassword: ""
 konga:
   enabled: true
 
+  kongAdminPassword: ""
+  kongName: ""
+  kongAdminHttp: 8001
+  kongaAdminPassword: ""
+
+
 
 ## @section Metrics Parameters
 ##

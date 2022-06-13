@@ -298,12 +298,6 @@ Return the proper kong admin url
 2022-06 for sysk8s
 */}}
 {{- define "kong.adminUrl" -}}
-    {{ include "common.names.fullname" . }}.{{ .Release.Namespace }}.svc..{{ .Values.clusterDomain }}
-{{- end -}}
-{{- define "kong.adminHttp" -}}
-    {{ coalesce .Values.service.ports.adminHttp .Values.service.adminHttpPort }}
-{{- end -}}
-{{- define "kong.adminHttps" -}}
-    {{ coalesce .Values.service.ports.adminHttps .Values.service.adminHttpsPort }}
+    {{ include "common.names.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}
 {{- end -}}
 
