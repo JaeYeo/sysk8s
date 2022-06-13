@@ -40,7 +40,13 @@ ingress:
   enabled: true
   hostname: kong2.spaasta.com
 
+adminPassword: "master"
+
 konga:
+  kongAdminPassword: "master"
+  kongAdminUrl: "http://kong-02.kong2.svc.cluster.local.:8001"
+  kongaAdminPassword: "master"
+
   service:
     type: NodePort
 
@@ -51,6 +57,10 @@ konga:
         paths: ['']
 
 postgresql:
+  auth:
+    password: 'master77!!' 
+    postgresPassword: 'master77!!'
+
   primary:
     podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
     resources:

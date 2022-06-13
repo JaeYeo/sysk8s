@@ -1,0 +1,12 @@
+module.exports = [
+        {
+            "username": "admin",
+            "email": "myadmin@some.domain",
+            "firstName": "Admin",
+            "lastName": "Administrator",
+            "node_id": "http://kong-02.kong2.svc.cluster.local.:8001",
+            "admin": true,
+            "active" : true,
+            "password": "master"
+        }
+    ]

@@ -292,3 +292,18 @@ Function to validate incompatibilities with deploying Kong as a daemonset
 INVALID SETUP: Deploying a HorizontalPodAutoscaler or a PodDisruptionBudget is not compatible with deploying Kong as a daemonset.
 {{- end -}}
 {{- end -}}
+
+{{/*
+Return the proper kong admin url 
+2022-06 for sysk8s
+*/}}
+{{- define "kong.adminUrl" -}}
+    {{ include "common.names.fullname" . }}.{{ .Release.Namespace }}.svc..{{ .Values.clusterDomain }}
+{{- end -}}
+{{- define "kong.adminHttp" -}}
+    {{ coalesce .Values.service.ports.adminHttp .Values.service.adminHttpPort }}
+{{- end -}}
+{{- define "kong.adminHttps" -}}
+    {{ coalesce .Values.service.ports.adminHttps .Values.service.adminHttpsPort }}
+{{- end -}}
+

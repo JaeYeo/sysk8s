@@ -1,12 +1,15 @@
 dependencies:
 - name: postgresql
   repository: https://charts.bitnami.com/bitnami
-  version: 11.1.28
+  version: 11.6.5
 - name: common
   repository: https://charts.bitnami.com/bitnami
-  version: 1.13.1
+  version: 1.16.0
 - name: cassandra
   repository: https://charts.bitnami.com/bitnami
-  version: 9.1.18
-digest: sha256:6d6f8729ea3577a5b7da981566e4f91533e530aac3fcd50f82ee71862fc3e8f5
-generated: "2022-05-12T10:40:37.538873617+09:00"
+  version: 9.2.4
+- name: konga
+  repository: file://../../../kong-0.1.1-konga/charts/konga
+  version: 1.0.0
+digest: sha256:cc8a4cc975a0e039eb29da0124926a390f42cf40246cdcd481f84987c80471c9
+generated: "2022-06-10T17:33:47.516441005+09:00"

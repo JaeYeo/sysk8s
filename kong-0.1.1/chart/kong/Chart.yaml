@@ -16,7 +16,7 @@ dependencies:
     version: 9.x.x
   - condition: konga.enabled
     name: konga
-    repository: "file://home/ubuntu/helm-broker/konga/charts/konga"
+    repository: "file://../../../kong-0.1.1-konga/charts/konga"
     version: 1.0.0
 description: Kong is an open source Microservice API gateway and platform designed for managing microservices requests of high-availability, fault-tolerance, and distributed systems.
 engine: gotpl

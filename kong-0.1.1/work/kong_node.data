@@ -1,0 +1,9 @@
+module.exports = [
+    {
+        "name": "Kong Seed",
+        "type": "basic_auth",
+        "kong_admin_url": "http://kong-02.kong2.svc.cluster.local.:8001",
+        "username": "admin",
+        "password": "master" 
+    }
+]
