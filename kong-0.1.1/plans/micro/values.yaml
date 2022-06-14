@@ -25,12 +25,12 @@ kong:
       cpu: 4000m
   livenessProbe:
     failureThreshold: 50
-    initialDelaySeconds: 240
-    periodSeconds: 240 
+    initialDelaySeconds: 180 
+    periodSeconds: 180 
   readinessProbe:
     failureThreshold: 50
-    initialDelaySeconds: 240
-    periodSeconds: 240
+    initialDelaySeconds: 180 
+    periodSeconds: 180 
 
 service:
   exposeAdmin: true 

@@ -1,23 +1,55 @@
 ## Configure resource requests and limits
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
 ##
-kubeVersion: 1.20-11
 
-architecture: replicaset 
-replicaCount: 2
+kubeVersion: 1.20-11 
 
-podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
-resources:
-  requests:
-    memory: 2Gi
-    cpu: 1000m
-  limits:
-    memory: 4Gi
-    cpu: 2000m
-persistence:
-  size: 16Gi
+migration:
+  podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
+  resources:
+    requests:
+      memory: 4Gi
+      cpu: 2000m
+    limits:
+      memory: 8Gi
+      cpu: 4000m
+
+kong: 
+  podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
+  resources:
+    requests:
+      memory: 4Gi
+      cpu: 2000m
+    limits:
+      memory: 8Gi
+      cpu: 4000m
+  livenessProbe:
+    failureThreshold: 50
+    initialDelaySeconds: 180 
+    periodSeconds: 180 
+  readinessProbe:
+    failureThreshold: 50
+    initialDelaySeconds: 180 
+    periodSeconds: 180 
+
 service:
+  exposeAdmin: true 
   type: NodePort
 
+konga:
+  service:
+    type: NodePort
 
+postgresql:
+  primary:
+    podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
+    resources:
+      requests:
+        memory: 4Gi
+        cpu: 2000m
+      limits:
+        memory: 8Gi
+        cpu: 4000m
+    persistence:
+      size: 8Gi
 
