@@ -25,44 +25,22 @@ kong:
       cpu: 4000m
   livenessProbe:
     failureThreshold: 50
-    initialDelaySeconds: 180
-    periodSeconds: 180 
+    initialDelaySeconds: 240
+    periodSeconds: 240 
   readinessProbe:
     failureThreshold: 50
-    initialDelaySeconds: 180
-    periodSeconds: 180
+    initialDelaySeconds: 240
+    periodSeconds: 240
 
 service:
   exposeAdmin: true 
   type: NodePort
 
-ingress:
-  enabled: true
-  hostname: kong2.spaasta.com
-
-adminPassword: "master"
-
 konga:
-  kongAdminPassword: "master"
-  kongName: "kong-02"
-  kongAdminHttp: 8001
-
-  kongaAdminPassword: "master"
-
   service:
     type: NodePort
 
-  ingress:
-    enabled: true
-    hosts:
-      - host: konga2.spaasta.com
-        paths: ['']
-
 postgresql:
-  auth:
-    password: 'master77!!' 
-    postgresPassword: 'master77!!'
-
   primary:
     podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
     resources:
@@ -74,6 +52,4 @@ postgresql:
         cpu: 4000m
     persistence:
       size: 8Gi
-      #  service:
-      #type: NodePort
 

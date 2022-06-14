@@ -15,15 +15,14 @@ image:
 nameOverride: ""
 fullnameOverride: ""
 
+kongName: ""
 kongAdminPassword: ""
-kongAdminUrl: ""
+
 kongaAdminPassword: ""
 
 service:
   type: ClusterIP
   port: 80
-
-
 
 # Konga default configuration
 config: {}
