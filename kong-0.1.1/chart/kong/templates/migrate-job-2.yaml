@@ -3,8 +3,15 @@ kind: Job
 metadata:
   name: {{ include "common.names.fullname" . }}-migrate-2
   namespace: {{ .Release.Namespace }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: server
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  annotations:
+    helm.sh/hook: post-install, pre-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
 spec:
-  activeDeadlineSeconds: 180
   template:
     metadata:
       labels: {{- include "common.labels.standard" . | nindent 8 }}
@@ -79,3 +86,26 @@ spec:
             {{- if .Values.migration.extraEnvVars }}
             {{- include "common.tplvalues.render" (dict "value" .Values.migration.extraEnvVars "context" $) | nindent 12 }}
             {{- end }}
+          {{- if or .Values.migration.extraEnvVarsCM .Values.migration.extraEnvVarsSecret }}
+          envFrom:
+            {{- if .Values.migration.extraEnvVarsCM }}
+            - configMapRef:
+                name: {{ .Values.migration.extraEnvVarsCM }}
+            {{- end }}
+            {{- if .Values.migration.extraEnvVarsSecret }}
+            - secretRef:
+                name: {{ .Values.migration.extraEnvVarsSecret }}
+            {{- end }}
+          {{- end }}
+          {{- if .Values.migration.extraVolumeMounts }}
+          volumeMounts:
+            {{- include "common.tplvalues.render" (dict "value" .Values.migration.extraVolumeMounts "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.migration.resources }}
+          resources: {{- toYaml .Values.migration.resources | nindent 12 }}
+          {{- end }}
+      {{- if .Values.extraVolumes }}
+      volumes:
+      {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumes "context" $) | nindent 6 }}
+      {{- end }}
+
