@@ -11,8 +11,8 @@ migration:
       memory: 4Gi
       cpu: 2000m
     limits:
-      memory: 8Gi
-      cpu: 4000m
+      memory: 4Gi
+      cpu: 2000m
 
 kong: 
   podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
