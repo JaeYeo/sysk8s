@@ -721,7 +721,7 @@ migration:
   ## @param migration.annotations [object] Add annotations to the job
   ##
   annotations:
-    helm.sh/hook: post-install, pre-upgrade
+    helm.sh/hook: post-install
     helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
   ## @param migration.podLabels Additional pod labels
   ## Ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
