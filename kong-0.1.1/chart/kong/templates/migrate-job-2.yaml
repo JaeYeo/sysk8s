@@ -1,28 +1,14 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "common.names.fullname" . }}-migrate
+  name: {{ include "common.names.fullname" . }}-migrate-2
   namespace: {{ .Release.Namespace }}
-  labels: {{- include "common.labels.standard" . | nindent 4 }}
-    app.kubernetes.io/component: server
-    {{- if .Values.commonLabels }}
-    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
-    {{- end }}
-  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.migration.annotations "context" $ ) | nindent 4 }}
-    {{- if .Values.commonAnnotations }}
-    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
-    {{- end }}
 spec:
+  ttlSecondsAfterFinished: 300
   template:
     metadata:
       labels: {{- include "common.labels.standard" . | nindent 8 }}
         app.kubernetes.io/component: migration
-        {{- if .Values.migration.podLabels }}
-        {{- include "common.tplvalues.render" (dict "value" .Values.migration.podLabels "context" $) | nindent 8 }}
-        {{- end }}
-      {{- if .Values.migration.podAnnotations }}
-      annotations: {{- include "common.tplvalues.render" (dict "value" .Values.migration.podAnnotations "context" $) | nindent 8 }}
-      {{- end }}
     spec:
       {{- include "kong.imagePullSecrets" . | nindent 6 }}
       restartPolicy: OnFailure
@@ -33,7 +19,7 @@ spec:
       hostAliases: {{- include "common.tplvalues.render" (dict "value" .Values.migration.hostAliases "context" $) | nindent 8 }}
       {{- end }}
       containers:
-        - name: kong-migrate
+        - name: kong-migrate-2
           image: {{ template "kong.migration.image" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- if .Values.migration.command }}
@@ -93,25 +79,3 @@ spec:
             {{- if .Values.migration.extraEnvVars }}
             {{- include "common.tplvalues.render" (dict "value" .Values.migration.extraEnvVars "context" $) | nindent 12 }}
             {{- end }}
-          {{- if or .Values.migration.extraEnvVarsCM .Values.migration.extraEnvVarsSecret }}
-          envFrom:
-            {{- if .Values.migration.extraEnvVarsCM }}
-            - configMapRef:
-                name: {{ .Values.migration.extraEnvVarsCM }}
-            {{- end }}
-            {{- if .Values.migration.extraEnvVarsSecret }}
-            - secretRef:
-                name: {{ .Values.migration.extraEnvVarsSecret }}
-            {{- end }}
-          {{- end }}
-          {{- if .Values.migration.extraVolumeMounts }}
-          volumeMounts:
-            {{- include "common.tplvalues.render" (dict "value" .Values.migration.extraVolumeMounts "context" $) | nindent 12 }}
-          {{- end }}
-          {{- if .Values.migration.resources }}
-          resources: {{- toYaml .Values.migration.resources | nindent 12 }}
-          {{- end }}
-      {{- if .Values.extraVolumes }}
-      volumes:
-      {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumes "context" $) | nindent 6 }}
-      {{- end }}
