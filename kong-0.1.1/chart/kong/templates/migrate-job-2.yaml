@@ -4,7 +4,7 @@ metadata:
   name: {{ include "common.names.fullname" . }}-migrate-2
   namespace: {{ .Release.Namespace }}
 spec:
-  ttlSecondsAfterFinished: 300
+  activeDeadlineSeconds: 180
   template:
     metadata:
       labels: {{- include "common.labels.standard" . | nindent 8 }}
