@@ -8,11 +8,11 @@ migration:
   podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
   resources:
     requests:
-      memory: 4Gi
-      cpu: 2000m
+      memory: 1Gi
+      cpu: 500m
     limits:
-      memory: 8Gi
-      cpu: 4000m
+      memory: 1Gi
+      cpu: 500m
 
 kong: 
   podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
