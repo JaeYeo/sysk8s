@@ -33,14 +33,14 @@ credential:
     valueFrom:
       secretKeyRef:
         name: {{ include "common.names.fullname" . }}-admin 
-        key: kong-admin-passwords 
+        key: kong-admin-password
 {{- end }}
 {{- if and .Values.konga.enabled .Values.konga.kongaAdminPassword }}
   - name: KONGA_PASSWORD 
     valueFrom:
       secretKeyRef:
         name: {{ include "common.names.fullname" . }}-konga-admin 
-        key: konga-admin-passwords 
+        key: konga-admin-passwords
 {{- end }}
 {{- if .Values.ingress.enabled }}
   - name: KONG_INGRESS_HOSTNAME
