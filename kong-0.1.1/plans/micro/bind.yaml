@@ -47,10 +47,6 @@ credential:
     value: {{ .Values.ingress.hostname }}
 {{- end }}
 {{- if and .Values.konga.enabled .Values.konga.ingress.enabled }}
-{{- $kongaIngress := "" }}
-{{- range .Values.ingress.hosts }}
-{{-     $kongaIngress := .host }}
-{{- end }}
   - name: KONGA_INGRESS_HOSTNAME
-    value: {{ $kongaIngress }}
+    value: "konga.spaasta.com" 
 {{- end }}
