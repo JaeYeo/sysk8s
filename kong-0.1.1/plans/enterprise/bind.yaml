@@ -40,7 +40,7 @@ credential:
     valueFrom:
       secretKeyRef:
         name: {{ include "common.names.fullname" . }}-konga-admin 
-        key: konga-admin-passwords
+        key: konga-admin-password
 {{- end }}
 {{- if .Values.ingress.enabled }}
   - name: KONG_INGRESS_HOSTNAME
