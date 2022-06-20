@@ -2,7 +2,9 @@
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
 ##
 
-kubeVersion: 1.20-11 
+global:
+  kubeVersion: 1.20-11 
+
 
 migration:
   podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
