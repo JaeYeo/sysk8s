@@ -11,6 +11,16 @@ credential:
       serviceRef:
         name: {{ include "common.names.fullname" . }} 
         jsonpath: '{ .spec.ports[?(@.name=="https-proxy")].port }'
+  - name: ADMIN_HTTP_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }} 
+        jsonpath: '{ .spec.ports[?(@.name=="http-admin")].port }'
+  - name: ADMIN_HTTPS_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }} 
+        jsonpath: '{ .spec.ports[?(@.name=="https-admin")].port }'
 {{- if (eq .Values.service.type "NodePort") }}
   - name: PROXY_HTTP_NODE_PORT
     valueFrom:
@@ -22,6 +32,16 @@ credential:
       serviceRef:
         name: {{ include "common.names.fullname" . }} 
         jsonpath: '{ .spec.ports[?(@.name=="https-proxy")].nodePort }'
+  - name: ADMIN_HTTP_NODE_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }} 
+        jsonpath: '{ .spec.ports[?(@.name=="http-admin")].nodePort }'
+  - name: ADMIN_HTTPS_NODE_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }} 
+        jsonpath: '{ .spec.ports[?(@.name=="https-admin")].nodePort }'
 {{- end }}
   - name: CLUSTER_IP
     valueFrom:
