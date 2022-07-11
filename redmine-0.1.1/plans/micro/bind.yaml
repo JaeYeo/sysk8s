@@ -1,0 +1,39 @@
+credential:
+  - name: JENKINS_USER 
+    value: {{ .Values.jenkinsUser | quote }}
+  - name: JENKINS_PASSWORD 
+    valueFrom:
+      secretKeyRef:
+        name: {{ template "common.names.fullname" . }} 
+        key: jenkins-password 
+{{- if .Values.ingress.enabled }}
+  - name: INGRESS_HOSTNAME
+    value: {{ .Values.ingress.hostname }} 
+{{- end }}
+  - name: HTTP_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }}
+        jsonpath: '{ .spec.ports[?(@.name=="http")].port }'
+  - name: HTTPS_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }}
+        jsonpath: '{ .spec.ports[?(@.name=="https")].port }'
+{{- if (eq .Values.service.type "NodePort") }}
+  - name: HTTP_NODE_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }}
+        jsonpath: '{ .spec.ports[?(@.name=="http")].nodePort }'
+  - name: HTTPS_NODE_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }}
+        jsonpath: '{ .spec.ports[?(@.name=="https")].nodePort }'
+{{- end }}
+  - name: CLUSTER_IP
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }}
+        jsonpath: '{ .spec.clusterIP }'

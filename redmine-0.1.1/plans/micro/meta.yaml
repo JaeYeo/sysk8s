@@ -1,0 +1,6 @@
+name: micro
+id: 3901a606-fdb4-11ec-b939-0242ac120002
+description: "Redmine micro plan, standalone."
+displayName: Micro
+
+bindable: true

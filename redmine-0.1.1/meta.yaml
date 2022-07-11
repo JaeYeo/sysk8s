@@ -1,0 +1,12 @@
+name: redmine 
+version: 0.1.1
+id: 3901a606-fdb4-11ec-b939-0242ac120001
+description: "redmine by Helm Broker. "
+displayName: "redmine"
+tags: redmine, sysmasterk8s 
+providerDisplayName: bitnami
+longDescription: "https://github.com/bitnami/charts/tree/master/bitnami/redmine/#installing-the-chart"
+documentationURL: https://github.com/bitnami/bitnami-docker-redmine
+supportURL: https://bitnami.com/support
+imageURL: https://bitnami.com/assets/stacks/redmine/img/redmine-stack-220x234.png
+bindable: true
