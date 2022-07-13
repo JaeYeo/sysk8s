@@ -24,8 +24,10 @@ readinessProbe:
 service:
   type: NodePort
 
+databaseType: "postgresql"
+
 mariadb:
-  enabled: true
+  enabled: false 
   podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
   resources:
     requests:
@@ -38,5 +40,14 @@ mariadb:
     size: 16G
 
 postgresql:
-  enabled: false
-
+  enabled: true
+  podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
+  resources:
+    requests:
+      memory: 4Gi
+      cpu: 2000m
+    limits:
+      memory: 8Gi
+      cpu: 4000m
+  persistence:
+    size: 16G

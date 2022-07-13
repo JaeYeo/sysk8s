@@ -1,11 +1,11 @@
 credential:
-  - name: JENKINS_USER 
-    value: {{ .Values.jenkinsUser | quote }}
-  - name: JENKINS_PASSWORD 
+  - name: REDMINE_USERNAME 
+    value: {{ .Values.redmineUsername | quote }}
+  - name: REDMINE_PASSWORD 
     valueFrom:
       secretKeyRef:
         name: {{ template "common.names.fullname" . }} 
-        key: jenkins-password 
+        key: redmine-password 
 {{- if .Values.ingress.enabled }}
   - name: INGRESS_HOSTNAME
     value: {{ .Values.ingress.hostname }} 
