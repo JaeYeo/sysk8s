@@ -1,0 +1,19 @@
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ServiceInstance
+metadata:
+  name: redis-03
+  namespace: redis
+spec:
+  clusterServiceClassExternalName: redis
+  clusterServicePlanExternalName: micro 
+  parameters:
+    fullnameOverride: redis-03
+    global:
+      redis:
+        password: master77!!
+    master:
+      service:
+        ports:
+          redis: 6380
+      containerPorts:
+        redis: 6380

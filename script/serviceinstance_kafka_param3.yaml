@@ -1,0 +1,15 @@
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ServiceInstance
+metadata:
+  name: kafka-03
+  namespace: kafka
+spec:
+  clusterServiceClassExternalName: kafka
+  clusterServicePlanExternalName: micro 
+  parameters:
+    fullnameOverride: kafka-03
+    service:
+      type: NodePort
+    zookeeper:
+      service:
+        type: NodePort

@@ -1,0 +1,10 @@
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ServiceInstance
+metadata:
+  name: mariadb-01
+  namespace: mariadb
+spec:
+  serviceClassExternalName: mariadb 
+  servicePlanExternalName: micro 
+  parameters:
+    fullnameOverride: mariadb-01 

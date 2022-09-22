@@ -1,0 +1,8 @@
+apiVersion: addons.kyma-project.io/v1alpha1
+kind: AddonsConfiguration
+metadata:
+  name: mariadb-cfg
+  namespace: mariadb
+spec:
+  repositories:
+    - url: "https://raw.githubusercontent.com/infranics/sysk8s/main/mariadb-0.1.0/index-mariadb.yaml"

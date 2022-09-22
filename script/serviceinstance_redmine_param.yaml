@@ -1,0 +1,18 @@
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ServiceInstance
+metadata:
+  name: redmine-03
+  namespace: redmine 
+spec:
+  clusterServiceClassExternalName: redmine 
+  clusterServicePlanExternalName: micro 
+  parameters:
+    fullnameOverride: redmine-03
+    redmineUsername: "admin"
+    redminePassword: "master"
+    ingress:
+      enabled: true
+      hostname: redmine.spaasta.com
+    postgresql:
+      auth:
+        password: 'master77!!'

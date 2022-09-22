@@ -1,0 +1,9 @@
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ServiceBinding
+metadata:
+  name: mongodb-sharded-binding
+  namespace: mongodb-sharded 
+spec:
+  instanceRef:
+    name: mongodb-sharded-03
+

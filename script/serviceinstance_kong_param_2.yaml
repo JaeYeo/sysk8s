@@ -1,0 +1,28 @@
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ServiceInstance
+metadata:
+  name: kong-04
+  namespace: kong2 
+spec:
+  clusterServiceClassExternalName: kong 
+  clusterServicePlanExternalName: micro 
+  parameters:
+    fullnameOverride: kong-04
+    ingress:
+      enabled: true
+      hostname: kong.spaasta.com
+    adminPassword: "master"
+    konga:
+      kongAdminPassword: "master"
+      kongName: "kong-03"
+      kongAdminHttp: 8001
+      kongaAdminPassword: "master"
+      ingress:
+        enabled: true
+        hosts:
+          - host: konga.spaasta.com
+            paths: ['']
+    postgresql:
+      auth:
+        password: 'master77!!'
+        postgresPassword: 'master77!!'

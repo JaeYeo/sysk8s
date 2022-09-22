@@ -1,0 +1,7 @@
+apiVersion: addons.kyma-project.io/v1alpha1
+kind: ClusterAddonsConfiguration
+metadata:
+  name: jenkins-cfg
+spec:
+  repositories:
+    - url: "https://raw.githubusercontent.com/infranics/sysk8s/main/jenkins-0.1.0/index-jenkins.yaml"

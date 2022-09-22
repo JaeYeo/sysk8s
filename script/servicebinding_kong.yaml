@@ -1,0 +1,9 @@
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ServiceBinding
+metadata:
+  name: kong-03-binding
+  namespace: kong 
+spec:
+  instanceRef:
+    name: kong-03
+

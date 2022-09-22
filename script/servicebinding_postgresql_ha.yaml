@@ -1,0 +1,9 @@
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ServiceBinding
+metadata:
+  name: postgresql-ha-03-binding
+  namespace: postgresql-ha 
+spec:
+  instanceRef:
+    name: postgresql-ha-03
+

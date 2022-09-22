@@ -1,0 +1,7 @@
+apiVersion: addons.kyma-project.io/v1alpha1
+kind: ClusterAddonsConfiguration
+metadata:
+  name: redis-cfg
+spec:
+  repositories:
+    - url: "https://k8s-nexus.spaasta.com/repository/downloads/addons/redis-0.1.0/index-redis.yaml"

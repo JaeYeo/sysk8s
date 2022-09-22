@@ -1,0 +1,9 @@
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ServiceBinding
+metadata:
+  name: kafka-binding
+  namespace: kafka 
+spec:
+  instanceRef:
+    name: kafka-03
+

@@ -1,0 +1,20 @@
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ServiceInstance
+metadata:
+  name: mariadb-03
+  namespace: mariadb
+spec:
+  clusterServiceClassExternalName: mariadb 
+  clusterServicePlanExternalName: micro 
+  parameters:
+    fullnameOverride: mariadb-03
+    auth:
+      rootPassword: master77!!
+      database: sysk8s
+    primary:
+      service:
+        ports:
+          mysql: 3308
+    global:
+      imageRegistry: "registry.systeer.com"
+

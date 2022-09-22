@@ -1,0 +1,14 @@
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ServiceInstance
+metadata:
+  name: jenkins-03
+  namespace: jenkins
+spec:
+  clusterServiceClassExternalName: jenkins
+  clusterServicePlanExternalName: micro 
+  parameters:
+    fullnameOverride: jenkins-03
+    jenkinsPassword: master77!!
+    ingress:
+      enabled: true
+      hostname: jenkins03.dev.sm-k8s.com 

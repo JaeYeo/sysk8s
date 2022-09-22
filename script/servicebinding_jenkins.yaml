@@ -1,0 +1,9 @@
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ServiceBinding
+metadata:
+  name: jenkins-binding
+  namespace: jenkins 
+spec:
+  instanceRef:
+    name: jenkins-03
+

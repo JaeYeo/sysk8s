@@ -1,0 +1,7 @@
+apiVersion: addons.kyma-project.io/v1alpha1
+kind: ClusterAddonsConfiguration
+metadata:
+  name: mongodb-cfg
+spec:
+  repositories:
+    - url: "https://raw.githubusercontent.com/infranics/sysk8s/main/mongodb-0.1.0/index-mongodb.yaml"

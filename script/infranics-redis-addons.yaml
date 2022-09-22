@@ -1,0 +1,11 @@
+apiVersion: addons.kyma-project.io/v1alpha1
+kind: AddonsConfiguration
+metadata:
+  name: redis-cfg
+  namespace: redis011 
+  finalizers:
+  - addons.kyma-project.io
+  label:
+spec:
+  repositories:
+    - url: "https://raw.githubusercontent.com/infranics/sysk8s/main/redis-0.1.1/index-redis.yaml"

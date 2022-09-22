@@ -1,0 +1,17 @@
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ServiceInstance
+metadata:
+  name: mysql-03
+  namespace: mysql 
+spec:
+  clusterServiceClassExternalName: mysql 
+  clusterServicePlanExternalName: micro 
+  parameters:
+    fullnameOverride: mysql-03
+    auth:
+      rootPassword: master77!!
+      database: sysk8s
+    primary:
+      service:
+        ports:
+          mysql: 3308

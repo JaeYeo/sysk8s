@@ -1,0 +1,13 @@
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ServiceInstance
+metadata:
+  name: kafka-03
+  namespace: kafka
+spec:
+  clusterServiceClassExternalName: kafka
+  clusterServicePlanExternalName: enterprise 
+  parameters:
+    fullnameOverride: kafka-03
+    externalAccess:
+      service:
+        domain: "112.175.114.177"

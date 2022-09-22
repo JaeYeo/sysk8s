@@ -1,0 +1,8 @@
+apiVersion: addons.kyma-project.io/v1alpha1
+kind: AddonsConfiguration
+metadata:
+  name: rabbitmq-cfg
+  namespace: rabbitmq
+spec:
+  repositories:
+    - url: "https://raw.githubusercontent.com/infranics/sysk8s/main/rabbitmq-0.1.0/index-rabbitmq.yaml"

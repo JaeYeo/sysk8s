@@ -1,0 +1,17 @@
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ServiceInstance
+metadata:
+  name: rabbitmq-03
+  namespace: rabbitmq
+spec:
+  clusterServiceClassExternalName: rabbitmq 
+  clusterServicePlanExternalName: micro 
+  parameters:
+    fullnameOverride: rabbitmq-03
+    auth:
+      password: master77!!
+    service:
+      port: 5673
+    ingress:
+      enabled: true
+      hostname: rabbitmq3.dev.sm-k8s.com 
