@@ -1,0 +1,6 @@
+name: micro
+id: dbb4666a-904c-4403-b43e-eb1f0f49f9e2
+description: "Apache micro plan which uses the HTTP Server Project."
+displayName: Micro
+
+bindable: true

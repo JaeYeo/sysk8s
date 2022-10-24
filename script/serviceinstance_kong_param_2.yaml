@@ -2,7 +2,7 @@ apiVersion: servicecatalog.k8s.io/v1beta1
 kind: ServiceInstance
 metadata:
   name: kong-04
-  namespace: kong2 
+  namespace: default
 spec:
   clusterServiceClassExternalName: kong 
   clusterServicePlanExternalName: micro 

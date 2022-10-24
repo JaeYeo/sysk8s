@@ -16,5 +16,5 @@ credential:
   - name: CLUSTER_IP
     valueFrom:
       serviceRef:
-        name: {{ include "scouterapm.fullname" . }}
+        name: {{ printf "%s-master" (include "common.names.fullname" .) }} 
         jsonpath: '{ .spec.clusterIP }'
