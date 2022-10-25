@@ -1,0 +1,12 @@
+name: nginx
+version: 0.1.0
+id: a6cf1a6f-b2bf-4920-a4a9-c65b3e8e6121
+description: "Nginx by Helm Broker. "
+displayName: "Nginx"
+tags: nginx, sysmasterk8s 
+providerDisplayName: bitnami
+longDescription: "https://github.com/bitnami/charts/tree/master/bitnami/nginx/#installing-the-chart"
+documentationURL: https://github.com/bitnami/bitnami-docker-nginx
+supportURL: https://bitnami.com/support
+imageURL: https://bitnami.com/assets/stacks/nginx/img/nginx-stack-220x234.png
+bindable: true

@@ -1,0 +1,6 @@
+name: micro
+id: 22610482-a59b-4db9-97f4-73375c9380e2
+description: "Wildfly micro plan which uses the application server."
+displayName: Micro
+
+bindable: true

@@ -1,0 +1,12 @@
+name: wildfly
+version: 0.1.0
+id: 22610482-a59b-4db9-97f4-73375c9380e1
+description: "Wildfly by Helm Broker. "
+displayName: "Wildfly"
+tags: wildfly, sysmasterk8s 
+providerDisplayName: bitnami
+longDescription: "https://github.com/bitnami/charts/tree/master/bitnami/wildfly/#installing-the-chart"
+documentationURL: https://github.com/bitnami/bitnami-docker-apache
+supportURL: https://bitnami.com/support
+imageURL: https://bitnami.com/assets/stacks/wildfly/img/wildfly-stack-220x234.png
+bindable: true

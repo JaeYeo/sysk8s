@@ -1,0 +1,6 @@
+name: micro
+id: a6cf1a6f-b2bf-4920-a4a9-c65b3e8e6122
+description: "Nginx micro plan which uses the HTTP and reverse proxy server."
+displayName: Micro
+
+bindable: true

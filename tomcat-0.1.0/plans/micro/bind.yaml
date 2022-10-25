@@ -1,0 +1,20 @@
+credential:
+  - name: HOST
+    value: {{ include "tomcat.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+{{- if (eq .Values.service.type "NodePort") }}
+  - name: HTTP_NODE_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }}
+        jsonpath: '{ .spec.ports[?(@.name=="http")].nodePort }'
+  - name: HTTPS_NODE_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }}
+        jsonpath: '{ .spec.ports[?(@.name=="https")].nodePort }'
+{{- end }}
+  - name: CLUSTER_IP
+    valueFrom:
+      serviceRef:
+        name: {{ printf "%s-master" (include "common.names.fullname" .) }} 
+        jsonpath: '{ .spec.clusterIP }'

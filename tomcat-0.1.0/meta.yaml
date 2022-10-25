@@ -1,0 +1,12 @@
+name: tomcat
+version: 0.1.0
+id: d9d29c6d-fd62-47e4-bdb8-6dea4ddabab1
+description: "Tomcat by Helm Broker. "
+displayName: "Tomcat"
+tags: tomcat, sysmasterk8s 
+providerDisplayName: bitnami
+longDescription: "https://github.com/bitnami/charts/tree/master/bitnami/tomcat/#installing-the-chart"
+documentationURL: https://github.com/bitnami/bitnami-docker-tomcat
+supportURL: https://bitnami.com/support
+imageURL: https://bitnami.com/assets/stacks/tomcat/img/tomcat-stack-220x234.png
+bindable: true

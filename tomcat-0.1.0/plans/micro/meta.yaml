@@ -1,0 +1,6 @@
+name: micro
+id: d9d29c6d-fd62-47e4-bdb8-6dea4ddabab2
+description: "Tomcat micro plan which uses the web applications."
+displayName: Micro
+
+bindable: true
