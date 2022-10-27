@@ -417,8 +417,8 @@ service:
   ## @param service.nodePorts.https Node port for HTTPS
   ##
   nodePorts:
-    http: 30004
-    https: 30005
+    http: ""
+    https: ""
   ## @param service.clusterIP Apache service Cluster IP
   ## e.g.:
   ## clusterIP: None
