@@ -1,6 +1,6 @@
 credential:
   - name: HOST
-    value: {{ include "nginx.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+    value: {{ include "common.names.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
 {{- if (eq .Values.service.type "NodePort") }}
   - name: HTTP_NODE_PORT
     valueFrom:
@@ -16,5 +16,5 @@ credential:
   - name: CLUSTER_IP
     valueFrom:
       serviceRef:
-        name: {{ printf "%s-master" (include "common.names.fullname" .) }} 
+        name: {{ printf "%s" (include "common.names.fullname" .) }} 
         jsonpath: '{ .spec.clusterIP }'
