@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "codeserver.fullname" . }}-svc
+  labels:
+    {{- include "codeserver.labels" . | nindent 4 }}
+spec:
+{{- if eq .Values.service.type "ClusterIP" }}
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "codeserver.selectorLabels" . | nindent 4 }}
+{{- else if eq .Values.service.type "NodePort" }}
+  type: NodePort
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: 8080
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "codeserver.selectorLabels" . | nindent 4 }}
+{{- end }}

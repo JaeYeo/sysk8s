@@ -1,0 +1,18 @@
+credential:
+  - name: CLUSTER_IP
+    valueFrom:
+      serviceRef:
+        name: {{ include "codeserver.fullname" . }}-svc
+        jsonpath: '{ .spec.clusterIP }'
+{{- if (eq .Values.service.type "NodePort") }}
+  - name: NODE_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "codeserver.fullname" . }}-svc
+        jsonpath: '{ .spec.ports[?(@.name=="http")].nodePort }'
+{{- end }}
+  - name: userPassWord
+    valueFrom:
+      ConfigMapKeyRef:
+        name: {{ template "codeserver.fullname" . }}-configmap
+        key: password

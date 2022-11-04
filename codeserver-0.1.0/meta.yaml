@@ -1,0 +1,12 @@
+name: codeserver
+version: 0.1.0
+id: d63844ce-38cf-4a42-b1ed-b897582c6b0d
+description: "CodeServer by Helm Broker."
+displayName: "CodeServer"
+tags: codeserver
+providerDisplayName: infranics
+longDescription: "https://github.com/hyunkim13/codeserver.git"
+documentationURL: ""
+supportURL: ""
+imageURL: ""
+bindable: true

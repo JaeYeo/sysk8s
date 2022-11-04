@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "codeserver.fullname" . }}-configmap
+  labels:
+{{ include "codeserver.labels" . | indent 4 }}
+data:
+  password: {{ .Values.codeserver.password }}

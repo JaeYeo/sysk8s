@@ -8,7 +8,7 @@ global:
   imageRegistry: ""
 
 image:
-  registry: registry.systeer.com
+  registry: registry.saas.sysmasterk8s.com
   repository: pantsel/konga
   tag: 0.16.1 
   pullPolicy: IfNotPresent
