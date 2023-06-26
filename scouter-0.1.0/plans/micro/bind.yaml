@@ -1,0 +1,25 @@
+credential:
+  - name: HOST
+    value: {{ include "scouterapm.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+{{- if (eq .Values.service.type "NodePort") }}
+  - name: WEB_NODE_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "scouterapm.fullname" . }}
+        jsonpath: '{ .spec.ports[?(@.name=="web2")].nodePort }'
+  - name: COLLECTOR_NODE_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "scouterapm.fullname" . }}
+        jsonpath: '{ .spec.ports[?(@.name=="http2")].nodePort }'
+  - name: UDP_NODE_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "scouterapm.fullname" . }}
+        jsonpath: '{ .spec.ports[?(@.name=="udp2")].nodePort }'
+{{- end }}
+  - name: CLUSTER_IP
+    valueFrom:
+      serviceRef:
+        name: {{ include "scouterapm.fullname" . }}
+        jsonpath: '{ .spec.clusterIP }'

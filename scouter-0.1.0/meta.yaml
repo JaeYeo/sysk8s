@@ -1,0 +1,13 @@
+name: scouterapm
+version: 0.1.0
+id: bae70f-40e57f48-6e5521e-81899-c9df45
+description: "ScouterAPM by Helm Broker. "
+displayName: "ScouterAPM"
+tags: scouterapm, sysmasterk8s
+providerDisplayName: infranics
+longDescription: "https://github.com/sanghyuk83/scouter.git"
+documentationURL: ""
+supportURL: ""
+imageURL: ""
+bindable: true
+
