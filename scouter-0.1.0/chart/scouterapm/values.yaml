@@ -7,7 +7,7 @@ scouterapm:
 replicaCount: 1
 
 image:
-  repository: harbor.sysmastervm.com:9443/monitoring/scouterserver
+  repository: harbor.sysmastervm.com/monitoring/scouterserver
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: "monitoring-v0.5"
