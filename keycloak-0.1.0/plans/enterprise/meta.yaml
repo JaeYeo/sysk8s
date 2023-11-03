@@ -1,0 +1,6 @@
+name: enterprise
+id: e2541d35-590a-490b-8662-0c1ad0ebe0f3
+description: "Keycloak enterprise plan which uses the HTTP Server Project."
+displayName: Enterprise
+
+bindable: true
