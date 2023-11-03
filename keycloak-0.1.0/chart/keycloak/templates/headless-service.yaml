@@ -19,7 +19,7 @@ spec:
       port: {{ coalesce .Values.service.ports.http .Values.service.port }}
       protocol: TCP
       targetPort: http
-    {{- if .Values.auth.tls.enabled }}
+    {{- if .Values.tls.enabled }}
     - name: https
       port: {{ coalesce .Values.service.ports.https .Values.service.httpsPort }}
       protocol: TCP

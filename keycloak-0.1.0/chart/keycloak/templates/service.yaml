@@ -49,7 +49,7 @@ spec:
       nodePort: null
       {{- end }}
     {{- end }}
-    {{- if .Values.auth.tls.enabled }}
+    {{- if .Values.tls.enabled }}
     - name: https
       port: {{ coalesce .Values.service.ports.https .Values.service.httpsPort }}
       protocol: TCP
