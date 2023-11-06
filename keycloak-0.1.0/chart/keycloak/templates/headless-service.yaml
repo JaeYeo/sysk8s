@@ -13,13 +13,13 @@ metadata:
   {{- end }}
 spec:
   type: ClusterIP
-  clusterIP: ""
+  clusterIP: None
   ports:
     - name: http
       port: {{ coalesce .Values.service.ports.http .Values.service.port }}
       protocol: TCP
       targetPort: http
-    {{- if .Values.tls.enabled }}
+    {{- if .Values.auth.tls.enabled }}
     - name: https
       port: {{ coalesce .Values.service.ports.https .Values.service.httpsPort }}
       protocol: TCP
