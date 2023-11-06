@@ -19,7 +19,7 @@ metadata:
     {{- end }}
   {{- end }}
 spec:
-  type: ClusterIP
+  type: NodePort
   ports:
     - name: http
       port: {{ coalesce .Values.metrics.service.ports.http .Values.metrics.service.port }}
