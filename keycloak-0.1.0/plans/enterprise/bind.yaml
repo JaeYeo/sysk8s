@@ -5,7 +5,7 @@ credential:
     valueFrom:
       secretKeyRef:
         name: {{ template "common.names.fullname" . }} 
-        key: keycloak-password 
+        key: admin-password 
 {{- if .Values.ingress.enabled }}
   - name: INGRESS_HOSTNAME
     value: {{ .Values.ingress.hostname }} 
