@@ -1,5 +1,5 @@
 {{- $globalSecretName := printf "%s" (tpl (include "common.secrets.name" (dict "existingSecret" .Values.auth.existingSecret "context" $)) $) }}
-apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: {{ template "keycloak.fullname" . }}
