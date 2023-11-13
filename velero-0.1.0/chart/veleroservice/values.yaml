@@ -1,0 +1,214 @@
+## Default values for SysMasterK8sVelero.
+replicaCount: 1
+
+## ------------------------------------------------------
+## velero Api service Options
+## name, image(repository, tag), ingress etc
+## ------------------------------------------------------
+veleroApi:
+  ##  name
+  fullnameOverride: "velero-api"
+
+  ## Specify an array of imagePullSecrets.
+  ## Secrets must be manually created in the namespace.
+  imagePullSecrets: []
+
+  ## Image Info
+  ## image: repository+tag
+  ## pullPolicy: Specify a imagePullPolicy
+  image:
+    repository: harbor.spaasta.com/velero/velero-api
+    tag: "1.7"
+    pullPolicy: IfNotPresent
+
+  ## service
+  service:
+    type: ClusterIP
+    port: 80
+
+  # ingress
+  # host: Enter the URL that can be connected to the velero web service.
+  ingress:
+    enabled: false
+    className: ""
+    annotations:
+      ingress.kubernetes.io/path-is-regex: "true"
+      nginx.ingress.kubernetes.io/cors-allow-origin: '*'
+      nginx.ingress.kubernetes.io/enable-cors: "true"
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/proxy-redirect-from: http://
+      nginx.ingress.kubernetes.io/proxy-redirect-to: https://
+    hosts:
+      - host: velero-test.saas.sysmasterk8s.com
+        paths:
+          - path: /api
+            pathType: ImplementationSpecific
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  ## Custom pod annotations
+  podAnnotations: {}
+    # fsGroup: 2000
+
+  ## Security Context
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  ## Node labels for pod assignment
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  nodeSelector: {}
+
+  ## Taints to tolerate on node assignment:
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  tolerations: []
+
+  ## Pod scheduling constraints
+  ## Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity
+  affinity: {}
+
+  # This secret value must be base64 encoded.
+  # This option is required to run spring boot.
+  secret:
+    spring_datasource_url: amRiYzpteXNxbDovLzExMi4xNzUuMTE0LjE1ODozMzA2L0s4U19NT05JVE9SSU5HP2NoYXJhY3RlckVuY29kaW5nPVVURi04JmF1dG9SZWNvbm5lY3Q9dHJ1ZSZmYWlsT3ZlclJlYWRPbmx5PWZhbHNlJm1heFJlY29ubmVjdHM9MTA=
+    server_port: ODA=
+    server_servlet_context_path: L2FwaQ==
+    spring_cloud_vault_k8s_configpath: L3RtcC9rdWJlY29uZmln
+    spring_datasource_username: cm9vdA==
+    spring_datasource_password: Q2hhbGxlbmdlNzchIQ==
+    spring_cloud_vault_host: dmF1bHQuc2Fhcy5zeXNtYXN0ZXJrOHMuY29t
+    spring_cloud_vault_port: ODA=
+    spring_cloud_vault_token: cy5KYmJZUGY0VVZZT1FKQlpnQWxtYUxvUHM=
+    spring_cloud_vault_k8s_projectid: MDAwMDAwMDAtMDAwMC0wMDAwLTAwMDAtMDAwMDAwMDAwMDAw
+
+  # now only use enabled option
+  # Other options are features you need to add.
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+## ------------------------------------------------------
+# velero App service Options
+# name, image(repository, tag), ingress etc
+## ------------------------------------------------------
+veleroApp:
+  ##  name
+  fullnameOverride: "velero-app"
+
+  ## Specify an array of imagePullSecrets.
+  ## Secrets must be manually created in the namespace.
+  imagePullSecrets: []
+
+  ## Image Info
+  ## image: repository+tag
+  ## pullPolicy: Specify a imagePullPolicy
+  image:
+    repository: harbor.spaasta.com/velero/velero-app
+    tag: "2.5"
+    pullPolicy: IfNotPresent
+
+  ## service
+  service:
+    type: ClusterIP
+    port: 80
+
+  # ingress
+  # host: Enter the URL that can be connected to the velero web service.
+  ingress:
+    enabled: false
+    className: ""
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: /
+      ingress.kubernetes.io/path-is-regex: "true"
+      nginx.ingress.kubernetes.io/cors-allow-origin: '*'
+      nginx.ingress.kubernetes.io/enable-cors: "true"
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/proxy-redirect-from: http://
+      nginx.ingress.kubernetes.io/proxy-redirect-to: https://
+    hosts:
+      - host: velero-test.saas.sysmasterk8s.com
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls: []
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  ## Custom pod annotations
+  podAnnotations: {}
+    # fsGroup: 2000
+
+  ## Security Context
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  ## Node labels for pod assignment
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  nodeSelector: {}
+
+  ## Taints to tolerate on node assignment:
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  tolerations: []
+
+  ## Pod scheduling constraints
+  ## Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity
+  affinity: {}
+
+
+  ## The configmap is information 
+  ##authentication_url contains keycloak access information.
+  configmap:
+    authentication_url: https://keycloak2.spaasta.com/auth
+    authentication_client_id: velero
+    authentication_realm: sysK8s
+
+  # now only use enabled option
+  # Other options are features you need to add.
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+    #    persistence.size
+
+global:
+  persistence:
+    size: 50Gi

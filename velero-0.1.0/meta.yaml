@@ -1,0 +1,12 @@
+name: velero
+version: 0.1.1
+id: 25e18d08-6cc5-11ee-b962-0242ac120002
+description: "VeleroService by Helm Broker."
+displayName: "VeleroService"
+tags: velero
+providerDisplayName: infranics
+longDescription: "https://github.com/juchan133/velero.git"
+documentationURL: ""
+supportURL: ""
+imageURL: ""
+bindable: true

@@ -1,0 +1,45 @@
+{{- if .Values.veleroApi.ingress.enabled -}}
+{{- $fullName := include "veleroApi.fullname" . -}}
+{{- $svcPort := .Values.veleroApi.service.port -}}
+apiVersion: networking.k8s.io/v1
+#apiVersion: networking.k8s.io/v1beta1
+#apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ $fullName }}
+  labels:
+    {{- include "veleroApi.labels" . | nindent 4 }}
+  {{- with .Values.veleroApi.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if and .Values.veleroApi.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
+  ingressClassName: {{ .Values.veleroApi.ingress.className }}
+  {{- end }}
+  {{- if .Values.veleroApi.ingress.tls }}
+  tls:
+    {{- range .Values.veleroApi.ingress.tls }}
+    - hosts:
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
+  rules:
+    {{- range .Values.veleroApi.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ .path }}
+            pathType: {{ .pathType }}
+            backend:
+              service:
+                name: {{ $fullName }}
+                port:
+                  number: {{ $svcPort }}
+          {{- end }}
+    {{- end }}
+{{- end }}

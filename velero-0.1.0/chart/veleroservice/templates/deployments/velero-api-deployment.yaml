@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "veleroApi.fullname" . }}
+  labels:
+    {{- include "veleroApi.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.veleroApi.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "veleroApi.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.veleroApi.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "veleroApi.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.veleroApi.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.veleroApi.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ include "veleroApi.fullname" . }}
+          securityContext:
+            {{- toYaml .Values.veleroApi.securityContext | nindent 12 }}
+          image: "{{ .Values.veleroApi.image.repository }}:{{ .Values.veleroApi.image.tag }}"
+          imagePullPolicy: {{ .Values.veleroApi.image.pullPolicy }}
+          envFrom:
+          - secretRef:
+              name: {{ include "veleroApi.fullname" . }}-secret
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+              # livenessProbe:
+              #httpGet:
+              # path: /api/velero/backup/ping
+              #port: 80
+              #scheme: HTTP
+          readinessProbe:
+            httpGet:
+              path: /api/velero/backup/ping
+              port: 80
+              scheme: HTTP
+          resources:
+            {{- toYaml .Values.veleroApi.resources | nindent 12 }}
+      {{- with .Values.veleroApi.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.veleroApi.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.veleroApi.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -1,0 +1,6 @@
+name: micro
+id: 25e190fa-6cc5-11ee-b962-0242ac120002
+description: "Micro plan"
+displayName: Micro
+
+bindable: true

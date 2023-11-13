@@ -1,0 +1,15 @@
+# now keycloak info to save configmap
+# recommend: to move velero-api secret, call api
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "veleroApp.fullname" . }}-configmap
+data:
+  my_authentication_target.json: |
+    [
+      { "name": "URL", "value": "{{ .Values.veleroApp.configmap.authentication_url }}" },
+      { "name": "CLIENT_ID", "value": "{{ .Values.veleroApp.configmap.authentication_client_id }}" },
+      { "name": "REALM", "value": "{{ .Values.veleroApp.configmap.authentication_realm }}" }
+    ]
+

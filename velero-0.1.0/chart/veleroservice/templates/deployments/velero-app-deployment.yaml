@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "veleroApp.fullname" . }}
+  labels:
+    {{- include "veleroApp.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.veleroApp.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "veleroApp.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.veleroApp.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "veleroApp.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.veleroApp.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.veleroApp.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ include "veleroApp.fullname" . }}
+          securityContext:
+            {{- toYaml .Values.veleroApp.securityContext | nindent 12 }}
+          image: "{{ .Values.veleroApp.image.repository }}:{{ .Values.veleroApp.image.tag }}"
+          imagePullPolicy: {{ .Values.veleroApp.image.pullPolicy }}
+          volumeMounts:
+          - name: {{ include "veleroApp.fullname" . }}-configmap
+            mountPath: /usr/local/apache2/htdocs/my_authentication_target.json
+            subPath: my_authentication_target.json
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+              scheme: HTTP
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+              scheme: HTTP
+          resources:
+            {{- toYaml .Values.veleroApp.resources | nindent 12 }}
+      {{- with .Values.veleroApp.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.veleroApp.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.veleroApp.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+      - name: {{ include "veleroApp.fullname" . }}-configmap
+        configMap:
+          name: {{ include "veleroApp.fullname" . }}-configmap
+          items:
+          - key: my_authentication_target.json
+            path: my_authentication_target.json
