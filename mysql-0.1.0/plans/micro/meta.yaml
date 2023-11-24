@@ -1,0 +1,6 @@
+name: micro
+id: d4a54ba4-dcc0-11ec-9d64-0242ac120002 
+description: "Mysql micro plan, standalone."
+displayName: Micro
+
+bindable: true

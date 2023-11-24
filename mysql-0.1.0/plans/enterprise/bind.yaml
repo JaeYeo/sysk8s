@@ -1,0 +1,27 @@
+credential:
+  - name: HOST
+    value: {{ include "mysql.primary.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}
+  - name: PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "mysql.primary.fullname" . }} 
+        jsonpath: '{ .spec.ports[?(@.name=="mysql")].port }'
+  - name: MYSQL_ROOT_PASSWORD 
+    valueFrom:
+      secretKeyRef:
+        name: {{ template "mysql.secretName" . }} 
+        key: mysql-root-password 
+  - name: DATABASE
+    value: {{ .Values.auth.database | quote }}
+{{- if (eq .Values.primary.service.type "NodePort") }}
+  - name: NODE_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "mysql.primary.fullname" . }} 
+        jsonpath: '{ .spec.ports[?(@.name=="mysql")].nodePort }'
+{{- end }}
+  - name: CLUSTER_IP
+    valueFrom:
+      serviceRef:
+        name: {{ include "mysql.primary.fullname" . }} 
+        jsonpath: '{ .spec.clusterIP }'
