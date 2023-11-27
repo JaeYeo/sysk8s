@@ -15,7 +15,7 @@ primary:
       memory: 4Gi
       cpu: 2000m
   persistence:
-    size: 16Gi
+    size: 8Gi
   service:
     type: NodePort
 
@@ -29,6 +29,6 @@ readReplicas:
       memory: 4Gi
       cpu: 2000m
   persistence:
-    size: 16Gi
+    size: 8Gi
 
 
