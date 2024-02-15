@@ -1,0 +1,6 @@
+name: micro
+id: e2541d35-590a-490b-8662-0c1ad0ebe1f2
+description: "Keycloak micro plan which uses the HTTP Server Project."
+displayName: Micro
+
+bindable: true

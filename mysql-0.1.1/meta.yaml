@@ -1,5 +1,5 @@
 name: mysql 
-version: 0.1.0
+version: 0.1.1
 id: d4a54ba4-dcc0-11ec-9d64-0242ac120001
 description: "Mysql by Helm Broker. "
 displayName: "Mysql"

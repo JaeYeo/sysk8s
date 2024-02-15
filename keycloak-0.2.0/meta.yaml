@@ -1,0 +1,12 @@
+name: keycloak
+version: 0.1.0
+id: e2541d35-590a-490b-8662-0c1ad0ebe1f1
+description: "Keycloak by Helm Broker. "
+displayName: "Keycloak"
+tags: keycloak, sysmasterk8s 
+providerDisplayName: bitnami
+longDescription: "https://github.com/bitnami/charts/tree/master/bitnami/keycloak/#installing-the-chart"
+documentationURL: https://github.com/bitnami/bitnami-docker-keycloak
+supportURL: https://bitnami.com/support
+imageURL: https://bitnami.com/assets/stacks/keycloak/img/keycloak-stack-220x234.png
+bindable: true
