@@ -9,9 +9,9 @@ replicas: 1
 
 image:
   # The Keycloak image repository
-  repository: quay.io/keycloak/keycloak
-  # Overrides the Keycloak image tag whose default is the chart appVersion
-  tag: ""
+  registry: docker.io
+  repository: platform_component/keycloak/keycloak
+  tag: 19.0.3_dev10
   # The Keycloak image pull policy
   pullPolicy: IfNotPresent
 
