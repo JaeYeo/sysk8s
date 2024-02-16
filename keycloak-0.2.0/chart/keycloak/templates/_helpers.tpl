@@ -73,3 +73,9 @@ Create the service DNS name.
 {{- define "keycloak.serviceDnsName" -}}
 {{ include "keycloak.fullname" . }}-headless.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}
 {{- end }}
+
+Return the Database port
+*/}}
+{{- define "keycloak.databasePort" -}}
+{{- ternary "5432" .Values.externalDatabase.port .Values.postgresql.enabled | quote -}}
+{{- end -}}
