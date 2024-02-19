@@ -99,3 +99,15 @@ Return true if a TLS secret object should be created
     {{- true -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Return the Database hostname
+*/}}
+{{- define "keycloak.databaseHost" -}}
+{{- if eq .Values.postgresql.architecture "replication" }}
+{{- ternary (include "keycloak.postgresql.fullname" .) .Values.externalDatabase.host .Values.postgresql.enabled -}}-primary
+{{- else -}}
+{{- ternary (include "keycloak.postgresql.fullname" .) .Values.externalDatabase.host .Values.postgresql.enabled -}}
+{{- end -}}
+{{- end -}}
+
