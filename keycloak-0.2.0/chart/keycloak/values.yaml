@@ -141,6 +141,34 @@ extraEnvFrom: ""
 #  Pod priority class name
 priorityClassName: ""
 
+## @param replicaCount Number of Keycloak replicas to deploy
+##
+replicaCount: 1
+## @param containerPorts.http Keycloak HTTP container port
+## @param containerPorts.https Keycloak HTTPS container port
+##
+containerPorts:
+  http: 8080
+  https: 8443
+## Keycloak pods' SecurityContext
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+## @param podSecurityContext.enabled Enabled Keycloak pods' Security Context
+## @param podSecurityContext.fsGroup Set Keycloak pod's Security Context fsGroup
+##
+podSecurityContext:
+  enabled: true
+  fsGroup: 1001
+## Keycloak containers' Security Context
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+## @param containerSecurityContext.enabled Enabled Keycloak containers' Security Context
+## @param containerSecurityContext.runAsUser Set Keycloak container's Security Context runAsUser
+## @param containerSecurityContext.runAsNonRoot Set Keycloak container's Security Context runAsNonRoot
+##
+containerSecurityContext:
+  enabled: true
+  runAsUser: 1001
+  runAsNonRoot: true
+
 # Pod affinity
 affinity: |
   podAntiAffinity:
