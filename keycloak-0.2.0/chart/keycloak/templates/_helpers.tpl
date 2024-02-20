@@ -148,3 +148,12 @@ Return the Database user
     {{- .Values.externalDatabase.user -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Return true if a configmap object should be created
+*/}}
+{{- define "keycloak.createConfigmap" -}}
+{{- if and .Values.configuration (not .Values.existingConfigmap) }}
+    {{- true -}}
+{{- end -}}
+{{- end -}}
