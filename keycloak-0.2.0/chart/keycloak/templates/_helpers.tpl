@@ -202,3 +202,10 @@ Return true if a configmap object should be created for keycloak-config-cli
     {{- true -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Return the proper Keycloak image name
+*/}}
+{{- define "keycloak.image" -}}
+{{ include "common.images.image" (dict "imageRoot" .Values.image "global" .Values.global) }}
+{{- end -}}
