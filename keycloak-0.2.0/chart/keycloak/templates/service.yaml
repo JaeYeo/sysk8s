@@ -39,7 +39,7 @@ spec:
   {{- end }}
   ports:
     {{- if .Values.service.http.enabled }}
-    - port: {{ coalesce .Values.service.sepc.ports.http .Values.service.port }}
+    - port: {{ coalesce .Values.service.spec.ports.http .Values.service.port }}
       name: http
       protocol: TCP
       targetPort: http
