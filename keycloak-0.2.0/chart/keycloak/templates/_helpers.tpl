@@ -129,3 +129,22 @@ Return the Database database name
     {{- .Values.externalDatabase.database -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Return the Database user
+*/}}
+{{- define "keycloak.databaseUser" -}}
+{{- if .Values.postgresql.enabled }}
+    {{- if .Values.global.postgresql }}
+        {{- if .Values.global.postgresql.auth }}
+            {{- coalesce .Values.global.postgresql.auth.username .Values.postgresql.auth.username -}}
+        {{- else -}}
+            {{- .Values.postgresql.auth.username -}}
+        {{- end -}}
+    {{- else -}}
+        {{- .Values.postgresql.auth.username -}}
+    {{- end -}}
+{{- else -}}
+    {{- .Values.externalDatabase.user -}}
+{{- end -}}
+{{- end -}}
