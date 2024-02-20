@@ -111,3 +111,21 @@ Return the Database hostname
 {{- end -}}
 {{- end -}}
 
+{{/*
+Return the Database database name
+*/}}
+{{- define "keycloak.databaseName" -}}
+{{- if .Values.postgresql.enabled }}
+    {{- if .Values.global.postgresql }}
+        {{- if .Values.global.postgresql.auth }}
+            {{- coalesce .Values.global.postgresql.auth.database .Values.postgresql.auth.database -}}
+        {{- else -}}
+            {{- .Values.postgresql.auth.database -}}
+        {{- end -}}
+    {{- else -}}
+        {{- .Values.postgresql.auth.database -}}
+    {{- end -}}
+{{- else -}}
+    {{- .Values.externalDatabase.database -}}
+{{- end -}}
+{{- end -}}
