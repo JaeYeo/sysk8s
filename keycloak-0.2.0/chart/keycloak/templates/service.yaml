@@ -39,7 +39,7 @@ spec:
   {{- end }}
   ports:
     {{- if .Values.service.http.enabled }}
-    - port: {{ coalesce .Values.service.spec.ports.http .Values.service.port }}
+    - port: 80
       name: http
       protocol: TCP
       targetPort: http
@@ -50,7 +50,7 @@ spec:
       {{- end }}
     {{- end }}
     {{- if .Values.auth.tls.enabled }}
-    - port: {{ coalesce .Values.service.spec.ports.https .Values.service.httpsPort }}
+    - port: 443
       name: https
       protocol: TCP
       targetPort: https
