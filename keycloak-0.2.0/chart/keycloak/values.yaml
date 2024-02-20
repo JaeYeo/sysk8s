@@ -471,9 +471,10 @@ service:
   ## @param service.ports.http Keycloak service HTTP port
   ## @param service.ports.https Keycloak service HTTPS port
   ##
-  ports:
-    http: 80
-    https: 443
+  spec:
+    ports:
+      http: 80
+      https: 443
   ## @param service.nodePorts [object] Specify the nodePort values for the LoadBalancer and NodePort service types.
   ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport
   ##
@@ -729,9 +730,10 @@ metrics:
   service:
     ## @param metrics.service.ports.http Metrics service HTTP port
     ##
-    ports:
-      http: 80
-      https: 443
+    spec:
+      ports:
+        http: 80
+        https: 443
     ## @param metrics.service.annotations [object] Annotations for enabling prometheus to access the metrics endpoints
     ##
     annotations:
