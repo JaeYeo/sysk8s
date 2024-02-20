@@ -39,8 +39,8 @@ spec:
   {{- end }}
   ports:
     {{- if .Values.service.http.enabled }}
-    - name: http
-      port: {{ coalesce .Values.service.ports.http .Values.service.port }}
+    - port: {{ coalesce .Values.service.ports.http .Values.service.port }}
+      name: http
       protocol: TCP
       targetPort: http
       {{- if (and (or (eq .Values.service.type "NodePort") (eq .Values.service.type "LoadBalancer")) (not (empty .Values.service.nodePorts.http))) }}
@@ -50,8 +50,8 @@ spec:
       {{- end }}
     {{- end }}
     {{- if .Values.auth.tls.enabled }}
-    - name: https
-      port: {{ coalesce .Values.service.ports.https .Values.service.httpsPort }}
+    - port: {{ coalesce .Values.service.ports.https .Values.service.httpsPort }}
+      name: https
       protocol: TCP
       targetPort: https
       {{- if (and (or (eq .Values.service.type "NodePort") (eq .Values.service.type "LoadBalancer")) (not (empty .Values.service.nodePorts.https))) }}
