@@ -738,7 +738,7 @@ metrics:
     ##
     annotations:
       prometheus.io/scrape: "true"
-      prometheus.io/port: "{{ .Values.metrics.service.ports.http }}"
+      prometheus.io/port: "{{ .Values.metrics.service.spec.ports.http }}"
   ## Prometheus Operator ServiceMonitor configuration
   ##
   serviceMonitor:
