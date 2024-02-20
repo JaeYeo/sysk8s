@@ -209,3 +209,45 @@ Return the proper Keycloak image name
 {{- define "keycloak.image" -}}
 {{ include "common.images.image" (dict "imageRoot" .Values.image "global" .Values.global) }}
 {{- end -}}
+
+{{/*
+Return the Database encrypted password
+*/}}
+{{- define "keycloak.databaseSecretName" -}}
+{{- if .Values.postgresql.enabled }}
+    {{- if .Values.global.postgresql }}
+        {{- if .Values.global.postgresql.auth }}
+            {{- if .Values.global.postgresql.auth.existingSecret }}
+                {{- tpl .Values.global.postgresql.auth.existingSecret $ -}}
+            {{- else -}}
+                {{- default (include "keycloak.postgresql.fullname" .) (tpl .Values.postgresql.auth.existingSecret $) -}}
+            {{- end -}}
+        {{- else -}}
+            {{- default (include "keycloak.postgresql.fullname" .) (tpl .Values.postgresql.auth.existingSecret $) -}}
+        {{- end -}}
+    {{- else -}}
+        {{- default (include "keycloak.postgresql.fullname" .) (tpl .Values.postgresql.auth.existingSecret $) -}}
+    {{- end -}}
+{{- else -}}
+    {{- default (include "common.secrets.name" (dict "existingSecret" .Values.auth.existingSecret "context" $)) (tpl .Values.externalDatabase.existingSecret $) -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Add environment variables to configure database values
+*/}}
+{{- define "keycloak.databaseSecretKey" -}}
+{{- if .Values.postgresql.enabled -}}
+    {{- print "password" -}}
+{{- else -}}
+    {{- if .Values.externalDatabase.existingSecret -}}
+        {{- if .Values.externalDatabase.existingSecretPasswordKey -}}
+            {{- printf "%s" .Values.externalDatabase.existingSecretPasswordKey -}}
+        {{- else -}}
+            {{- print "password" -}}
+        {{- end -}}
+    {{- else -}}
+        {{- print "password" -}}
+    {{- end -}}
+{{- end -}}
+{{- end -}}
