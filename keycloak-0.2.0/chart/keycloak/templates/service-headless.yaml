@@ -11,7 +11,7 @@ spec:
   clusterIP: None
   ports:
     - name: http
-      port: {{ coalesce .Values.service.spec.ports.http .Values.service.port }}
+      port: {{ .Values.service.httpPort }}
       targetPort: http
       protocol: TCP
   selector:

@@ -1,5 +1,5 @@
 name: keycloak
-version: 0.1.0
+version: 0.2.0
 id: e2541d35-590a-490b-8662-0c1ad0ebe1f1
 description: "Keycloak by Helm Broker. "
 displayName: "Keycloak"
