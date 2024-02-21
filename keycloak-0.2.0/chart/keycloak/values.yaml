@@ -105,25 +105,8 @@ command: []
 args: []
 
 # Additional environment variables for Keycloak
-#
-extraEnv: |
-  - name: DB_VENDOR
-    value: postgres
-  - name: DB_ADDR
-    value: sysk8s-keycloak-postgresql
-  - name: DB_PORT
-    value: "5432"
-  - name: DB_DATABASE
-    value: keycloak
-  - name: DB_USER
-    value: keycloak
-  - name: DB_PASSWORD
-    value: keycloak
-  - name: KEYCLOAK_USER
-    value: keycloak
-  - name: KEYCLOAK_PASSWORD
-    value: keycloak
-    #  - name: JAVA_OPTS
+
+
  
 #extraEnv: ""
   # - name: KEYCLOAK_LOGLEVEL
