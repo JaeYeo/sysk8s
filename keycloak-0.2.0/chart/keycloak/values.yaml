@@ -116,13 +116,13 @@ extraEnv: |
   - name: DB_DATABASE
     value: keycloak
   - name: DB_USER
-    value: postgres
+    value: keycloak
   - name: DB_PASSWORD
-    value: postgres
+    value: keycloak
   - name: KEYCLOAK_USER
     value: keycloak
   - name: KEYCLOAK_PASSWORD
-    value: {{ .Values.keycloakPassword }}
+    value: keycloak
     #  - name: JAVA_OPTS
  
 #extraEnv: ""
