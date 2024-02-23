@@ -23,7 +23,7 @@ import (
 	"net"
 	"reflect"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	scfeatures "github.com/kubernetes-sigs/service-catalog/pkg/features"
 	"github.com/kubernetes-sigs/service-catalog/pkg/pretty"
 
@@ -66,7 +66,7 @@ const (
 )
 
 // bindingControllerKind contains the schema.GroupVersionKind for this controller type.
-var bindingControllerKind = v1beta1.SchemeGroupVersion.WithKind("ServiceBinding")
+var bindingControllerKind = v1.SchemeGroupVersion.WithKind("ServiceBinding")
 
 // ServiceBinding handlers and control-loop
 
@@ -97,14 +97,14 @@ func (c *controller) bindingUpdate(oldObj, newObj interface{}) {
 	// Bindings with ongoing asynchronous operations will be manually added
 	// to the polling queue by the reconciler. They should be ignored here in
 	// order to enforce polling rate-limiting.
-	binding := newObj.(*v1beta1.ServiceBinding)
+	binding := newObj.(*v1.ServiceBinding)
 	if !binding.Status.AsyncOpInProgress {
 		c.bindingAdd(newObj)
 	}
 }
 
 func (c *controller) bindingDelete(obj interface{}) {
-	binding, ok := obj.(*v1beta1.ServiceBinding)
+	binding, ok := obj.(*v1.ServiceBinding)
 	if binding == nil || !ok {
 		return
 	}
@@ -132,9 +132,9 @@ func (c *controller) reconcileServiceBindingKey(key string) error {
 	return c.reconcileServiceBinding(binding)
 }
 
-func isServiceBindingFailed(binding *v1beta1.ServiceBinding) bool {
+func isServiceBindingFailed(binding *v1.ServiceBinding) bool {
 	for _, condition := range binding.Status.Conditions {
-		if condition.Type == v1beta1.ServiceBindingConditionFailed && condition.Status == v1beta1.ConditionTrue {
+		if condition.Type == v1.ServiceBindingConditionFailed && condition.Status == v1.ConditionTrue {
 			return true
 		}
 	}
@@ -142,9 +142,9 @@ func isServiceBindingFailed(binding *v1beta1.ServiceBinding) bool {
 }
 
 // isServiceBindingSucceeded checks if binding has ready/true conditions
-func (c *controller) isServiceBindingSucceeded(binding *v1beta1.ServiceBinding) bool {
+func (c *controller) isServiceBindingSucceeded(binding *v1.ServiceBinding) bool {
 	for _, condition := range binding.Status.Conditions {
-		if condition.Type == v1beta1.ServiceBindingConditionReady && condition.Status == v1beta1.ConditionTrue {
+		if condition.Type == v1.ServiceBindingConditionReady && condition.Status == v1.ConditionTrue {
 			return true
 		}
 	}
@@ -153,7 +153,7 @@ func (c *controller) isServiceBindingSucceeded(binding *v1beta1.ServiceBinding) 
 
 // getReconciliationActionForServiceBinding gets the action the reconciler
 // should be taking on the given binding.
-func getReconciliationActionForServiceBinding(binding *v1beta1.ServiceBinding) ReconciliationAction {
+func getReconciliationActionForServiceBinding(binding *v1.ServiceBinding) ReconciliationAction {
 	switch {
 	case binding.Status.AsyncOpInProgress:
 		return reconcilePoll
@@ -167,7 +167,7 @@ func getReconciliationActionForServiceBinding(binding *v1beta1.ServiceBinding) R
 // reconcileServiceBinding is the control-loop for reconciling ServiceBindings.
 // An error is returned to indicate that the binding has not been fully
 // processed and should be resubmitted at a later time.
-func (c *controller) reconcileServiceBinding(binding *v1beta1.ServiceBinding) error {
+func (c *controller) reconcileServiceBinding(binding *v1.ServiceBinding) error {
 	pcb := pretty.NewBindingContextBuilder(binding)
 	klog.V(6).Info(pcb.Messagef(`beginning to process resourceVersion: %v`, binding.ResourceVersion))
 
@@ -186,7 +186,7 @@ func (c *controller) reconcileServiceBinding(binding *v1beta1.ServiceBinding) er
 
 // reconcileServiceBindingAdd is responsible for handling the creation of new
 // service bindings.
-func (c *controller) reconcileServiceBindingAdd(binding *v1beta1.ServiceBinding) error {
+func (c *controller) reconcileServiceBindingAdd(binding *v1.ServiceBinding) error {
 	pcb := pretty.NewBindingContextBuilder(binding)
 
 	if !c.isServiceBindingStatusInitialized(binding) {
@@ -215,20 +215,20 @@ func (c *controller) reconcileServiceBindingAdd(binding *v1beta1.ServiceBinding)
 	instance, err := c.instanceLister.ServiceInstances(binding.Namespace).Get(binding.Spec.InstanceRef.Name)
 	if err != nil {
 		msg := fmt.Sprintf(`References a non-existent %s "%s/%s"`, pretty.ServiceInstance, binding.Namespace, binding.Spec.InstanceRef.Name)
-		readyCond := newServiceBindingReadyCondition(v1beta1.ConditionFalse, errorNonexistentServiceInstanceReason, msg)
+		readyCond := newServiceBindingReadyCondition(v1.ConditionFalse, errorNonexistentServiceInstanceReason, msg)
 		return c.processServiceBindingOperationError(binding, readyCond)
 	}
 
 	var prettyName string
 	var brokerClient osb.Client
 	var request *osb.BindRequest
-	var inProgressProperties *v1beta1.ServiceBindingPropertiesState
+	var inProgressProperties *v1.ServiceBindingPropertiesState
 
 	if instance.Spec.ClusterServiceClassSpecified() {
 		if instance.Spec.ClusterServiceClassRef == nil || instance.Spec.ClusterServicePlanRef == nil {
 			// retry later
 			msg := fmt.Sprintf(`Binding cannot begin because ClusterServiceClass and ClusterServicePlan references for %s have not been resolved yet`, pretty.ServiceInstanceName(instance))
-			readyCond := newServiceBindingReadyCondition(v1beta1.ConditionFalse, errorServiceInstanceRefsUnresolved, msg)
+			readyCond := newServiceBindingReadyCondition(v1.ConditionFalse, errorServiceInstanceRefsUnresolved, msg)
 			return c.processServiceBindingOperationError(binding, readyCond)
 		}
 
@@ -241,14 +241,14 @@ func (c *controller) reconcileServiceBindingAdd(binding *v1beta1.ServiceBinding)
 
 		if !isClusterServicePlanBindable(serviceClass, servicePlan) {
 			msg := fmt.Sprintf(`References a non-bindable %s and Plan (%q) combination`, pretty.ClusterServiceClassName(serviceClass), instance.Spec.ClusterServicePlanExternalName)
-			readyCond := newServiceBindingReadyCondition(v1beta1.ConditionFalse, errorNonbindableClusterServiceClassReason, msg)
-			failedCond := newServiceBindingFailedCondition(v1beta1.ConditionTrue, errorNonbindableClusterServiceClassReason, msg)
+			readyCond := newServiceBindingReadyCondition(v1.ConditionFalse, errorNonbindableClusterServiceClassReason, msg)
+			failedCond := newServiceBindingFailedCondition(v1.ConditionTrue, errorNonbindableClusterServiceClassReason, msg)
 			return c.processBindFailure(binding, readyCond, failedCond, false)
 		}
 
 		if !isServiceInstanceReady(instance) {
 			msg := fmt.Sprintf(`Binding cannot begin because referenced %s is not ready`, pretty.ServiceInstanceName(instance))
-			readyCond := newServiceBindingReadyCondition(v1beta1.ConditionFalse, errorServiceInstanceNotReadyReason, msg)
+			readyCond := newServiceBindingReadyCondition(v1.ConditionFalse, errorServiceInstanceNotReadyReason, msg)
 			return c.processServiceBindingOperationError(binding, readyCond)
 		}
 
@@ -265,7 +265,7 @@ func (c *controller) reconcileServiceBindingAdd(binding *v1beta1.ServiceBinding)
 		if instance.Spec.ServiceClassRef == nil || instance.Spec.ServicePlanRef == nil {
 			// retry later
 			msg := fmt.Sprintf(`Binding cannot begin because ServiceClass and ServicePlan references for %s have not been resolved yet`, pretty.ServiceInstanceName(instance))
-			readyCond := newServiceBindingReadyCondition(v1beta1.ConditionFalse, errorServiceInstanceRefsUnresolved, msg)
+			readyCond := newServiceBindingReadyCondition(v1.ConditionFalse, errorServiceInstanceRefsUnresolved, msg)
 			return c.processServiceBindingOperationError(binding, readyCond)
 		}
 
@@ -278,14 +278,14 @@ func (c *controller) reconcileServiceBindingAdd(binding *v1beta1.ServiceBinding)
 
 		if !isServicePlanBindable(serviceClass, servicePlan) {
 			msg := fmt.Sprintf(`References a non-bindable %s and Plan (%q) combination`, pretty.ServiceClassName(serviceClass), instance.Spec.ClusterServicePlanExternalName)
-			readyCond := newServiceBindingReadyCondition(v1beta1.ConditionFalse, errorNonbindableClusterServiceClassReason, msg)
-			failedCond := newServiceBindingFailedCondition(v1beta1.ConditionTrue, errorNonbindableClusterServiceClassReason, msg)
+			readyCond := newServiceBindingReadyCondition(v1.ConditionFalse, errorNonbindableClusterServiceClassReason, msg)
+			failedCond := newServiceBindingFailedCondition(v1.ConditionTrue, errorNonbindableClusterServiceClassReason, msg)
 			return c.processBindFailure(binding, readyCond, failedCond, false)
 		}
 
 		if !isServiceInstanceReady(instance) {
 			msg := fmt.Sprintf(`Binding cannot begin because referenced %s is not ready`, pretty.ServiceInstanceName(instance))
-			readyCond := newServiceBindingReadyCondition(v1beta1.ConditionFalse, errorServiceInstanceNotReadyReason, msg)
+			readyCond := newServiceBindingReadyCondition(v1.ConditionFalse, errorServiceInstanceNotReadyReason, msg)
 			return c.processServiceBindingOperationError(binding, readyCond)
 		}
 
@@ -300,7 +300,7 @@ func (c *controller) reconcileServiceBindingAdd(binding *v1beta1.ServiceBinding)
 	}
 
 	if binding.Status.CurrentOperation == "" {
-		binding, err = c.recordStartOfServiceBindingOperation(binding, v1beta1.ServiceBindingOperationBind, inProgressProperties)
+		binding, err = c.recordStartOfServiceBindingOperation(binding, v1.ServiceBindingOperationBind, inProgressProperties)
 		if err != nil {
 			// There has been an update to the binding. Start reconciliation
 			// over with a fresh view of the binding.
@@ -314,23 +314,23 @@ func (c *controller) reconcileServiceBindingAdd(binding *v1beta1.ServiceBinding)
 	if err != nil {
 		if httpErr, ok := osb.IsHTTPError(err); ok {
 			msg := fmt.Sprintf("ServiceBroker returned failure; bind operation will not be retried: %v", err.Error())
-			readyCond := newServiceBindingReadyCondition(v1beta1.ConditionFalse, errorBindCallReason, msg)
-			failedCond := newServiceBindingFailedCondition(v1beta1.ConditionTrue, "ServiceBindingReturnedFailure", msg)
+			readyCond := newServiceBindingReadyCondition(v1.ConditionFalse, errorBindCallReason, msg)
+			failedCond := newServiceBindingFailedCondition(v1.ConditionTrue, "ServiceBindingReturnedFailure", msg)
 			return c.processBindFailure(binding, readyCond, failedCond, shouldStartOrphanMitigation(httpErr.StatusCode))
 		}
 
 		if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
 			msg := "Communication with the ServiceBroker timed out; Bind operation will not be retried: " + err.Error()
-			failedCond := newServiceBindingFailedCondition(v1beta1.ConditionTrue, errorBindCallReason, msg)
+			failedCond := newServiceBindingFailedCondition(v1.ConditionTrue, errorBindCallReason, msg)
 			return c.processBindFailure(binding, nil, failedCond, true)
 		}
 
 		msg := fmt.Sprintf(`Error creating ServiceBinding for %s: %s`, prettyName, err)
-		readyCond := newServiceBindingReadyCondition(v1beta1.ConditionFalse, errorBindCallReason, msg)
+		readyCond := newServiceBindingReadyCondition(v1.ConditionFalse, errorBindCallReason, msg)
 
 		if c.reconciliationRetryDurationExceeded(binding.Status.OperationStartTime) {
 			msg := "Stopping reconciliation retries, too much time has elapsed"
-			failedCond := newServiceBindingFailedCondition(v1beta1.ConditionTrue, errorReconciliationRetryTimeoutReason, msg)
+			failedCond := newServiceBindingFailedCondition(v1.ConditionTrue, errorReconciliationRetryTimeoutReason, msg)
 			return c.processBindFailure(binding, readyCond, failedCond, false)
 		}
 
@@ -350,11 +350,11 @@ func (c *controller) reconcileServiceBindingAdd(binding *v1beta1.ServiceBinding)
 	err = c.injectServiceBinding(binding, response.Credentials)
 	if err != nil {
 		msg := fmt.Sprintf(`Error injecting bind result: %s`, err)
-		readyCond := newServiceBindingReadyCondition(v1beta1.ConditionFalse, errorInjectingBindResultReason, msg)
+		readyCond := newServiceBindingReadyCondition(v1.ConditionFalse, errorInjectingBindResultReason, msg)
 
 		if c.reconciliationRetryDurationExceeded(binding.Status.OperationStartTime) {
 			msg := "Stopping reconciliation retries, too much time has elapsed"
-			failedCond := newServiceBindingFailedCondition(v1beta1.ConditionTrue, errorReconciliationRetryTimeoutReason, msg)
+			failedCond := newServiceBindingFailedCondition(v1.ConditionTrue, errorReconciliationRetryTimeoutReason, msg)
 			return c.processBindFailure(binding, readyCond, failedCond, true)
 		}
 
@@ -366,7 +366,7 @@ func (c *controller) reconcileServiceBindingAdd(binding *v1beta1.ServiceBinding)
 	return c.processBindSuccess(binding)
 }
 
-func (c *controller) reconcileServiceBindingDelete(binding *v1beta1.ServiceBinding) error {
+func (c *controller) reconcileServiceBindingDelete(binding *v1.ServiceBinding) error {
 	var err error
 	pcb := pretty.NewBindingContextBuilder(binding)
 
@@ -375,12 +375,12 @@ func (c *controller) reconcileServiceBindingDelete(binding *v1beta1.ServiceBindi
 		return nil
 	}
 
-	if finalizers := sets.NewString(binding.Finalizers...); !finalizers.Has(v1beta1.FinalizerServiceCatalog) {
+	if finalizers := sets.NewString(binding.Finalizers...); !finalizers.Has(v1.FinalizerServiceCatalog) {
 		return nil
 	}
 
 	// If unbind has failed, do not do anything more
-	if binding.Status.UnbindStatus == v1beta1.ServiceBindingUnbindStatusFailed {
+	if binding.Status.UnbindStatus == v1.ServiceBindingUnbindStatusFailed {
 		klog.V(4).Info(pcb.Message("Not processing delete event because unbinding has failed"))
 		return nil
 	}
@@ -390,15 +390,15 @@ func (c *controller) reconcileServiceBindingDelete(binding *v1beta1.ServiceBindi
 	binding = binding.DeepCopy()
 
 	// If unbinding succeeded or is not needed, then clear out the finalizers
-	if binding.Status.UnbindStatus == v1beta1.ServiceBindingUnbindStatusNotRequired ||
-		binding.Status.UnbindStatus == v1beta1.ServiceBindingUnbindStatusSucceeded {
+	if binding.Status.UnbindStatus == v1.ServiceBindingUnbindStatusNotRequired ||
+		binding.Status.UnbindStatus == v1.ServiceBindingUnbindStatusSucceeded {
 
 		return c.processServiceBindingGracefulDeletionSuccess(binding)
 	}
 
 	if err := c.ejectServiceBinding(binding); err != nil {
 		msg := fmt.Sprintf(`Error ejecting binding. Error deleting secret: %s`, err)
-		readyCond := newServiceBindingReadyCondition(v1beta1.ConditionFalse, errorEjectingBindReason, msg)
+		readyCond := newServiceBindingReadyCondition(v1.ConditionFalse, errorEjectingBindReason, msg)
 		return c.processServiceBindingOperationError(binding, readyCond)
 	}
 
@@ -408,8 +408,8 @@ func (c *controller) reconcileServiceBindingDelete(binding *v1beta1.ServiceBindi
 			binding.Status.OperationStartTime = &now
 		}
 	} else {
-		if binding.Status.CurrentOperation != v1beta1.ServiceBindingOperationUnbind {
-			binding, err = c.recordStartOfServiceBindingOperation(binding, v1beta1.ServiceBindingOperationUnbind, nil)
+		if binding.Status.CurrentOperation != v1.ServiceBindingOperationUnbind {
+			binding, err = c.recordStartOfServiceBindingOperation(binding, v1.ServiceBindingOperationUnbind, nil)
 			if err != nil {
 				// There has been an update to the binding. Start reconciliation
 				// over with a fresh view of the binding.
@@ -426,7 +426,7 @@ func (c *controller) reconcileServiceBindingDelete(binding *v1beta1.ServiceBindi
 			`References a non-existent %s "%s/%s"`,
 			pretty.ServiceInstance, binding.Namespace, binding.Spec.InstanceRef.Name,
 		)
-		readyCond := newServiceBindingReadyCondition(v1beta1.ConditionFalse, errorNonexistentServiceInstanceReason, msg)
+		readyCond := newServiceBindingReadyCondition(v1.ConditionFalse, errorNonexistentServiceInstanceReason, msg)
 		return c.processServiceBindingOperationError(binding, readyCond)
 	}
 
@@ -435,7 +435,7 @@ func (c *controller) reconcileServiceBindingDelete(binding *v1beta1.ServiceBindi
 			`trying to unbind to %s "%s/%s" that has ongoing asynchronous operation`,
 			pretty.ServiceInstance, binding.Namespace, binding.Spec.InstanceRef.Name,
 		)
-		readyCond := newServiceBindingReadyCondition(v1beta1.ConditionFalse, errorWithOngoingAsyncOperationReason, msg)
+		readyCond := newServiceBindingReadyCondition(v1.ConditionFalse, errorWithOngoingAsyncOperationReason, msg)
 		return c.processServiceBindingOperationError(binding, readyCond)
 	}
 
@@ -487,11 +487,11 @@ func (c *controller) reconcileServiceBindingDelete(binding *v1beta1.ServiceBindi
 		msg := fmt.Sprintf(
 			`Error unbinding from %s: %s`, prettyBrokerName, err,
 		)
-		readyCond := newServiceBindingReadyCondition(v1beta1.ConditionUnknown, errorUnbindCallReason, msg)
+		readyCond := newServiceBindingReadyCondition(v1.ConditionUnknown, errorUnbindCallReason, msg)
 
 		if c.reconciliationRetryDurationExceeded(binding.Status.OperationStartTime) {
 			msg := "Stopping reconciliation retries, too much time has elapsed"
-			failedCond := newServiceBindingReadyCondition(v1beta1.ConditionTrue, errorReconciliationRetryTimeoutReason, msg)
+			failedCond := newServiceBindingReadyCondition(v1.ConditionTrue, errorReconciliationRetryTimeoutReason, msg)
 			return c.processUnbindFailure(binding, readyCond, failedCond)
 		}
 
@@ -512,7 +512,7 @@ func (c *controller) reconcileServiceBindingDelete(binding *v1beta1.ServiceBindi
 //
 // Note: enforcing that the plan belongs to the given service class is the
 // responsibility of the caller.
-func isClusterServicePlanBindable(serviceClass *v1beta1.ClusterServiceClass, plan *v1beta1.ClusterServicePlan) bool {
+func isClusterServicePlanBindable(serviceClass *v1.ClusterServiceClass, plan *v1.ClusterServicePlan) bool {
 	if plan.Spec.Bindable != nil {
 		return *plan.Spec.Bindable
 	}
@@ -527,7 +527,7 @@ func isClusterServicePlanBindable(serviceClass *v1beta1.ClusterServiceClass, pla
 //
 // Note: enforcing that the plan belongs to the given service class is the
 // responsibility of the caller.
-func isServicePlanBindable(serviceClass *v1beta1.ServiceClass, plan *v1beta1.ServicePlan) bool {
+func isServicePlanBindable(serviceClass *v1.ServiceClass, plan *v1.ServicePlan) bool {
 	if plan.Spec.Bindable != nil {
 		return *plan.Spec.Bindable
 	}
@@ -535,7 +535,7 @@ func isServicePlanBindable(serviceClass *v1beta1.ServiceClass, plan *v1beta1.Ser
 	return serviceClass.Spec.Bindable
 }
 
-func (c *controller) injectServiceBinding(binding *v1beta1.ServiceBinding, credentials map[string]interface{}) error {
+func (c *controller) injectServiceBinding(binding *v1.ServiceBinding, credentials map[string]interface{}) error {
 	pcb := pretty.NewBindingContextBuilder(binding)
 	klog.V(5).Info(pcb.Messagef(`Creating/updating Secret "%s/%s" with %d keys`,
 		binding.Namespace, binding.Spec.SecretName, len(credentials),
@@ -602,7 +602,7 @@ func (c *controller) injectServiceBinding(binding *v1beta1.ServiceBinding, crede
 	return err
 }
 
-func (c *controller) transformCredentials(transforms []v1beta1.SecretTransform, credentials map[string]interface{}) error {
+func (c *controller) transformCredentials(transforms []v1.SecretTransform, credentials map[string]interface{}) error {
 	for _, t := range transforms {
 		switch {
 		case t.AddKey != nil:
@@ -654,7 +654,7 @@ func evaluateJSONPath(jsonPath string, credentials map[string]interface{}) (stri
 	return buf.String(), nil
 }
 
-func (c *controller) ejectServiceBinding(binding *v1beta1.ServiceBinding) error {
+func (c *controller) ejectServiceBinding(binding *v1.ServiceBinding) error {
 	var err error
 	pcb := pretty.NewBindingContextBuilder(binding)
 	klog.V(5).Info(pcb.Messagef(`Deleting Secret "%s/%s"`,
@@ -677,9 +677,9 @@ func (c *controller) ejectServiceBinding(binding *v1beta1.ServiceBinding) error 
 //
 // Note: objects coming from informers should never be mutated; always pass a
 // deep copy as the binding parameter.
-func setServiceBindingCondition(toUpdate *v1beta1.ServiceBinding,
-	conditionType v1beta1.ServiceBindingConditionType,
-	status v1beta1.ConditionStatus,
+func setServiceBindingCondition(toUpdate *v1.ServiceBinding,
+	conditionType v1.ServiceBindingConditionType,
+	status v1.ConditionStatus,
 	reason, message string) {
 
 	setServiceBindingConditionInternal(toUpdate, conditionType, status, reason, message, metav1.Now())
@@ -689,9 +689,9 @@ func setServiceBindingCondition(toUpdate *v1beta1.ServiceBinding,
 // setServiceBindingConditionInternal is
 // setServiceBindingCondition but allows the time to be parameterized
 // for testing.
-func setServiceBindingConditionInternal(toUpdate *v1beta1.ServiceBinding,
-	conditionType v1beta1.ServiceBindingConditionType,
-	status v1beta1.ConditionStatus,
+func setServiceBindingConditionInternal(toUpdate *v1.ServiceBinding,
+	conditionType v1.ServiceBindingConditionType,
+	status v1.ConditionStatus,
 	reason, message string,
 	t metav1.Time) {
 	pcb := pretty.NewBindingContextBuilder(toUpdate)
@@ -701,7 +701,7 @@ func setServiceBindingConditionInternal(toUpdate *v1beta1.ServiceBinding,
 		conditionType, status,
 	))
 
-	newCondition := v1beta1.ServiceBindingCondition{
+	newCondition := v1.ServiceBindingCondition{
 		Type:    conditionType,
 		Status:  status,
 		Reason:  reason,
@@ -714,7 +714,7 @@ func setServiceBindingConditionInternal(toUpdate *v1beta1.ServiceBinding,
 			conditionType, t,
 		))
 		newCondition.LastTransitionTime = t
-		toUpdate.Status.Conditions = []v1beta1.ServiceBindingCondition{newCondition}
+		toUpdate.Status.Conditions = []v1.ServiceBindingCondition{newCondition}
 		return
 	}
 	for i, cond := range toUpdate.Status.Conditions {
@@ -743,7 +743,7 @@ func setServiceBindingConditionInternal(toUpdate *v1beta1.ServiceBinding,
 	toUpdate.Status.Conditions = append(toUpdate.Status.Conditions, newCondition)
 }
 
-func (c *controller) updateServiceBindingStatus(toUpdate *v1beta1.ServiceBinding) (*v1beta1.ServiceBinding, error) {
+func (c *controller) updateServiceBindingStatus(toUpdate *v1.ServiceBinding) (*v1.ServiceBinding, error) {
 	pcb := pretty.NewBindingContextBuilder(toUpdate)
 	klog.V(4).Info(pcb.Message("Updating status"))
 	updatedBinding, err := c.serviceCatalogClient.ServiceBindings(toUpdate.Namespace).UpdateStatus(context.Background(), toUpdate, metav1.UpdateOptions{})
@@ -761,9 +761,9 @@ func (c *controller) updateServiceBindingStatus(toUpdate *v1beta1.ServiceBinding
 // updateServiceBindingCondition updates the given condition for the given ServiceBinding
 // with the given status, reason, and message.
 func (c *controller) updateServiceBindingCondition(
-	binding *v1beta1.ServiceBinding,
-	conditionType v1beta1.ServiceBindingConditionType,
-	status v1beta1.ConditionStatus,
+	binding *v1.ServiceBinding,
+	conditionType v1.ServiceBindingConditionType,
+	status v1.ConditionStatus,
 	reason, message string) error {
 
 	pcb := pretty.NewBindingContextBuilder(binding)
@@ -785,8 +785,8 @@ func (c *controller) updateServiceBindingCondition(
 	return err
 }
 
-func (c *controller) isServiceBindingStatusInitialized(binding *v1beta1.ServiceBinding) bool {
-	emptyStatus := v1beta1.ServiceBindingStatus{}
+func (c *controller) isServiceBindingStatusInitialized(binding *v1.ServiceBinding) bool {
+	emptyStatus := v1.ServiceBindingStatus{}
 	return !reflect.DeepEqual(binding.Status, emptyStatus)
 }
 
@@ -794,11 +794,11 @@ func (c *controller) isServiceBindingStatusInitialized(binding *v1beta1.ServiceB
 // In normal scenario it should be done when client is creating the ServiceBinding,
 // but right now we cannot modify the Status (sub-resource) in webhook on CREATE action.
 // As a temporary solution we are doing that in the reconcile function.
-func (c *controller) initializeServiceBindingStatus(binding *v1beta1.ServiceBinding) error {
+func (c *controller) initializeServiceBindingStatus(binding *v1.ServiceBinding) error {
 	updated := binding.DeepCopy()
-	updated.Status = v1beta1.ServiceBindingStatus{
-		Conditions:   []v1beta1.ServiceBindingCondition{},
-		UnbindStatus: v1beta1.ServiceBindingUnbindStatusNotRequired,
+	updated.Status = v1.ServiceBindingStatus{
+		Conditions:   []v1.ServiceBindingCondition{},
+		UnbindStatus: v1.ServiceBindingUnbindStatusNotRequired,
 	}
 
 	_, err := c.serviceCatalogClient.ServiceBindings(updated.Namespace).UpdateStatus(context.Background(), updated, metav1.UpdateOptions{})
@@ -820,8 +820,8 @@ func (c *controller) initializeServiceBindingStatus(binding *v1beta1.ServiceBind
 // 1 - a modifiable copy of toUpdate; or toUpdate if there was an error
 // 2 - any error that occurred
 func (c *controller) recordStartOfServiceBindingOperation(
-	toUpdate *v1beta1.ServiceBinding, operation v1beta1.ServiceBindingOperation, inProgressProperties *v1beta1.ServiceBindingPropertiesState) (
-	*v1beta1.ServiceBinding, error) {
+	toUpdate *v1.ServiceBinding, operation v1.ServiceBindingOperation, inProgressProperties *v1.ServiceBindingPropertiesState) (
+	*v1.ServiceBinding, error) {
 
 	currentReconciledGeneration := toUpdate.Status.ReconciledGeneration
 	clearServiceBindingCurrentOperation(toUpdate)
@@ -834,18 +834,18 @@ func (c *controller) recordStartOfServiceBindingOperation(
 	reason := ""
 	message := ""
 	switch operation {
-	case v1beta1.ServiceBindingOperationBind:
+	case v1.ServiceBindingOperationBind:
 		reason = bindingInFlightReason
 		message = bindingInFlightMessage
-		toUpdate.Status.UnbindStatus = v1beta1.ServiceBindingUnbindStatusRequired
-	case v1beta1.ServiceBindingOperationUnbind:
+		toUpdate.Status.UnbindStatus = v1.ServiceBindingUnbindStatusRequired
+	case v1.ServiceBindingOperationUnbind:
 		reason = unbindingInFlightReason
 		message = unbindingInFlightMessage
 	}
 	setServiceBindingCondition(
 		toUpdate,
-		v1beta1.ServiceBindingConditionReady,
-		v1beta1.ConditionFalse,
+		v1.ServiceBindingConditionReady,
+		v1.ConditionFalse,
 		reason,
 		message,
 	)
@@ -855,7 +855,7 @@ func (c *controller) recordStartOfServiceBindingOperation(
 // clearServiceBindingCurrentOperation sets the fields of the binding's
 // Status to indicate that there is no current operation being performed. The
 // Status is *not* recorded in the registry.
-func clearServiceBindingCurrentOperation(toUpdate *v1beta1.ServiceBinding) {
+func clearServiceBindingCurrentOperation(toUpdate *v1.ServiceBinding) {
 	toUpdate.Status.CurrentOperation = ""
 	toUpdate.Status.OperationStartTime = nil
 	toUpdate.Status.AsyncOpInProgress = false
@@ -869,7 +869,7 @@ func clearServiceBindingCurrentOperation(toUpdate *v1beta1.ServiceBinding) {
 // if a deletion was performed while an async bind is running.
 // TODO: rework saving off current generation as the start of the async
 // operation, see PR 1708/Issue 1587.
-func rollbackBindingReconciledGenerationOnDeletion(binding *v1beta1.ServiceBinding, currentReconciledGeneration int64) {
+func rollbackBindingReconciledGenerationOnDeletion(binding *v1.ServiceBinding, currentReconciledGeneration int64) {
 	if binding.DeletionTimestamp != nil {
 		klog.V(4).Infof("Not updating ReconciledGeneration after async operation because there is a deletion pending.")
 		binding.Status.ReconciledGeneration = currentReconciledGeneration
@@ -883,7 +883,7 @@ func (c *controller) requeueServiceBindingForPoll(key string) error {
 
 // beginPollingServiceBinding does a rate-limited add of the key for the given
 // binding to the controller's binding polling queue.
-func (c *controller) beginPollingServiceBinding(binding *v1beta1.ServiceBinding) error {
+func (c *controller) beginPollingServiceBinding(binding *v1.ServiceBinding) error {
 	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(binding)
 	if err != nil {
 		klog.Errorf("Couldn't create a key for object %+v: %v", binding, err)
@@ -897,13 +897,13 @@ func (c *controller) beginPollingServiceBinding(binding *v1beta1.ServiceBinding)
 
 // continuePollingServiceBinding does a rate-limited add of the key for the
 // given binding to the controller's binding polling queue.
-func (c *controller) continuePollingServiceBinding(binding *v1beta1.ServiceBinding) error {
+func (c *controller) continuePollingServiceBinding(binding *v1.ServiceBinding) error {
 	return c.beginPollingServiceBinding(binding)
 }
 
 // finishPollingServiceBinding removes the binding's key from the controller's
 // binding polling queue.
-func (c *controller) finishPollingServiceBinding(binding *v1beta1.ServiceBinding) error {
+func (c *controller) finishPollingServiceBinding(binding *v1.ServiceBinding) error {
 	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(binding)
 	if err != nil {
 		klog.Errorf("Couldn't create a key for object %+v: %v", binding, err)
@@ -915,7 +915,7 @@ func (c *controller) finishPollingServiceBinding(binding *v1beta1.ServiceBinding
 	return nil
 }
 
-func (c *controller) pollServiceBinding(binding *v1beta1.ServiceBinding) error {
+func (c *controller) pollServiceBinding(binding *v1.ServiceBinding) error {
 	pcb := pretty.NewBindingContextBuilder(binding)
 	klog.V(4).Infof(pcb.Message("Processing"))
 
@@ -924,7 +924,7 @@ func (c *controller) pollServiceBinding(binding *v1beta1.ServiceBinding) error {
 	instance, err := c.instanceLister.ServiceInstances(binding.Namespace).Get(binding.Spec.InstanceRef.Name)
 	if err != nil {
 		msg := fmt.Sprintf(`References a non-existent %s "%s/%s"`, pretty.ServiceInstance, binding.Namespace, binding.Spec.InstanceRef.Name)
-		readyCond := newServiceBindingReadyCondition(v1beta1.ConditionFalse, errorNonexistentServiceInstanceReason, msg)
+		readyCond := newServiceBindingReadyCondition(v1.ConditionFalse, errorNonexistentServiceInstanceReason, msg)
 		return c.processServiceBindingOperationError(binding, readyCond)
 	}
 
@@ -937,7 +937,7 @@ func (c *controller) pollServiceBinding(binding *v1beta1.ServiceBinding) error {
 	// deleting or mitigating an orphan; this is more readable than
 	// checking the timestamps in various places.
 	mitigatingOrphan := binding.Status.OrphanMitigationInProgress
-	deleting := binding.Status.CurrentOperation == v1beta1.ServiceBindingOperationUnbind || mitigatingOrphan
+	deleting := binding.Status.CurrentOperation == v1.ServiceBindingOperationUnbind || mitigatingOrphan
 
 	request, err := c.prepareServiceBindingLastOperationRequest(binding, instance)
 	if err != nil {
@@ -995,7 +995,7 @@ func (c *controller) pollServiceBinding(binding *v1beta1.ServiceBinding) error {
 			}
 
 			message = fmt.Sprintf("%s (%s)", message, *response.Description)
-			setServiceBindingCondition(binding, v1beta1.ServiceBindingConditionReady, v1beta1.ConditionFalse, reason, message)
+			setServiceBindingCondition(binding, v1.ServiceBindingConditionReady, v1.ConditionFalse, reason, message)
 			c.recorder.Event(binding, corev1.EventTypeNormal, reason, message)
 
 			if _, err := c.updateServiceBindingStatus(binding); err != nil {
@@ -1027,8 +1027,8 @@ func (c *controller) pollServiceBinding(binding *v1beta1.ServiceBinding) error {
 		if err != nil {
 			reason := errorFetchingBindingFailedReason
 			msg := fmt.Sprintf("Could not do a GET on binding resource: %v", err)
-			readyCond := newServiceBindingReadyCondition(v1beta1.ConditionFalse, reason, msg)
-			failedCond := newServiceBindingFailedCondition(v1beta1.ConditionTrue, reason, msg)
+			readyCond := newServiceBindingReadyCondition(v1.ConditionFalse, reason, msg)
+			failedCond := newServiceBindingFailedCondition(v1.ConditionTrue, reason, msg)
 
 			if err := c.processBindFailure(binding, readyCond, failedCond, true); err != nil {
 				return err
@@ -1041,8 +1041,8 @@ func (c *controller) pollServiceBinding(binding *v1beta1.ServiceBinding) error {
 			reason := errorInjectingBindResultReason
 			msg := fmt.Sprintf("Error injecting bind results: %v", err)
 
-			readyCond := newServiceBindingReadyCondition(v1beta1.ConditionFalse, reason, msg)
-			failedCond := newServiceBindingFailedCondition(v1beta1.ConditionTrue, reason, msg)
+			readyCond := newServiceBindingReadyCondition(v1.ConditionFalse, reason, msg)
+			failedCond := newServiceBindingFailedCondition(v1.ConditionTrue, reason, msg)
 
 			if err := c.processBindFailure(binding, readyCond, failedCond, true); err != nil {
 				return err
@@ -1060,8 +1060,8 @@ func (c *controller) pollServiceBinding(binding *v1beta1.ServiceBinding) error {
 		if !deleting {
 			reason := errorBindCallReason
 			message := "Bind call failed: " + description
-			readyCond := newServiceBindingReadyCondition(v1beta1.ConditionFalse, reason, message)
-			failedCond := newServiceBindingFailedCondition(v1beta1.ConditionTrue, reason, message)
+			readyCond := newServiceBindingReadyCondition(v1.ConditionFalse, reason, message)
+			failedCond := newServiceBindingFailedCondition(v1.ConditionTrue, reason, message)
 			if err := c.processBindFailure(binding, readyCond, failedCond, false); err != nil {
 				return c.handleServiceBindingPollingError(binding, err)
 			}
@@ -1069,13 +1069,13 @@ func (c *controller) pollServiceBinding(binding *v1beta1.ServiceBinding) error {
 		}
 
 		msg := "Unbind call failed: " + description
-		readyCond := newServiceBindingReadyCondition(v1beta1.ConditionUnknown, errorUnbindCallReason, msg)
+		readyCond := newServiceBindingReadyCondition(v1.ConditionUnknown, errorUnbindCallReason, msg)
 
 		if c.reconciliationRetryDurationExceeded(binding.Status.OperationStartTime) {
 			return c.processServiceBindingPollingFailureRetryTimeout(binding, readyCond)
 		}
 
-		setServiceBindingCondition(binding, v1beta1.ServiceBindingConditionReady, readyCond.Status, readyCond.Reason, readyCond.Message)
+		setServiceBindingCondition(binding, v1.ServiceBindingConditionReady, readyCond.Status, readyCond.Reason, readyCond.Message)
 		c.recorder.Event(binding, corev1.EventTypeWarning, errorUnbindCallReason, msg)
 
 		// we must trigger a new unbind attempt entirely (as opposed to
@@ -1104,17 +1104,17 @@ func (c *controller) pollServiceBinding(binding *v1beta1.ServiceBinding) error {
 
 // processServiceBindingPollingFailureRetryTimeout marks the binding as having
 // failed polling due to its reconciliation retry duration expiring
-func (c *controller) processServiceBindingPollingFailureRetryTimeout(binding *v1beta1.ServiceBinding, readyCond *v1beta1.ServiceBindingCondition) error {
+func (c *controller) processServiceBindingPollingFailureRetryTimeout(binding *v1.ServiceBinding, readyCond *v1.ServiceBindingCondition) error {
 	mitigatingOrphan := binding.Status.OrphanMitigationInProgress
-	deleting := binding.Status.CurrentOperation == v1beta1.ServiceBindingOperationUnbind || mitigatingOrphan
+	deleting := binding.Status.CurrentOperation == v1.ServiceBindingOperationUnbind || mitigatingOrphan
 
 	// if no specific failure provided, just say the operation timed out.
 	if readyCond == nil {
 		operation := "Bind"
-		status := v1beta1.ConditionFalse
+		status := v1.ConditionFalse
 		if deleting {
 			operation = "Unbind"
-			status = v1beta1.ConditionUnknown
+			status = v1.ConditionUnknown
 		}
 
 		msg := fmt.Sprintf("The asynchronous %v operation timed out and will not be retried", operation)
@@ -1122,7 +1122,7 @@ func (c *controller) processServiceBindingPollingFailureRetryTimeout(binding *v1
 	}
 
 	msg := "Stopping reconciliation retries because too much time has elapsed"
-	failedCond := newServiceBindingFailedCondition(v1beta1.ConditionTrue, errorReconciliationRetryTimeoutReason, msg)
+	failedCond := newServiceBindingFailedCondition(v1.ConditionTrue, errorReconciliationRetryTimeoutReason, msg)
 
 	var err error
 	if deleting {
@@ -1143,9 +1143,9 @@ func (c *controller) processServiceBindingPollingFailureRetryTimeout(binding *v1
 // newServiceBindingReadyCondition is a helper function that returns a Ready
 // condition with the given status, reason, and message, with its transition
 // time set to now.
-func newServiceBindingReadyCondition(status v1beta1.ConditionStatus, reason, message string) *v1beta1.ServiceBindingCondition {
-	return &v1beta1.ServiceBindingCondition{
-		Type:               v1beta1.ServiceBindingConditionReady,
+func newServiceBindingReadyCondition(status v1.ConditionStatus, reason, message string) *v1.ServiceBindingCondition {
+	return &v1.ServiceBindingCondition{
+		Type:               v1.ServiceBindingConditionReady,
 		Status:             status,
 		Reason:             reason,
 		Message:            message,
@@ -1156,9 +1156,9 @@ func newServiceBindingReadyCondition(status v1beta1.ConditionStatus, reason, mes
 // newServiceBindingFailedCondition is a helper function that returns a Failed
 // condition with the given status, reason, and message, with its transition
 // time set to now.
-func newServiceBindingFailedCondition(status v1beta1.ConditionStatus, reason, message string) *v1beta1.ServiceBindingCondition {
-	return &v1beta1.ServiceBindingCondition{
-		Type:               v1beta1.ServiceBindingConditionFailed,
+func newServiceBindingFailedCondition(status v1.ConditionStatus, reason, message string) *v1.ServiceBindingCondition {
+	return &v1.ServiceBindingCondition{
+		Type:               v1.ServiceBindingConditionFailed,
 		Status:             status,
 		Reason:             reason,
 		Message:            message,
@@ -1168,7 +1168,7 @@ func newServiceBindingFailedCondition(status v1beta1.ConditionStatus, reason, me
 
 // setServiceBindingLastOperation sets the last operation key on the given
 // binding.
-func setServiceBindingLastOperation(binding *v1beta1.ServiceBinding, operationKey *osb.OperationKey) {
+func setServiceBindingLastOperation(binding *v1.ServiceBinding, operationKey *osb.OperationKey) {
 	if operationKey != nil && *operationKey != "" {
 		key := string(*operationKey)
 		binding.Status.LastOperation = &key
@@ -1178,8 +1178,8 @@ func setServiceBindingLastOperation(binding *v1beta1.ServiceBinding, operationKe
 // prepareBindRequest creates a bind request object to be passed to the broker
 // client to create the given binding.
 func (c *controller) prepareBindRequest(
-	binding *v1beta1.ServiceBinding, instance *v1beta1.ServiceInstance) (
-	*osb.BindRequest, *v1beta1.ServiceBindingPropertiesState, error) {
+	binding *v1.ServiceBinding, instance *v1.ServiceInstance) (
+	*osb.BindRequest, *v1.ServiceBindingPropertiesState, error) {
 
 	var scExternalID string
 	var spExternalID string
@@ -1251,7 +1251,7 @@ func (c *controller) prepareBindRequest(
 		}
 	}
 
-	inProgressProperties := &v1beta1.ServiceBindingPropertiesState{
+	inProgressProperties := &v1.ServiceBindingPropertiesState{
 		Parameters:        rawParametersWithRedaction,
 		ParameterChecksum: parametersChecksum,
 		UserInfo:          binding.Spec.UserInfo,
@@ -1306,7 +1306,7 @@ func (c *controller) prepareBindRequest(
 // prepareUnbindRequest creates an unbind request object to be passed to the
 // broker client to delete the given binding.
 func (c *controller) prepareUnbindRequest(
-	binding *v1beta1.ServiceBinding, instance *v1beta1.ServiceInstance) (
+	binding *v1.ServiceBinding, instance *v1.ServiceInstance) (
 	*osb.UnbindRequest, error) {
 
 	var scExternalID string
@@ -1372,7 +1372,7 @@ func (c *controller) prepareUnbindRequest(
 // passed to the broker client to query the given binding's last operation
 // endpoint.
 func (c *controller) prepareServiceBindingLastOperationRequest(
-	binding *v1beta1.ServiceBinding, instance *v1beta1.ServiceInstance) (
+	binding *v1.ServiceBinding, instance *v1.ServiceInstance) (
 	*osb.BindingLastOperationRequest, error) {
 
 	var scExternalID string
@@ -1434,7 +1434,7 @@ func (c *controller) prepareServiceBindingLastOperationRequest(
 
 // processServiceBindingOperationError handles the logging and updating of a
 // ServiceBinding that hit a retryable error during reconciliation.
-func (c *controller) processServiceBindingOperationError(binding *v1beta1.ServiceBinding, readyCond *v1beta1.ServiceBindingCondition) error {
+func (c *controller) processServiceBindingOperationError(binding *v1.ServiceBinding, readyCond *v1.ServiceBindingCondition) error {
 	c.recorder.Event(binding, corev1.EventTypeWarning, readyCond.Reason, readyCond.Message)
 	setServiceBindingCondition(binding, readyCond.Type, readyCond.Status, readyCond.Reason, readyCond.Message)
 	if _, err := c.updateServiceBindingStatus(binding); err != nil {
@@ -1447,8 +1447,8 @@ func (c *controller) processServiceBindingOperationError(binding *v1beta1.Servic
 // processBindSuccess handles the logging and updating of a ServiceBinding that
 // has successfully been created at the broker and has had its credentials
 // injected in the cluster.
-func (c *controller) processBindSuccess(binding *v1beta1.ServiceBinding) error {
-	setServiceBindingCondition(binding, v1beta1.ServiceBindingConditionReady, v1beta1.ConditionTrue, successInjectedBindResultReason, successInjectedBindResultMessage)
+func (c *controller) processBindSuccess(binding *v1.ServiceBinding) error {
+	setServiceBindingCondition(binding, v1.ServiceBindingConditionReady, v1.ConditionTrue, successInjectedBindResultReason, successInjectedBindResultMessage)
 	currentReconciledGeneration := binding.Status.ReconciledGeneration
 	clearServiceBindingCurrentOperation(binding)
 	rollbackBindingReconciledGenerationOnDeletion(binding, currentReconciledGeneration)
@@ -1463,7 +1463,7 @@ func (c *controller) processBindSuccess(binding *v1beta1.ServiceBinding) error {
 
 // processBindFailure handles the logging and updating of a ServiceBinding that
 // hit a terminal failure during bind reconciliation.
-func (c *controller) processBindFailure(binding *v1beta1.ServiceBinding, readyCond, failedCond *v1beta1.ServiceBindingCondition, shouldMitigateOrphan bool) error {
+func (c *controller) processBindFailure(binding *v1.ServiceBinding, readyCond, failedCond *v1.ServiceBindingCondition, shouldMitigateOrphan bool) error {
 	currentReconciledGeneration := binding.Status.ReconciledGeneration
 	if readyCond != nil {
 		c.recorder.Event(binding, corev1.EventTypeWarning, readyCond.Reason, readyCond.Message)
@@ -1475,7 +1475,7 @@ func (c *controller) processBindFailure(binding *v1beta1.ServiceBinding, readyCo
 
 	if shouldMitigateOrphan {
 		msg := "Starting orphan mitigation"
-		readyCond := newServiceBindingReadyCondition(v1beta1.ConditionFalse, errorServiceBindingOrphanMitigation, msg)
+		readyCond := newServiceBindingReadyCondition(v1.ConditionFalse, errorServiceBindingOrphanMitigation, msg)
 		setServiceBindingCondition(binding, readyCond.Type, readyCond.Status, readyCond.Reason, readyCond.Message)
 		c.recorder.Event(binding, corev1.EventTypeWarning, readyCond.Reason, readyCond.Message)
 
@@ -1497,9 +1497,9 @@ func (c *controller) processBindFailure(binding *v1beta1.ServiceBinding, readyCo
 // processBindAsyncResponse handles the logging and updating of a
 // ServiceInstance that received an asynchronous response from the broker when
 // requesting a bind.
-func (c *controller) processBindAsyncResponse(binding *v1beta1.ServiceBinding, response *osb.BindResponse) error {
+func (c *controller) processBindAsyncResponse(binding *v1.ServiceBinding, response *osb.BindResponse) error {
 	setServiceBindingLastOperation(binding, response.OperationKey)
-	setServiceBindingCondition(binding, v1beta1.ServiceBindingConditionReady, v1beta1.ConditionFalse, asyncBindingReason, asyncBindingMessage)
+	setServiceBindingCondition(binding, v1.ServiceBindingConditionReady, v1.ConditionFalse, asyncBindingReason, asyncBindingMessage)
 	binding.Status.AsyncOpInProgress = true
 
 	if _, err := c.updateServiceBindingStatus(binding); err != nil {
@@ -1513,9 +1513,9 @@ func (c *controller) processBindAsyncResponse(binding *v1beta1.ServiceBinding, r
 // handleServiceBindingReconciliationError is a helper function that handles on
 // error whether the error represents an operation error and should update the
 // ServiceBinding resource.
-func (c *controller) handleServiceBindingReconciliationError(binding *v1beta1.ServiceBinding, err error) error {
+func (c *controller) handleServiceBindingReconciliationError(binding *v1.ServiceBinding, err error) error {
 	if resourceErr, ok := err.(*operationError); ok {
-		readyCond := newServiceBindingReadyCondition(v1beta1.ConditionFalse, resourceErr.reason, resourceErr.message)
+		readyCond := newServiceBindingReadyCondition(v1.ConditionFalse, resourceErr.reason, resourceErr.message)
 		return c.processServiceBindingOperationError(binding, readyCond)
 	}
 	return err
@@ -1524,7 +1524,7 @@ func (c *controller) handleServiceBindingReconciliationError(binding *v1beta1.Se
 // processServiceBindingGracefulDeletionSuccess handles the logging and
 // updating of a ServiceBinding that has successfully finished graceful
 // deletion.
-func (c *controller) processServiceBindingGracefulDeletionSuccess(binding *v1beta1.ServiceBinding) error {
+func (c *controller) processServiceBindingGracefulDeletionSuccess(binding *v1.ServiceBinding) error {
 	pcb := pretty.NewBindingContextBuilder(binding)
 
 	updatedBinding, err := c.updateServiceBindingStatus(binding)
@@ -1535,7 +1535,7 @@ func (c *controller) processServiceBindingGracefulDeletionSuccess(binding *v1bet
 
 	toUpdate := updatedBinding.DeepCopy()
 	finalizers := sets.NewString(toUpdate.Finalizers...)
-	finalizers.Delete(v1beta1.FinalizerServiceCatalog)
+	finalizers.Delete(v1.FinalizerServiceCatalog)
 	toUpdate.Finalizers = finalizers.List()
 
 	_, err = c.serviceCatalogClient.ServiceBindings(toUpdate.Namespace).Update(context.Background(), toUpdate, metav1.UpdateOptions{})
@@ -1549,7 +1549,7 @@ func (c *controller) processServiceBindingGracefulDeletionSuccess(binding *v1bet
 
 // processUnbindSuccess handles the logging and updating of a ServiceBinding
 // that has successfully been deleted at the broker.
-func (c *controller) processUnbindSuccess(binding *v1beta1.ServiceBinding) error {
+func (c *controller) processUnbindSuccess(binding *v1.ServiceBinding) error {
 	mitigatingOrphan := binding.Status.OrphanMitigationInProgress
 
 	reason := successUnboundReason
@@ -1559,10 +1559,10 @@ func (c *controller) processUnbindSuccess(binding *v1beta1.ServiceBinding) error
 		msg = successOrphanMitigationMessage
 	}
 
-	setServiceBindingCondition(binding, v1beta1.ServiceBindingConditionReady, v1beta1.ConditionFalse, reason, msg)
+	setServiceBindingCondition(binding, v1.ServiceBindingConditionReady, v1.ConditionFalse, reason, msg)
 	clearServiceBindingCurrentOperation(binding)
 	binding.Status.ExternalProperties = nil
-	binding.Status.UnbindStatus = v1beta1.ServiceBindingUnbindStatusSucceeded
+	binding.Status.UnbindStatus = v1.ServiceBindingUnbindStatusSucceeded
 
 	if mitigatingOrphan {
 		if _, err := c.updateServiceBindingStatus(binding); err != nil {
@@ -1583,29 +1583,29 @@ func (c *controller) processUnbindSuccess(binding *v1beta1.ServiceBinding) error
 // processUnbindFailure handles the logging and updating of a
 // ServiceBinding that hit a terminal failure during unbind
 // reconciliation.
-func (c *controller) processUnbindFailure(binding *v1beta1.ServiceBinding, readyCond, failedCond *v1beta1.ServiceBindingCondition) error {
+func (c *controller) processUnbindFailure(binding *v1.ServiceBinding, readyCond, failedCond *v1.ServiceBindingCondition) error {
 	if failedCond == nil {
 		return fmt.Errorf("failedCond must not be nil")
 	}
 
 	if readyCond != nil {
-		setServiceBindingCondition(binding, v1beta1.ServiceBindingConditionReady, v1beta1.ConditionUnknown, readyCond.Reason, readyCond.Message)
+		setServiceBindingCondition(binding, v1.ServiceBindingConditionReady, v1.ConditionUnknown, readyCond.Reason, readyCond.Message)
 		c.recorder.Event(binding, corev1.EventTypeWarning, readyCond.Reason, readyCond.Message)
 	}
 
 	if binding.Status.OrphanMitigationInProgress {
 		// replace Ready condition with orphan mitigation-related one.
 		msg := "Orphan mitigation failed: " + failedCond.Message
-		readyCond := newServiceBindingReadyCondition(v1beta1.ConditionUnknown, errorOrphanMitigationFailedReason, msg)
-		setServiceBindingCondition(binding, v1beta1.ServiceBindingConditionReady, readyCond.Status, readyCond.Reason, readyCond.Message)
+		readyCond := newServiceBindingReadyCondition(v1.ConditionUnknown, errorOrphanMitigationFailedReason, msg)
+		setServiceBindingCondition(binding, v1.ServiceBindingConditionReady, readyCond.Status, readyCond.Reason, readyCond.Message)
 		c.recorder.Event(binding, corev1.EventTypeWarning, readyCond.Reason, readyCond.Message)
 	} else {
-		setServiceBindingCondition(binding, v1beta1.ServiceBindingConditionFailed, failedCond.Status, failedCond.Reason, failedCond.Message)
+		setServiceBindingCondition(binding, v1.ServiceBindingConditionFailed, failedCond.Status, failedCond.Reason, failedCond.Message)
 		c.recorder.Event(binding, corev1.EventTypeWarning, failedCond.Reason, failedCond.Message)
 	}
 
 	clearServiceBindingCurrentOperation(binding)
-	binding.Status.UnbindStatus = v1beta1.ServiceBindingUnbindStatusFailed
+	binding.Status.UnbindStatus = v1.ServiceBindingUnbindStatusFailed
 
 	if _, err := c.updateServiceBindingStatus(binding); err != nil {
 		return err
@@ -1617,9 +1617,9 @@ func (c *controller) processUnbindFailure(binding *v1beta1.ServiceBinding, ready
 // processUnbindAsyncResponse handles the logging and updating of a
 // ServiceBinding that received an asynchronous response from the broker when
 // requesting an unbind.
-func (c *controller) processUnbindAsyncResponse(binding *v1beta1.ServiceBinding, response *osb.UnbindResponse) error {
+func (c *controller) processUnbindAsyncResponse(binding *v1.ServiceBinding, response *osb.UnbindResponse) error {
 	setServiceBindingLastOperation(binding, response.OperationKey)
-	setServiceBindingCondition(binding, v1beta1.ServiceBindingConditionReady, v1beta1.ConditionFalse, asyncUnbindingReason, asyncUnbindingMessage)
+	setServiceBindingCondition(binding, v1.ServiceBindingConditionReady, v1.ConditionFalse, asyncUnbindingReason, asyncUnbindingMessage)
 	binding.Status.AsyncOpInProgress = true
 
 	if _, err := c.updateServiceBindingStatus(binding); err != nil {
@@ -1632,7 +1632,7 @@ func (c *controller) processUnbindAsyncResponse(binding *v1beta1.ServiceBinding,
 
 // handleServiceBindingPollingError is a helper function that handles logic for
 // an error returned during reconciliation while polling a service binding.
-func (c *controller) handleServiceBindingPollingError(binding *v1beta1.ServiceBinding, err error) error {
+func (c *controller) handleServiceBindingPollingError(binding *v1.ServiceBinding, err error) error {
 	// During polling, an error means we should:
 	//	1) log the error
 	//	2) attempt to requeue in the polling queue

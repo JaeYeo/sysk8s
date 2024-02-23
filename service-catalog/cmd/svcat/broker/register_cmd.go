@@ -24,7 +24,7 @@ import (
 
 	"github.com/kubernetes-sigs/service-catalog/cmd/svcat/command"
 	"github.com/kubernetes-sigs/service-catalog/cmd/svcat/output"
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	servicecatalog "github.com/kubernetes-sigs/service-catalog/pkg/svcat/service-catalog"
 	"github.com/spf13/cobra"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -132,10 +132,10 @@ func (c *RegisterCmd) Run() error {
 		Scope:     c.Scope,
 	}
 	if c.RelistBehavior == "duration" {
-		opts.RelistBehavior = v1beta1.ServiceBrokerRelistBehaviorDuration
+		opts.RelistBehavior = v1.ServiceBrokerRelistBehaviorDuration
 		opts.RelistDuration = &metav1.Duration{Duration: c.RelistDuration}
 	} else if c.RelistBehavior == "manual" {
-		opts.RelistBehavior = v1beta1.ServiceBrokerRelistBehaviorManual
+		opts.RelistBehavior = v1.ServiceBrokerRelistBehaviorManual
 	}
 
 	broker, err := c.Context.App.Register(c.BrokerName, c.URL, opts, scopeOpts)
@@ -147,7 +147,7 @@ func (c *RegisterCmd) Run() error {
 		fmt.Fprintln(c.Output, "Waiting for the broker to be registered...")
 		finalBroker, err := c.Context.App.WaitForBroker(c.BrokerName, scopeOpts, c.Interval, c.Timeout)
 		if err == nil {
-			broker = finalBroker.(*v1beta1.ClusterServiceBroker)
+			broker = finalBroker.(*v1.ClusterServiceBroker)
 		}
 
 		output.WriteBrokerDetails(c.Output, broker)

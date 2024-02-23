@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package v1beta1
+package v1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -202,14 +202,14 @@ type ValidatingWebhook struct {
 	// Allowed values are "Exact" or "Equivalent".
 	//
 	// - Exact: match a request only if it exactly matches a specified rule.
-	// For example, if deployments can be modified via apps/v1, apps/v1beta1, and extensions/v1beta1,
+	// For example, if deployments can be modified via apps/v1, apps/v1, and extensions/v1,
 	// but "rules" only included `apiGroups:["apps"], apiVersions:["v1"], resources: ["deployments"]`,
-	// a request to apps/v1beta1 or extensions/v1beta1 would not be sent to the webhook.
+	// a request to apps/v1 or extensions/v1 would not be sent to the webhook.
 	//
 	// - Equivalent: match a request if modifies a resource listed in rules, even via another API group or version.
-	// For example, if deployments can be modified via apps/v1, apps/v1beta1, and extensions/v1beta1,
+	// For example, if deployments can be modified via apps/v1, apps/v1, and extensions/v1,
 	// and "rules" only included `apiGroups:["apps"], apiVersions:["v1"], resources: ["deployments"]`,
-	// a request to apps/v1beta1 or extensions/v1beta1 would be converted to apps/v1 and sent to the webhook.
+	// a request to apps/v1 or extensions/v1 would be converted to apps/v1 and sent to the webhook.
 	//
 	// Defaults to "Exact"
 	// +optional
@@ -299,7 +299,7 @@ type ValidatingWebhook struct {
 	// If a persisted webhook configuration specifies allowed versions and does not
 	// include any versions known to the API Server, calls to the webhook will fail
 	// and be subject to the failure policy.
-	// Default to `['v1beta1']`.
+	// Default to `['v1']`.
 	// +optional
 	AdmissionReviewVersions []string `json:"admissionReviewVersions,omitempty" protobuf:"bytes,8,rep,name=admissionReviewVersions"`
 }
@@ -334,14 +334,14 @@ type MutatingWebhook struct {
 	// Allowed values are "Exact" or "Equivalent".
 	//
 	// - Exact: match a request only if it exactly matches a specified rule.
-	// For example, if deployments can be modified via apps/v1, apps/v1beta1, and extensions/v1beta1,
+	// For example, if deployments can be modified via apps/v1, apps/v1, and extensions/v1,
 	// but "rules" only included `apiGroups:["apps"], apiVersions:["v1"], resources: ["deployments"]`,
-	// a request to apps/v1beta1 or extensions/v1beta1 would not be sent to the webhook.
+	// a request to apps/v1 or extensions/v1 would not be sent to the webhook.
 	//
 	// - Equivalent: match a request if modifies a resource listed in rules, even via another API group or version.
-	// For example, if deployments can be modified via apps/v1, apps/v1beta1, and extensions/v1beta1,
+	// For example, if deployments can be modified via apps/v1, apps/v1, and extensions/v1,
 	// and "rules" only included `apiGroups:["apps"], apiVersions:["v1"], resources: ["deployments"]`,
-	// a request to apps/v1beta1 or extensions/v1beta1 would be converted to apps/v1 and sent to the webhook.
+	// a request to apps/v1 or extensions/v1 would be converted to apps/v1 and sent to the webhook.
 	//
 	// Defaults to "Exact"
 	// +optional
@@ -431,7 +431,7 @@ type MutatingWebhook struct {
 	// If a persisted webhook configuration specifies allowed versions and does not
 	// include any versions known to the API Server, calls to the webhook will fail
 	// and be subject to the failure policy.
-	// Default to `['v1beta1']`.
+	// Default to `['v1']`.
 	// +optional
 	AdmissionReviewVersions []string `json:"admissionReviewVersions,omitempty" protobuf:"bytes,8,rep,name=admissionReviewVersions"`
 

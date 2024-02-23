@@ -22,7 +22,7 @@ import (
 	"math"
 	"time"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/pkg/errors"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -32,7 +32,7 @@ import (
 )
 
 // RetrieveInstances lists all instances in a namespace.
-func (sdk *SDK) RetrieveInstances(ns, classFilter, planFilter string) (*v1beta1.ServiceInstanceList, error) {
+func (sdk *SDK) RetrieveInstances(ns, classFilter, planFilter string) (*v1.ServiceInstanceList, error) {
 	instances, err := sdk.ServiceCatalog().ServiceInstances(ns).List(context.Background(), v1.ListOptions{})
 	if err != nil {
 		return nil, errors.Wrapf(err, "unable to list instances in %s", ns)
@@ -42,8 +42,8 @@ func (sdk *SDK) RetrieveInstances(ns, classFilter, planFilter string) (*v1beta1.
 		return instances, nil
 	}
 
-	filtered := v1beta1.ServiceInstanceList{
-		Items: []v1beta1.ServiceInstance{},
+	filtered := v1.ServiceInstanceList{
+		Items: []v1.ServiceInstance{},
 	}
 
 	for _, instance := range instances.Items {
@@ -62,7 +62,7 @@ func (sdk *SDK) RetrieveInstances(ns, classFilter, planFilter string) (*v1beta1.
 }
 
 // RetrieveInstance gets an instance by its name.
-func (sdk *SDK) RetrieveInstance(ns, name string) (*v1beta1.ServiceInstance, error) {
+func (sdk *SDK) RetrieveInstance(ns, name string) (*v1.ServiceInstance, error) {
 	instance, err := sdk.ServiceCatalog().ServiceInstances(ns).Get(context.Background(), name, v1.GetOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("unable to get instance '%s.%s' (%s)", ns, name, err)
@@ -71,8 +71,8 @@ func (sdk *SDK) RetrieveInstance(ns, name string) (*v1beta1.ServiceInstance, err
 }
 
 // RetrieveInstanceByBinding retrieves the parent instance for a binding.
-func (sdk *SDK) RetrieveInstanceByBinding(b *v1beta1.ServiceBinding,
-) (*v1beta1.ServiceInstance, error) {
+func (sdk *SDK) RetrieveInstanceByBinding(b *v1.ServiceBinding,
+) (*v1.ServiceInstance, error) {
 	ns := b.Namespace
 	instName := b.Spec.InstanceRef.Name
 	inst, err := sdk.ServiceCatalog().ServiceInstances(ns).Get(context.Background(), instName, v1.GetOptions{})
@@ -83,10 +83,10 @@ func (sdk *SDK) RetrieveInstanceByBinding(b *v1beta1.ServiceBinding,
 }
 
 // RetrieveInstancesByPlan retrieves all instances of a plan.
-func (sdk *SDK) RetrieveInstancesByPlan(plan Plan) ([]v1beta1.ServiceInstance, error) {
+func (sdk *SDK) RetrieveInstancesByPlan(plan Plan) ([]v1.ServiceInstance, error) {
 	planOpts := v1.ListOptions{
 		LabelSelector: labels.SelectorFromSet(labels.Set{
-			v1beta1.GroupName + "/" + v1beta1.FilterSpecClusterServicePlanRefName: plan.GetName(),
+			v1.GroupName + "/" + v1.FilterSpecClusterServicePlanRefName: plan.GetName(),
 		}).String(),
 	}
 	instances, err := sdk.ServiceCatalog().ServiceInstances("").List(context.Background(), planOpts)
@@ -98,8 +98,8 @@ func (sdk *SDK) RetrieveInstancesByPlan(plan Plan) ([]v1beta1.ServiceInstance, e
 }
 
 // InstanceParentHierarchy retrieves all ancestor resources of an instance.
-func (sdk *SDK) InstanceParentHierarchy(instance *v1beta1.ServiceInstance,
-) (*v1beta1.ClusterServiceClass, *v1beta1.ClusterServicePlan, *v1beta1.ClusterServiceBroker, error) {
+func (sdk *SDK) InstanceParentHierarchy(instance *v1.ServiceInstance,
+) (*v1.ClusterServiceClass, *v1.ClusterServicePlan, *v1.ClusterServiceBroker, error) {
 	class, plan, err := sdk.InstanceToServiceClassAndPlan(instance)
 	if err != nil {
 		return nil, nil, nil, err
@@ -114,10 +114,10 @@ func (sdk *SDK) InstanceParentHierarchy(instance *v1beta1.ServiceInstance,
 }
 
 // InstanceToServiceClassAndPlan retrieves the parent class and plan for an instance.
-func (sdk *SDK) InstanceToServiceClassAndPlan(instance *v1beta1.ServiceInstance,
-) (*v1beta1.ClusterServiceClass, *v1beta1.ClusterServicePlan, error) {
+func (sdk *SDK) InstanceToServiceClassAndPlan(instance *v1.ServiceInstance,
+) (*v1.ClusterServiceClass, *v1.ClusterServicePlan, error) {
 	classID := instance.Spec.ClusterServiceClassRef.Name
-	classCh := make(chan *v1beta1.ClusterServiceClass)
+	classCh := make(chan *v1.ClusterServiceClass)
 	classErrCh := make(chan error)
 	go func() {
 		class, err := sdk.ServiceCatalog().ClusterServiceClasses().Get(context.Background(), classID, v1.GetOptions{})
@@ -129,7 +129,7 @@ func (sdk *SDK) InstanceToServiceClassAndPlan(instance *v1beta1.ServiceInstance,
 	}()
 
 	planID := instance.Spec.ClusterServicePlanRef.Name
-	planCh := make(chan *v1beta1.ClusterServicePlan)
+	planCh := make(chan *v1.ClusterServicePlan)
 	planErrCh := make(chan error)
 	go func() {
 		plan, err := sdk.ServiceCatalog().ClusterServicePlans().Get(context.Background(), planID, v1.GetOptions{})
@@ -140,8 +140,8 @@ func (sdk *SDK) InstanceToServiceClassAndPlan(instance *v1beta1.ServiceInstance,
 		planCh <- plan
 	}()
 
-	var class *v1beta1.ClusterServiceClass
-	var plan *v1beta1.ClusterServicePlan
+	var class *v1.ClusterServiceClass
+	var plan *v1.ClusterServicePlan
 	for {
 		select {
 		case cl := <-classCh:
@@ -166,17 +166,17 @@ func (sdk *SDK) InstanceToServiceClassAndPlan(instance *v1beta1.ServiceInstance,
 // Provision creates an instance of a specific service class and plan specified
 // by their k8s names. Depending on provisionClusterInstance, it will create either
 // an instance of a cluster class/plan or a namespaced class/plan
-func (sdk *SDK) Provision(instanceName, classKubeName, planKubeName string, provisionClusterInstance bool, opts *ProvisionOptions) (*v1beta1.ServiceInstance, error) {
-	var request *v1beta1.ServiceInstance
+func (sdk *SDK) Provision(instanceName, classKubeName, planKubeName string, provisionClusterInstance bool, opts *ProvisionOptions) (*v1.ServiceInstance, error) {
+	var request *v1.ServiceInstance
 	if provisionClusterInstance {
-		request = &v1beta1.ServiceInstance{
+		request = &v1.ServiceInstance{
 			ObjectMeta: v1.ObjectMeta{
 				Name:      instanceName,
 				Namespace: opts.Namespace,
 			},
-			Spec: v1beta1.ServiceInstanceSpec{
+			Spec: v1.ServiceInstanceSpec{
 				ExternalID: opts.ExternalID,
-				PlanReference: v1beta1.PlanReference{
+				PlanReference: v1.PlanReference{
 					ClusterServiceClassName: classKubeName,
 					ClusterServicePlanName:  planKubeName,
 				},
@@ -185,14 +185,14 @@ func (sdk *SDK) Provision(instanceName, classKubeName, planKubeName string, prov
 			},
 		}
 	} else {
-		request = &v1beta1.ServiceInstance{
+		request = &v1.ServiceInstance{
 			ObjectMeta: v1.ObjectMeta{
 				Name:      instanceName,
 				Namespace: opts.Namespace,
 			},
-			Spec: v1beta1.ServiceInstanceSpec{
+			Spec: v1.ServiceInstanceSpec{
 				ExternalID: opts.ExternalID,
-				PlanReference: v1beta1.PlanReference{
+				PlanReference: v1.PlanReference{
 					ServiceClassName: classKubeName,
 					ServicePlanName:  planKubeName,
 				},
@@ -243,7 +243,7 @@ func (sdk *SDK) TouchInstance(ns, name string, retries int) error {
 }
 
 // WaitForInstanceToNotExist waits for the specified instance to no longer exist.
-func (sdk *SDK) WaitForInstanceToNotExist(ns, name string, interval time.Duration, timeout *time.Duration) (instance *v1beta1.ServiceInstance, err error) {
+func (sdk *SDK) WaitForInstanceToNotExist(ns, name string, interval time.Duration, timeout *time.Duration) (instance *v1.ServiceInstance, err error) {
 	if timeout == nil {
 		notimeout := time.Duration(math.MaxInt64)
 		timeout = &notimeout
@@ -264,7 +264,7 @@ func (sdk *SDK) WaitForInstanceToNotExist(ns, name string, interval time.Duratio
 }
 
 // WaitForInstance waits for the instance to complete the current operation (or fail).
-func (sdk *SDK) WaitForInstance(ns, name string, interval time.Duration, timeout *time.Duration) (instance *v1beta1.ServiceInstance, err error) {
+func (sdk *SDK) WaitForInstance(ns, name string, interval time.Duration, timeout *time.Duration) (instance *v1.ServiceInstance, err error) {
 	if timeout == nil {
 		notimeout := time.Duration(math.MaxInt64)
 		timeout = &notimeout
@@ -290,20 +290,20 @@ func (sdk *SDK) WaitForInstance(ns, name string, interval time.Duration, timeout
 }
 
 // IsInstanceReady returns if the instance is in the Ready status.
-func (sdk *SDK) IsInstanceReady(instance *v1beta1.ServiceInstance) bool {
-	return sdk.InstanceHasStatus(instance, v1beta1.ServiceInstanceConditionReady)
+func (sdk *SDK) IsInstanceReady(instance *v1.ServiceInstance) bool {
+	return sdk.InstanceHasStatus(instance, v1.ServiceInstanceConditionReady)
 }
 
 // IsInstanceFailed returns if the instance is in the Failed status.
-func (sdk *SDK) IsInstanceFailed(instance *v1beta1.ServiceInstance) bool {
-	return sdk.InstanceHasStatus(instance, v1beta1.ServiceInstanceConditionFailed)
+func (sdk *SDK) IsInstanceFailed(instance *v1.ServiceInstance) bool {
+	return sdk.InstanceHasStatus(instance, v1.ServiceInstanceConditionFailed)
 }
 
 // InstanceHasStatus returns if the instance is in the specified status.
-func (sdk *SDK) InstanceHasStatus(instance *v1beta1.ServiceInstance, status v1beta1.ServiceInstanceConditionType) bool {
+func (sdk *SDK) InstanceHasStatus(instance *v1.ServiceInstance, status v1.ServiceInstanceConditionType) bool {
 	for _, cond := range instance.Status.Conditions {
 		if cond.Type == status &&
-			cond.Status == v1beta1.ConditionTrue {
+			cond.Status == v1.ConditionTrue {
 			return true
 		}
 	}
@@ -311,7 +311,7 @@ func (sdk *SDK) InstanceHasStatus(instance *v1beta1.ServiceInstance, status v1be
 	return false
 }
 
-// RemoveFinalizerForInstance removes v1beta1.FinalizerServiceCatalog from the specified instance.
+// RemoveFinalizerForInstance removes v1.FinalizerServiceCatalog from the specified instance.
 func (sdk *SDK) RemoveFinalizerForInstance(ns, name string) error {
 	instance, err := sdk.RetrieveInstance(ns, name)
 	if err != nil {
@@ -319,7 +319,7 @@ func (sdk *SDK) RemoveFinalizerForInstance(ns, name string) error {
 	}
 
 	finalizers := sets.NewString(instance.Finalizers...)
-	finalizers.Delete(v1beta1.FinalizerServiceCatalog)
+	finalizers.Delete(v1.FinalizerServiceCatalog)
 	instance.Finalizers = finalizers.List()
 	_, err = sdk.ServiceCatalog().ServiceInstances(instance.Namespace).Update(context.Background(), instance, v1.UpdateOptions{})
 	if err != nil {

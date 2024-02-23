@@ -14,8 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// package v1beta1 is alpha objects from meta that will be introduced.
-package v1beta1
+// package v1 is alpha objects from meta that will be introduced.
+package v1
 
 import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -54,7 +54,7 @@ type TableOptions = v1.TableOptions
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 type PartialObjectMetadata = v1.PartialObjectMetadata
 
-// IMPORTANT: PartialObjectMetadataList has different protobuf field ids in v1beta1 than
+// IMPORTANT: PartialObjectMetadataList has different protobuf field ids in v1 than
 // v1 because ListMeta was accidentally omitted prior to 1.15. Therefore this type must
 // remain independent of v1.PartialObjectMetadataList to preserve mappings.
 

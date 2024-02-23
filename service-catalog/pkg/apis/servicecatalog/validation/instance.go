@@ -19,7 +19,7 @@ package validation
 import (
 	"fmt"
 
-	sc "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	sc "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/controller"
 	scfeatures "github.com/kubernetes-sigs/service-catalog/pkg/features"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"

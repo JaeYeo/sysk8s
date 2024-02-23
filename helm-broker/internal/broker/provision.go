@@ -1,7 +1,6 @@
 package broker
 
 import (
-	"os"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -134,20 +133,7 @@ func (svc *provisionService) Provision(ctx context.Context, osbCtx OsbContext, r
 	if !found {
 		return nil, &osb.HTTPStatusCodeError{StatusCode: http.StatusBadRequest, ErrorMessage: strPtr(fmt.Sprintf("addon does not contain requested plan (planID: %s): %v", err, addonPlanID))}
 	}
-
-	///////////////////////////////////////////////////////////////////////////////////
-	//releaseName := createReleaseName(addon.Name, addonPlan.Name, iID)
-	// 2022-03 releaseName too long, use fullnameOverride param as relaseName if exists.
-	releaseName := createReleaseName2(addon.Name, addonPlan.Name, iID, requestedProvisioningParameters.Data )
-
-	//svc.log.Infof("releaseName:  %s", releaseName)
-
-	// 2022-04 update imageRegistry on req if need
-	updateChartValues(req)
-
-	svc.log.Infof("Updated provisioning %+v", req)
-
-	///////////////////////////////////////////////////////////////////////////////////
+	releaseName := createReleaseName(addon.Name, addonPlan.Name, iID)
 
 	i := internal.Instance{
 		ID:                     iID,
@@ -334,61 +320,6 @@ func createReleaseName(name internal.AddonName, planName internal.AddonPlanName,
 
 	return internal.ReleaseName(releaseName)
 }
-
-
-// 2022-03
-// releaseName is too long, use fullnameOverride in chartValues
-func createReleaseName2(name internal.AddonName, planName internal.AddonPlanName, iID internal.InstanceID, chartvalues internal.ChartValues ) internal.ReleaseName {
-
-
-	if fullnameOverride, ok := chartvalues["fullnameOverride"]; ok {
-		return internal.ReleaseName(fmt.Sprint(fullnameOverride))
-	} else {
-		// max name length 53 = 36(GUID) + 4(pre + special char) + 12 (6 for name, 6 for plan) + 1 extra char
-		releaseName := fmt.Sprintf(
-			"%s-%s-%s",
-			normalize(string(name)),
-			normalize(string(planName)),
-			iID)
-
-		return internal.ReleaseName(releaseName)
-	}
-}
-
-// 2022-04
-// update ImageRepository if need
-// helmbroker :no charvalue : no => no 
-// helmborker :no charvvalue: yes => no
-// helmborker :yes charvvalue: yes => no
-// helmbroker :yes chartvalue: no => update
-func updateChartValues(req *osb.ProvisionRequest) {
-
-
-	env_imageRegistry, env_ok := os.LookupEnv("IMAGE_REGISTRY")
-
-	if !env_ok {
-		return
-	}
-
-	// check glboal
-	if _, global_ok := req.Parameters["global"]; global_ok {
-
-		if _, img_ok := req.Parameters["global"].(map[string]interface{})["imageRegistry"]; img_ok {
-			return
-		} else {
-			req.Parameters["global"].(map[string]interface{})["imageRegistry"] = env_imageRegistry
-		}
-       	} else {
-
-		req.Parameters["global"] = make(map[string]interface{})
-
-		req.Parameters["global"].(map[string]interface{})["imageRegistry"] = env_imageRegistry
-
-	}
-
-}
-
-
 
 // to work correctly, https://github.com/ghodss/yaml has to be used
 func mergeValues(dest map[string]interface{}, src map[string]interface{}) map[string]interface{} {

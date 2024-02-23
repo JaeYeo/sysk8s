@@ -99,7 +99,7 @@ that looks similar to a `ClusterServiceBroker`. This resource will use resource
  kind `ServiceBroker` and requires a namespace. An example might look like:
 
 ```yaml
-apiVersion: servicecatalog.k8s.io/v1beta1
+apiVersion: servicecatalog.k8s.io/v1
 kind: ServiceBroker
 metadata:
   name: example-ns-broker
@@ -118,14 +118,14 @@ for the list of available Services and create corresponding `ServiceClass`
 and `ServicePlan` resources. These resources might look like this:
 
 ```yaml
-apiVersion: servicecatalog.k8s.io/v1beta1
+apiVersion: servicecatalog.k8s.io/v1
 kind: ServiceClass
 metadata:
   creationTimestamp: 2018-07-12T13:30:01Z
   name: 25434f16-d762-41c7-bbdd-8045d7f74ca6
   namespace: ns-broker
   resourceVersion: "13"
-  selfLink: /apis/servicecatalog.k8s.io/v1beta1/namespaces/ns-broker/serviceclasses/25434f16-d762-41c7-bbdd-8045d7f74ca6
+  selfLink: /apis/servicecatalog.k8s.io/v1/namespaces/ns-broker/serviceclasses/25434f16-d762-41c7-bbdd-8045d7f74ca6
   uid: adfa2d9a-85d7-11e8-a4f3-2ae408f4a9e4
 spec:
   bindable: true
@@ -138,14 +138,14 @@ spec:
 ```
 
 ```yaml
-apiVersion: servicecatalog.k8s.io/v1beta1
+apiVersion: servicecatalog.k8s.io/v1
 kind: ServicePlan
 metadata:
   creationTimestamp: 2018-07-12T13:30:02Z
   name: 4c6932e8-30ec-4af9-83d2-6e27286dbab3
   namespace: ns-broker
   resourceVersion: "24"
-  selfLink: /apis/servicecatalog.k8s.io/v1beta1/namespaces/ns-broker/serviceplans/4c6932e8-30ec-4af9-83d2-6e27286dbab3
+  selfLink: /apis/servicecatalog.k8s.io/v1/namespaces/ns-broker/serviceplans/4c6932e8-30ec-4af9-83d2-6e27286dbab3
   uid: ae8e23ac-85d7-11e8-a4f3-2ae408f4a9e4
 spec:
   description: basic plan
@@ -163,7 +163,7 @@ them in the context of a namespace. For example, a `ServiceInstance` YAML that
  look like this:
 
 ```yaml
-apiVersion: servicecatalog.k8s.io/v1beta1
+apiVersion: servicecatalog.k8s.io/v1
 kind: ServiceInstance
 metadata:
   name: example-mysql-instance
@@ -177,7 +177,7 @@ If you instead want to use the `ServiceClass` and `ServicePlan`
  namespace-scoped resources, the yaml might look like this:
 
 ```yaml
-apiVersion: servicecatalog.k8s.io/v1beta1
+apiVersion: servicecatalog.k8s.io/v1
 kind: ServiceInstance
 metadata:
   name: example-mysql-instance
@@ -191,7 +191,7 @@ For comparison, using the cluster-scoped `ClusterServiceClass` or
 `ClusterServicePlan`, the yaml would look like:
 
 ```yaml
-apiVersion: servicecatalog.k8s.io/v1beta1
+apiVersion: servicecatalog.k8s.io/v1
 kind: ServiceInstance
 metadata:
   name: example-mysql-instance
@@ -218,7 +218,7 @@ a broker, [catalog restrictions](catalog-restrictions.md) can be specified in or
  to accomplish this might look like:
 
 ```yaml
-apiVersion: servicecatalog.k8s.io/v1beta1
+apiVersion: servicecatalog.k8s.io/v1
 kind: ServiceBroker
 metadata:
   name: example-ns-broker

@@ -35,7 +35,7 @@ import (
 	"github.com/kubernetes-sigs/service-catalog/cmd/svcat/command"
 	"github.com/kubernetes-sigs/service-catalog/cmd/svcat/plugin"
 	"github.com/kubernetes-sigs/service-catalog/internal/test"
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/fake"
 	svcatfake "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/fake"
 	"github.com/kubernetes-sigs/service-catalog/pkg/svcat"
@@ -54,7 +54,7 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
-var catalogRequestRegex = regexp.MustCompile("/apis/servicecatalog.k8s.io/v1beta1/(.*)")
+var catalogRequestRegex = regexp.MustCompile("/apis/servicecatalog.k8s.io/v1/(.*)")
 var coreRequestRegex = regexp.MustCompile("/api/v1/(.*)")
 
 func TestMain(m *testing.M) {
@@ -83,36 +83,36 @@ func TestGetSvcatWithNamespacedBrokerFeatureDisabled(t *testing.T) {
 
 			// Setup fake data for the app
 			var fakes = []runtime.Object{
-				&v1beta1.ClusterServiceBroker{
+				&v1.ClusterServiceBroker{
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "my-cluster-broker",
 					},
 				},
-				&v1beta1.ClusterServiceClass{
+				&v1.ClusterServiceClass{
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "my-cluster-class",
 						Labels: map[string]string{
-							v1beta1.GroupName + "/" + v1beta1.FilterSpecExternalName: util.GenerateSHA("my-cluster-class"),
+							v1.GroupName + "/" + v1.FilterSpecExternalName: util.GenerateSHA("my-cluster-class"),
 						},
 					},
-					Spec: v1beta1.ClusterServiceClassSpec{
-						CommonServiceClassSpec: v1beta1.CommonServiceClassSpec{
+					Spec: v1.ClusterServiceClassSpec{
+						CommonServiceClassSpec: v1.CommonServiceClassSpec{
 							ExternalName: "my-cluster-class",
 						},
 					},
 				},
-				&v1beta1.ClusterServicePlan{
+				&v1.ClusterServicePlan{
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "my-cluster-plan",
 						Labels: map[string]string{
-							v1beta1.GroupName + "/" + v1beta1.FilterSpecExternalName: util.GenerateSHA("my-cluster-plan"),
+							v1.GroupName + "/" + v1.FilterSpecExternalName: util.GenerateSHA("my-cluster-plan"),
 						},
 					},
-					Spec: v1beta1.ClusterServicePlanSpec{
-						CommonServicePlanSpec: v1beta1.CommonServicePlanSpec{
+					Spec: v1.ClusterServicePlanSpec{
+						CommonServicePlanSpec: v1.CommonServicePlanSpec{
 							ExternalName: "my-cluster-plan",
 						},
-						ClusterServiceClassRef: v1beta1.ClusterObjectReference{
+						ClusterServiceClassRef: v1.ClusterObjectReference{
 							Name: "my-cluster-class",
 						},
 					},
@@ -123,15 +123,15 @@ func TestGetSvcatWithNamespacedBrokerFeatureDisabled(t *testing.T) {
 			// When the feature flag isn't enabled, the server will return resource not found
 			svcatClient.PrependReactor("list", "servicebrokers",
 				func(action k8stesting.Action) (handled bool, ret runtime.Object, err error) {
-					return true, nil, k8serrors.NewNotFound(v1beta1.Resource("servicebrokers"), "")
+					return true, nil, k8serrors.NewNotFound(v1.Resource("servicebrokers"), "")
 				})
 			svcatClient.PrependReactor("list", "serviceclasses",
 				func(action k8stesting.Action) (handled bool, ret runtime.Object, err error) {
-					return true, nil, k8serrors.NewNotFound(v1beta1.Resource("serviceclasses"), "")
+					return true, nil, k8serrors.NewNotFound(v1.Resource("serviceclasses"), "")
 				})
 			svcatClient.PrependReactor("list", "serviceplans",
 				func(action k8stesting.Action) (handled bool, ret runtime.Object, err error) {
-					return true, nil, k8serrors.NewNotFound(v1beta1.Resource("serviceplans"), "")
+					return true, nil, k8serrors.NewNotFound(v1.Resource("serviceplans"), "")
 				})
 
 			cxt := newContext()
@@ -437,7 +437,7 @@ func TestParametersForBinding(t *testing.T) {
 
 			fakeObject := createAction.GetObject()
 
-			binding, ok := fakeObject.(*v1beta1.ServiceBinding)
+			binding, ok := fakeObject.(*v1.ServiceBinding)
 			if !ok {
 				t.Fatal(t, "Failed to cast object to binding: ", fakeObject)
 			}
@@ -642,7 +642,7 @@ func newAPIServer() *httptest.Server {
 // apihandler handles requests to the service catalog endpoint.
 // When a request is received, it looks up the response from the testdata directory.
 // Example:
-// GET /apis/servicecatalog.k8s.io/v1beta1/clusterservicebrokers responds with testdata/clusterservicebrokers.json
+// GET /apis/servicecatalog.k8s.io/v1/clusterservicebrokers responds with testdata/clusterservicebrokers.json
 func apihandler(w http.ResponseWriter, r *http.Request) {
 	catalogMatch := catalogRequestRegex.FindStringSubmatch(r.RequestURI)
 	coreMatch := coreRequestRegex.FindStringSubmatch(r.RequestURI)

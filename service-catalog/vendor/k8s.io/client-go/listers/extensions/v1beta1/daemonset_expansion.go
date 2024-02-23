@@ -14,14 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package v1beta1
+package v1
 
 import (
 	"fmt"
 
-	apps "k8s.io/api/apps/v1beta1"
+	apps "k8s.io/api/apps/v1"
 	"k8s.io/api/core/v1"
-	"k8s.io/api/extensions/v1beta1"
+	"k8s.io/api/extensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 )
@@ -29,8 +29,8 @@ import (
 // DaemonSetListerExpansion allows custom methods to be added to
 // DaemonSetLister.
 type DaemonSetListerExpansion interface {
-	GetPodDaemonSets(pod *v1.Pod) ([]*v1beta1.DaemonSet, error)
-	GetHistoryDaemonSets(history *apps.ControllerRevision) ([]*v1beta1.DaemonSet, error)
+	GetPodDaemonSets(pod *v1.Pod) ([]*v1.DaemonSet, error)
+	GetHistoryDaemonSets(history *apps.ControllerRevision) ([]*v1.DaemonSet, error)
 }
 
 // DaemonSetNamespaceListerExpansion allows custom methods to be added to
@@ -40,9 +40,9 @@ type DaemonSetNamespaceListerExpansion interface{}
 // GetPodDaemonSets returns a list of DaemonSets that potentially match a pod.
 // Only the one specified in the Pod's ControllerRef will actually manage it.
 // Returns an error only if no matching DaemonSets are found.
-func (s *daemonSetLister) GetPodDaemonSets(pod *v1.Pod) ([]*v1beta1.DaemonSet, error) {
+func (s *daemonSetLister) GetPodDaemonSets(pod *v1.Pod) ([]*v1.DaemonSet, error) {
 	var selector labels.Selector
-	var daemonSet *v1beta1.DaemonSet
+	var daemonSet *v1.DaemonSet
 
 	if len(pod.Labels) == 0 {
 		return nil, fmt.Errorf("no daemon sets found for pod %v because it has no labels", pod.Name)
@@ -53,7 +53,7 @@ func (s *daemonSetLister) GetPodDaemonSets(pod *v1.Pod) ([]*v1beta1.DaemonSet, e
 		return nil, err
 	}
 
-	var daemonSets []*v1beta1.DaemonSet
+	var daemonSets []*v1.DaemonSet
 	for i := range list {
 		daemonSet = list[i]
 		if daemonSet.Namespace != pod.Namespace {
@@ -83,7 +83,7 @@ func (s *daemonSetLister) GetPodDaemonSets(pod *v1.Pod) ([]*v1beta1.DaemonSet, e
 // match a ControllerRevision. Only the one specified in the ControllerRevision's ControllerRef
 // will actually manage it.
 // Returns an error only if no matching DaemonSets are found.
-func (s *daemonSetLister) GetHistoryDaemonSets(history *apps.ControllerRevision) ([]*v1beta1.DaemonSet, error) {
+func (s *daemonSetLister) GetHistoryDaemonSets(history *apps.ControllerRevision) ([]*v1.DaemonSet, error) {
 	if len(history.Labels) == 0 {
 		return nil, fmt.Errorf("no DaemonSet found for ControllerRevision %s because it has no labels", history.Name)
 	}
@@ -93,7 +93,7 @@ func (s *daemonSetLister) GetHistoryDaemonSets(history *apps.ControllerRevision)
 		return nil, err
 	}
 
-	var daemonSets []*v1beta1.DaemonSet
+	var daemonSets []*v1.DaemonSet
 	for _, ds := range list {
 		selector, err := metav1.LabelSelectorAsSelector(ds.Spec.Selector)
 		if err != nil {

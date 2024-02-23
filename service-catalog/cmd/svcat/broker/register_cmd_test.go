@@ -23,7 +23,7 @@ import (
 	. "github.com/kubernetes-sigs/service-catalog/cmd/svcat/broker"
 	"github.com/kubernetes-sigs/service-catalog/cmd/svcat/command"
 	"github.com/kubernetes-sigs/service-catalog/cmd/svcat/test"
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/svcat"
 	servicecatalog "github.com/kubernetes-sigs/service-catalog/pkg/svcat/service-catalog"
 	"github.com/kubernetes-sigs/service-catalog/pkg/svcat/service-catalog/service-catalogfakes"
@@ -149,12 +149,12 @@ var _ = Describe("Register Command", func() {
 			brokerURL           string
 			certFile            string
 			classRestrictions   []string
-			brokerToReturn      *v1beta1.ClusterServiceBroker
+			brokerToReturn      *v1.ClusterServiceBroker
 			namespace           string
 			metaRelistDuration  *metav1.Duration
 			planRestrictions    []string
 			relistBehavior      string
-			relistBehaviorConst v1beta1.ServiceBrokerRelistBehavior
+			relistBehaviorConst v1.ServiceBrokerRelistBehavior
 			relistDuration      time.Duration
 			skipTLS             bool
 		)
@@ -169,29 +169,29 @@ var _ = Describe("Register Command", func() {
 			planRestrictions = []string{"foobarplana", "foobarplanb"}
 			skipTLS = true
 			relistBehavior = "duration"
-			relistBehaviorConst = v1beta1.ServiceBrokerRelistBehaviorDuration
+			relistBehaviorConst = v1.ServiceBrokerRelistBehaviorDuration
 			relistDuration = 10 * time.Minute
 			metaRelistDuration = &metav1.Duration{Duration: relistDuration}
 
-			brokerToReturn = &v1beta1.ClusterServiceBroker{
+			brokerToReturn = &v1.ClusterServiceBroker{
 				ObjectMeta: v1.ObjectMeta{
 					Name: brokerName,
 				},
-				Spec: v1beta1.ClusterServiceBrokerSpec{
-					CommonServiceBrokerSpec: v1beta1.CommonServiceBrokerSpec{
+				Spec: v1.ClusterServiceBrokerSpec{
+					CommonServiceBrokerSpec: v1.CommonServiceBrokerSpec{
 						CABundle:              certFileContents,
 						InsecureSkipTLSVerify: skipTLS,
 						RelistBehavior:        relistBehaviorConst,
 						RelistDuration:        metaRelistDuration,
 						URL:                   brokerURL,
-						CatalogRestrictions: &v1beta1.CatalogRestrictions{
+						CatalogRestrictions: &v1.CatalogRestrictions{
 							ServiceClass: classRestrictions,
 							ServicePlan:  planRestrictions,
 						},
 					},
-					AuthInfo: &v1beta1.ClusterServiceBrokerAuthInfo{
-						Basic: &v1beta1.ClusterBasicAuthConfig{
-							SecretRef: &v1beta1.ObjectReference{
+					AuthInfo: &v1.ClusterServiceBrokerAuthInfo{
+						Basic: &v1.ClusterBasicAuthConfig{
+							SecretRef: &v1.ObjectReference{
 								Name:      basicSecret,
 								Namespace: namespace,
 							},
@@ -253,8 +253,8 @@ var _ = Describe("Register Command", func() {
 		It("Passes in the bearer secret", func() {
 			bearerSecret := "foobarsecret"
 			brokerToReturn.Spec.AuthInfo.Basic = nil
-			brokerToReturn.Spec.AuthInfo.Bearer = &v1beta1.ClusterBearerTokenAuthConfig{
-				SecretRef: &v1beta1.ObjectReference{
+			brokerToReturn.Spec.AuthInfo.Bearer = &v1.ClusterBearerTokenAuthConfig{
+				SecretRef: &v1.ObjectReference{
 					Name: bearerSecret,
 				},
 			}

@@ -21,9 +21,9 @@ import (
 	scfake "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/fake"
 	"github.com/kubernetes-sigs/service-catalog/pkg/probe"
 	"github.com/stretchr/testify/assert"
-	admv1beta1 "k8s.io/api/admissionregistration/v1beta1"
+	admv1 "k8s.io/api/admissionregistration/v1"
 	appsv1 "k8s.io/api/apps/v1"
-	extv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
+	extv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	apiextfake "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/fake"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -51,7 +51,7 @@ func TestCleaner_RemoveCRDs(t *testing.T) {
 	assert.NoError(t, clr.RemoveCRDs(cmNamespace, cmName, []string{mutatingWebhookConfiguration}))
 
 	// Then
-	list, err := fakeCliext.ApiextensionsV1beta1().CustomResourceDefinitions().List(context.Background(), v1.ListOptions{})
+	list, err := fakeCliext.Apiextensionsv1().CustomResourceDefinitions().List(context.Background(), v1.ListOptions{})
 	assert.NoError(t, err)
 	assert.Len(t, list.Items, 1)
 	assert.Equal(t, "NotServiceCatalogCRD", list.Items[0].Name)
@@ -60,12 +60,12 @@ func TestCleaner_RemoveCRDs(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, int32(0), deployment.Status.Replicas)
 
-	mwcList, err := fakeClik8s.AdmissionregistrationV1beta1().MutatingWebhookConfigurations().List(context.Background(), v1.ListOptions{})
+	mwcList, err := fakeClik8s.Admissionregistrationv1().MutatingWebhookConfigurations().List(context.Background(), v1.ListOptions{})
 	assert.NoError(t, err)
 	assert.Len(t, mwcList.Items, 1)
 	assert.Equal(t, "custom-mutating-webhook-configuration", mwcList.Items[0].Name)
 
-	vwcList, err := fakeClik8s.AdmissionregistrationV1beta1().ValidatingWebhookConfigurations().List(context.Background(), v1.ListOptions{})
+	vwcList, err := fakeClik8s.Admissionregistrationv1().ValidatingWebhookConfigurations().List(context.Background(), v1.ListOptions{})
 	assert.NoError(t, err)
 	assert.Len(t, vwcList.Items, 1)
 }
@@ -82,17 +82,17 @@ func TestCleaner_RemoveCRDsNoDeployment(t *testing.T) {
 	assert.NoError(t, clr.RemoveCRDs(cmNamespace, cmName, []string{mutatingWebhookConfiguration}))
 
 	// Then
-	list, err := fakeCliext.ApiextensionsV1beta1().CustomResourceDefinitions().List(context.Background(), v1.ListOptions{})
+	list, err := fakeCliext.Apiextensionsv1().CustomResourceDefinitions().List(context.Background(), v1.ListOptions{})
 	assert.NoError(t, err)
 	assert.Len(t, list.Items, 1)
 	assert.Equal(t, "NotServiceCatalogCRD", list.Items[0].Name)
 
-	mwcList, err := fakeClik8s.AdmissionregistrationV1beta1().MutatingWebhookConfigurations().List(context.Background(), v1.ListOptions{})
+	mwcList, err := fakeClik8s.Admissionregistrationv1().MutatingWebhookConfigurations().List(context.Background(), v1.ListOptions{})
 	assert.NoError(t, err)
 	assert.Len(t, mwcList.Items, 1)
 	assert.Equal(t, "custom-mutating-webhook-configuration", mwcList.Items[0].Name)
 
-	vwcList, err := fakeClik8s.AdmissionregistrationV1beta1().ValidatingWebhookConfigurations().List(context.Background(), v1.ListOptions{})
+	vwcList, err := fakeClik8s.Admissionregistrationv1().ValidatingWebhookConfigurations().List(context.Background(), v1.ListOptions{})
 	assert.NoError(t, err)
 	assert.Len(t, vwcList.Items, 1)
 }
@@ -110,24 +110,24 @@ func newTestDeployment() *appsv1.Deployment {
 	}
 }
 
-func newTestWC() *admv1beta1.MutatingWebhookConfiguration {
-	return &admv1beta1.MutatingWebhookConfiguration{
+func newTestWC() *admv1.MutatingWebhookConfiguration {
+	return &admv1.MutatingWebhookConfiguration{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "custom-mutating-webhook-configuration",
 		},
 	}
 }
 
-func newTestMutatingWC() *admv1beta1.MutatingWebhookConfiguration {
-	return &admv1beta1.MutatingWebhookConfiguration{
+func newTestMutatingWC() *admv1.MutatingWebhookConfiguration {
+	return &admv1.MutatingWebhookConfiguration{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: mutatingWebhookConfiguration,
 		},
 	}
 }
 
-func newTestValidatingWC() *admv1beta1.ValidatingWebhookConfiguration {
-	return &admv1beta1.ValidatingWebhookConfiguration{
+func newTestValidatingWC() *admv1.ValidatingWebhookConfiguration {
+	return &admv1.ValidatingWebhookConfiguration{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: validatingWebhookConfiguration,
 		},
@@ -136,47 +136,47 @@ func newTestValidatingWC() *admv1beta1.ValidatingWebhookConfiguration {
 
 func newTestCRDs() []runtime.Object {
 	return []runtime.Object{
-		&extv1beta1.CustomResourceDefinition{
+		&extv1.CustomResourceDefinition{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "NotServiceCatalogCRD",
 			},
 		},
-		&extv1beta1.CustomResourceDefinition{
+		&extv1.CustomResourceDefinition{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: probe.ServiceBroker,
 			},
 		},
-		&extv1beta1.CustomResourceDefinition{
+		&extv1.CustomResourceDefinition{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: probe.ClusterServiceBroker,
 			},
 		},
-		&extv1beta1.CustomResourceDefinition{
+		&extv1.CustomResourceDefinition{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: probe.ServiceClass,
 			},
 		},
-		&extv1beta1.CustomResourceDefinition{
+		&extv1.CustomResourceDefinition{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: probe.ClusterServiceClass,
 			},
 		},
-		&extv1beta1.CustomResourceDefinition{
+		&extv1.CustomResourceDefinition{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: probe.ServicePlan,
 			},
 		},
-		&extv1beta1.CustomResourceDefinition{
+		&extv1.CustomResourceDefinition{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: probe.ClusterServicePlan,
 			},
 		},
-		&extv1beta1.CustomResourceDefinition{
+		&extv1.CustomResourceDefinition{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: probe.ServiceInstance,
 			},
 		},
-		&extv1beta1.CustomResourceDefinition{
+		&extv1.CustomResourceDefinition{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: probe.ServiceBinding,
 			},

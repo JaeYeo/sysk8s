@@ -19,34 +19,34 @@ limitations under the License.
 package fake
 
 import (
-	v1beta1 "k8s.io/client-go/kubernetes/typed/storage/v1beta1"
+	v1 "k8s.io/client-go/kubernetes/typed/storage/v1"
 	rest "k8s.io/client-go/rest"
 	testing "k8s.io/client-go/testing"
 )
 
-type FakeStorageV1beta1 struct {
+type FakeStoragev1 struct {
 	*testing.Fake
 }
 
-func (c *FakeStorageV1beta1) CSIDrivers() v1beta1.CSIDriverInterface {
+func (c *FakeStoragev1) CSIDrivers() v1.CSIDriverInterface {
 	return &FakeCSIDrivers{c}
 }
 
-func (c *FakeStorageV1beta1) CSINodes() v1beta1.CSINodeInterface {
+func (c *FakeStoragev1) CSINodes() v1.CSINodeInterface {
 	return &FakeCSINodes{c}
 }
 
-func (c *FakeStorageV1beta1) StorageClasses() v1beta1.StorageClassInterface {
+func (c *FakeStoragev1) StorageClasses() v1.StorageClassInterface {
 	return &FakeStorageClasses{c}
 }
 
-func (c *FakeStorageV1beta1) VolumeAttachments() v1beta1.VolumeAttachmentInterface {
+func (c *FakeStoragev1) VolumeAttachments() v1.VolumeAttachmentInterface {
 	return &FakeVolumeAttachments{c}
 }
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
-func (c *FakeStorageV1beta1) RESTClient() rest.Interface {
+func (c *FakeStoragev1) RESTClient() rest.Interface {
 	var ret *rest.RESTClient
 	return ret
 }

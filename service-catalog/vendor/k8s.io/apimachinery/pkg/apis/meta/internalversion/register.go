@@ -18,7 +18,7 @@ package internalversion
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	metav1beta1 "k8s.io/apimachinery/pkg/apis/meta/v1beta1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
@@ -60,10 +60,10 @@ func addToGroupVersion(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemeGroupVersion,
 		&metav1.Table{},
 		&metav1.TableOptions{},
-		&metav1beta1.PartialObjectMetadata{},
-		&metav1beta1.PartialObjectMetadataList{},
+		&metav1.PartialObjectMetadata{},
+		&metav1.PartialObjectMetadataList{},
 	)
-	if err := metav1beta1.AddMetaToScheme(scheme); err != nil {
+	if err := metav1.AddMetaToScheme(scheme); err != nil {
 		return err
 	}
 	if err := metav1.AddMetaToScheme(scheme); err != nil {

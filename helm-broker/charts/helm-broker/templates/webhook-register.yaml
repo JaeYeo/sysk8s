@@ -38,6 +38,6 @@ webhooks:
         namespace: {{ .Release.Namespace }}
         path: /hb-pod-mutating
         port: {{ .Values.webhook.service.port }}
-    admissionReviewVersions: ["v1beta1", "v1"]
+    admissionReviewVersions: ["v1"]
     sideEffects: None
     timeoutSeconds: 30

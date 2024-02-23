@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/kyma-project/helm-broker/internal"
-	"github.com/kyma-project/rafter/pkg/apis/rafter/v1beta1"
+	"github.com/kyma-project/rafter/pkg/apis/rafter/v1"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	apiErrors "k8s.io/apimachinery/pkg/api/errors"
@@ -48,7 +48,7 @@ func (d *Provider) SetNamespace(namespace string) {
 // EnsureAssetGroup creates AssetGroup for a given addon or updates it in case it already exists
 func (d *Provider) EnsureAssetGroup(addon *internal.Addon) error {
 	addon.Docs[0].Template.Sources = defaultDocsSourcesURLs(addon)
-	dt := &v1beta1.AssetGroup{
+	dt := &v1.AssetGroup{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      string(addon.ID),
 			Namespace: d.namespace,
@@ -57,7 +57,7 @@ func (d *Provider) EnsureAssetGroup(addon *internal.Addon) error {
 				hbLabelKey:     "true",
 			},
 		},
-		Spec: v1beta1.AssetGroupSpec{CommonAssetGroupSpec: addon.Docs[0].Template},
+		Spec: v1.AssetGroupSpec{CommonAssetGroupSpec: addon.Docs[0].Template},
 	}
 	d.log.Infof("- ensuring AssetGroup %s/%s", addon.ID, d.namespace)
 
@@ -80,7 +80,7 @@ func (d *Provider) EnsureAssetGroup(addon *internal.Addon) error {
 
 // EnsureAssetGroupRemoved removes AssetGroup for a given addon
 func (d *Provider) EnsureAssetGroupRemoved(id string) error {
-	dt := &v1beta1.AssetGroup{
+	dt := &v1.AssetGroup{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      id,
 			Namespace: d.namespace,
@@ -98,9 +98,9 @@ func (d *Provider) EnsureAssetGroupRemoved(id string) error {
 	})
 }
 
-func defaultDocsSourcesURLs(addon *internal.Addon) []v1beta1.Source {
+func defaultDocsSourcesURLs(addon *internal.Addon) []v1.Source {
 	// we use repositoryURL as the default sourceURL if its not provided
-	var sources []v1beta1.Source
+	var sources []v1.Source
 	for _, source := range addon.Docs[0].Template.Sources {
 		if source.URL == "" {
 			source.URL = addon.RepositoryURL
@@ -111,7 +111,7 @@ func defaultDocsSourcesURLs(addon *internal.Addon) []v1beta1.Source {
 }
 
 func (d *Provider) updateAssetGroup(addon *internal.Addon, namespace string) error {
-	dt := &v1beta1.AssetGroup{}
+	dt := &v1.AssetGroup{}
 
 	return retry.RetryOnConflict(retry.DefaultBackoff, func() error {
 		if err := d.dynamicClient.Get(context.Background(), types.NamespacedName{Name: string(addon.ID), Namespace: namespace}, dt); err != nil {
@@ -120,7 +120,7 @@ func (d *Provider) updateAssetGroup(addon *internal.Addon, namespace string) err
 		if reflect.DeepEqual(dt.Spec.CommonAssetGroupSpec, addon.Docs[0].Template) {
 			return nil
 		}
-		dt.Spec = v1beta1.AssetGroupSpec{CommonAssetGroupSpec: addon.Docs[0].Template}
+		dt.Spec = v1.AssetGroupSpec{CommonAssetGroupSpec: addon.Docs[0].Template}
 
 		if err := d.dynamicClient.Update(context.Background(), dt); err != nil {
 			return err

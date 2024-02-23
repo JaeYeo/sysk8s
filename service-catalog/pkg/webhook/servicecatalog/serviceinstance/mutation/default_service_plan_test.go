@@ -22,7 +22,7 @@ import (
 	"net/http"
 	"testing"
 
-	sc "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	sc "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/webhook/servicecatalog/serviceinstance/mutation"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -194,6 +194,22 @@ func TestServiceClassSpecified(t *testing.T) {
 				newServiceClass(className, className, namespace),
 				newServicePlans(className, namespace, 2, true)[0],
 				newServicePlans(className, namespace, 2, true)[1],
+			},
+		},
+		"SuccessWithFindingDefaultPlanForManyServiceClasses": {
+			instance: &sc.ServiceInstance{
+				ObjectMeta: metav1.ObjectMeta{Name: "instance", Namespace: "dummy"},
+				Spec: sc.ServiceInstanceSpec{
+					PlanReference: sc.PlanReference{
+						ServiceClassExternalName: className,
+					},
+				},
+			},
+			objects: []runtime.Object{
+				newServiceClass(className, className, namespace),
+				newServiceClass(className, className, "otherNamespace"),
+				newServicePlans(className, namespace, 1, true)[0],
+				newServicePlans(className, "otherNamespace", 1, true)[0],
 			},
 		},
 		"ErrorWhenNoPlansSpecified": {

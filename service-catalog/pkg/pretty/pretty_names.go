@@ -19,7 +19,7 @@ package pretty
 import (
 	"fmt"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 )
 
 // Name prints in the form `<Kind> (K8S: <K8S-Name> ExternalName: <External-Name>)`
@@ -37,12 +37,12 @@ func Name(kind Kind, k8sName, externalName string) string {
 }
 
 // ServiceInstanceName returns a string with the type, namespace and name of an instance.
-func ServiceInstanceName(instance *v1beta1.ServiceInstance) string {
+func ServiceInstanceName(instance *v1.ServiceInstance) string {
 	return fmt.Sprintf(`%s "%s/%s"`, ServiceInstance, instance.Namespace, instance.Name)
 }
 
 // ServiceBindingName returns a string with the type, namespace and name of a binding.
-func ServiceBindingName(binding *v1beta1.ServiceBinding) string {
+func ServiceBindingName(binding *v1.ServiceBinding) string {
 	return fmt.Sprintf(`%s "%s/%s"`, ServiceBinding, binding.Namespace, binding.Name)
 }
 
@@ -57,7 +57,7 @@ func ServiceBrokerName(serviceBrokerName string) string {
 }
 
 // ClusterServiceClassName returns a string with the k8s name and external name if available.
-func ClusterServiceClassName(serviceClass *v1beta1.ClusterServiceClass) string {
+func ClusterServiceClassName(serviceClass *v1.ClusterServiceClass) string {
 	if serviceClass != nil {
 		return Name(ClusterServiceClass, serviceClass.Name, serviceClass.Spec.ExternalName)
 	}
@@ -65,7 +65,7 @@ func ClusterServiceClassName(serviceClass *v1beta1.ClusterServiceClass) string {
 }
 
 // ServiceClassName returns a string with the k8s name and external name if available.
-func ServiceClassName(serviceClass *v1beta1.ServiceClass) string {
+func ServiceClassName(serviceClass *v1.ServiceClass) string {
 	if serviceClass != nil {
 		return Name(ServiceClass, fmt.Sprintf("%s/%s", serviceClass.Namespace, serviceClass.Name), serviceClass.Spec.ExternalName)
 	}
@@ -73,7 +73,7 @@ func ServiceClassName(serviceClass *v1beta1.ServiceClass) string {
 }
 
 // ClusterServicePlanName returns a string with the k8s name and external name if available.
-func ClusterServicePlanName(servicePlan *v1beta1.ClusterServicePlan) string {
+func ClusterServicePlanName(servicePlan *v1.ClusterServicePlan) string {
 	if servicePlan != nil {
 		return Name(ClusterServicePlan, servicePlan.Name, servicePlan.Spec.ExternalName)
 	}
@@ -81,7 +81,7 @@ func ClusterServicePlanName(servicePlan *v1beta1.ClusterServicePlan) string {
 }
 
 // ServicePlanName returns a string with the k8s name and external name if available.
-func ServicePlanName(servicePlan *v1beta1.ServicePlan) string {
+func ServicePlanName(servicePlan *v1.ServicePlan) string {
 	if servicePlan != nil {
 		return Name(ServicePlan, fmt.Sprintf("%s/%s", servicePlan.Namespace, servicePlan.Name), servicePlan.Spec.ExternalName)
 	}
@@ -89,7 +89,7 @@ func ServicePlanName(servicePlan *v1beta1.ServicePlan) string {
 }
 
 // FromServiceInstanceOfClusterServiceClassAtBrokerName returns a string in the form of "%s of %s at %s" to help in logging the full context.
-func FromServiceInstanceOfClusterServiceClassAtBrokerName(instance *v1beta1.ServiceInstance, serviceClass *v1beta1.ClusterServiceClass, brokerName string) string {
+func FromServiceInstanceOfClusterServiceClassAtBrokerName(instance *v1.ServiceInstance, serviceClass *v1.ClusterServiceClass, brokerName string) string {
 	return fmt.Sprintf(
 		"%s of %s at %s",
 		ServiceInstanceName(instance), ClusterServiceClassName(serviceClass), ClusterServiceBrokerName(brokerName),
@@ -97,7 +97,7 @@ func FromServiceInstanceOfClusterServiceClassAtBrokerName(instance *v1beta1.Serv
 }
 
 // FromServiceInstanceOfServiceClassAtBrokerName returns a string in the form of "%s of %s at %s" to help in logging the full context.
-func FromServiceInstanceOfServiceClassAtBrokerName(instance *v1beta1.ServiceInstance, serviceClass *v1beta1.ServiceClass, brokerName string) string {
+func FromServiceInstanceOfServiceClassAtBrokerName(instance *v1.ServiceInstance, serviceClass *v1.ServiceClass, brokerName string) string {
 	return fmt.Sprintf(
 		"%s of %s at %s",
 		ServiceInstanceName(instance), ServiceClassName(serviceClass), ServiceBrokerName(brokerName),

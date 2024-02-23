@@ -48,7 +48,7 @@ recommended because your changes may be lost the next time the catalog syncs.
     parameters:
                                 
     ```yaml
-    apiVersion: servicecatalog.k8s.io/v1beta1
+    apiVersion: servicecatalog.k8s.io/v1
     kind: ClusterServicePlan
     metadata:
       name: custom-mysql
@@ -83,7 +83,7 @@ recommended because your changes may be lost the next time the catalog syncs.
     parameters:
                                 
     ```yaml
-    apiVersion: servicecatalog.k8s.io/v1beta1
+    apiVersion: servicecatalog.k8s.io/v1
     kind: ClusterServiceClass
     metadata:
       name: custom-mysql

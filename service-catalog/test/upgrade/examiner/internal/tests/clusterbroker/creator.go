@@ -18,8 +18,8 @@ package clusterbroker
 
 import (
 	"context"
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
-	scClientset "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/typed/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
+	scClientset "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/typed/servicecatalog/v1"
 	"github.com/pkg/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -28,16 +28,16 @@ import (
 
 type creator struct {
 	common
-	sc        scClientset.ServicecatalogV1beta1Interface
+	sc        scClientset.Servicecatalogv1Interface
 	namespace string
 }
 
 func newCreator(cli ClientGetter, ns string) *creator {
 	return &creator{
-		sc:        cli.ServiceCatalogClient().ServicecatalogV1beta1(),
+		sc:        cli.ServiceCatalogClient().Servicecatalogv1(),
 		namespace: ns,
 		common: common{
-			sc:        cli.ServiceCatalogClient().ServicecatalogV1beta1(),
+			sc:        cli.ServiceCatalogClient().Servicecatalogv1(),
 			namespace: ns,
 		},
 	}
@@ -63,13 +63,13 @@ func (c *creator) execute() error {
 
 func (c *creator) registerClusterServiceBroker() error {
 	klog.Infof("Create ClusterServiceBroker %q", clusterServiceBrokerName)
-	_, err := c.sc.ClusterServiceBrokers().Create(context.Background(),&v1beta1.ClusterServiceBroker{
+	_, err := c.sc.ClusterServiceBrokers().Create(context.Background(),&v1.ClusterServiceBroker{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      clusterServiceBrokerName,
 			Namespace: c.namespace,
 		},
-		Spec: v1beta1.ClusterServiceBrokerSpec{
-			CommonServiceBrokerSpec: v1beta1.CommonServiceBrokerSpec{
+		Spec: v1.ClusterServiceBrokerSpec{
+			CommonServiceBrokerSpec: v1.CommonServiceBrokerSpec{
 				URL: "http://test-broker-test-broker.test-broker.svc.cluster.local",
 			},
 		},
@@ -97,13 +97,13 @@ func (c *creator) createServiceInstance() error {
 }
 
 func (c *creator) createDefaultServiceInstance() error {
-	_, err := c.sc.ServiceInstances(c.namespace).Create(context.Background(), &v1beta1.ServiceInstance{
+	_, err := c.sc.ServiceInstances(c.namespace).Create(context.Background(), &v1.ServiceInstance{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      serviceInstanceName,
 			Namespace: c.namespace,
 		},
-		Spec: v1beta1.ServiceInstanceSpec{
-			PlanReference: v1beta1.PlanReference{
+		Spec: v1.ServiceInstanceSpec{
+			PlanReference: v1.PlanReference{
 				ClusterServiceClassExternalName: "test-service-multiple-plans",
 				ClusterServicePlanExternalName:  "default",
 			},
@@ -131,13 +131,13 @@ func (c *creator) createServiceBinding() error {
 }
 
 func (c *creator) createDefaultServiceBinding() error {
-	_, err := c.sc.ServiceBindings(c.namespace).Create(context.Background(), &v1beta1.ServiceBinding{
+	_, err := c.sc.ServiceBindings(c.namespace).Create(context.Background(), &v1.ServiceBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      serviceBindingName,
 			Namespace: c.namespace,
 		},
-		Spec: v1beta1.ServiceBindingSpec{
-			InstanceRef: v1beta1.LocalObjectReference{
+		Spec: v1.ServiceBindingSpec{
+			InstanceRef: v1.LocalObjectReference{
 				Name: serviceInstanceName,
 			},
 		},

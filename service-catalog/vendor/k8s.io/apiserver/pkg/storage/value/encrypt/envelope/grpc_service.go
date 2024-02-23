@@ -30,7 +30,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	kmsapi "k8s.io/apiserver/pkg/storage/value/encrypt/envelope/v1beta1"
+	kmsapi "k8s.io/apiserver/pkg/storage/value/encrypt/envelope/v1"
 )
 
 const (
@@ -38,7 +38,7 @@ const (
 	unixProtocol = "unix"
 
 	// Current version for the protocol interface definition.
-	kmsapiVersion = "v1beta1"
+	kmsapiVersion = "v1"
 
 	versionErrorf = "KMS provider api version %s is not supported, only %s is supported now"
 )

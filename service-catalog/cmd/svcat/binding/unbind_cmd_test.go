@@ -28,7 +28,7 @@ import (
 
 	"github.com/kubernetes-sigs/service-catalog/cmd/svcat/command"
 	svcattest "github.com/kubernetes-sigs/service-catalog/cmd/svcat/test"
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	svcatfake "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/fake"
 	"github.com/kubernetes-sigs/service-catalog/pkg/svcat"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -227,7 +227,7 @@ func TestUnbindCommand(t *testing.T) {
 			k8sClient := k8sfake.NewSimpleClientset()
 			var fakes []runtime.Object
 			if tc.fakeInstance != "" {
-				fakes = append(fakes, &v1beta1.ServiceInstance{
+				fakes = append(fakes, &v1.ServiceInstance{
 					ObjectMeta: v1.ObjectMeta{
 						Namespace: ns,
 						Name:      tc.fakeInstance,
@@ -235,12 +235,12 @@ func TestUnbindCommand(t *testing.T) {
 				})
 			}
 			for _, name := range tc.fakeBindings {
-				fakes = append(fakes, &v1beta1.ServiceBinding{
+				fakes = append(fakes, &v1.ServiceBinding{
 					ObjectMeta: v1.ObjectMeta{
 						Namespace: ns,
 						Name:      name,
 					},
-					Spec: v1beta1.ServiceBindingSpec{InstanceRef: v1beta1.LocalObjectReference{Name: tc.fakeInstance}},
+					Spec: v1.ServiceBindingSpec{InstanceRef: v1.LocalObjectReference{Name: tc.fakeInstance}},
 				})
 			}
 			svcatClient := svcatfake.NewSimpleClientset(fakes...)

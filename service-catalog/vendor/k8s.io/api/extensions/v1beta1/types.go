@@ -14,10 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package v1beta1
+package v1
 
 import (
-	appsv1beta1 "k8s.io/api/apps/v1beta1"
+	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -510,7 +510,7 @@ const (
 	// DefaultDaemonSetUniqueLabelKey is the default label key that is added
 	// to existing DaemonSet pods to distinguish between old and new
 	// DaemonSet pods during DaemonSet template updates.
-	DefaultDaemonSetUniqueLabelKey = appsv1beta1.ControllerRevisionHashLabelKey
+	DefaultDaemonSetUniqueLabelKey = appsv1.ControllerRevisionHashLabelKey
 )
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
@@ -534,7 +534,7 @@ type DaemonSetList struct {
 // endpoints defined by a backend. An Ingress can be configured to give services
 // externally-reachable urls, load balance traffic, terminate SSL, offer name
 // based virtual hosting etc.
-// DEPRECATED - This group version of Ingress is deprecated by networking.k8s.io/v1beta1 Ingress. See the release notes for more information.
+// DEPRECATED - This group version of Ingress is deprecated by networking.k8s.io/v1 Ingress. See the release notes for more information.
 type Ingress struct {
 	metav1.TypeMeta `json:",inline"`
 	// Standard object's metadata.

@@ -47,7 +47,7 @@ chart and their default values.
 | `webhook.minReadySeconds` | how many seconds an webhook server pod needs to be ready before killing the next, during update | `1` |
 | `webhook.annotations` | Annotations for webhook pods | `{}` |
 | `webhook.nodeSelector` | A nodeSelector value to apply to the webhook pods. If not specified, no nodeSelector will be applied | |
-| `webhook.service.type` | Type of service; valid values are `LoadBalancer` , `NodePort` and `ClusterIP` | `NodePort` |
+| `webhook.service.type` | Type of service; valid values are `LoadBalancer` , `NodePort` and `ClusterIP` | `ClusterIP` |
 | `webhook.service.nodePort.securePort` | If service type is `NodePort`, specifies a port in allowable range (e.g. 30000 - 32767 on minikube); The TLS-enabled endpoint will be exposed here | `30443` |
 | `webhook.service.clusterIP` | If service type is ClusterIP, specify clusterIP as `None` for `headless services` OR specify your own specific IP OR leave blank to let Kubernetes assign a cluster IP |  |
 | `webhook.verbosity` | Log level; valid values are in the range 0 - 10 | `10` |
@@ -76,9 +76,13 @@ chart and their default values.
 | `rbacEnable` | If true, create & use RBAC resources | `true` |
 | `originatingIdentityEnabled` | Whether the OriginatingIdentity feature should be enabled | `true` |
 | `persistence.storageClass` | Define the storageclass use by pvc | `null` |
+| `affinity`  | Affinity settings ([docs](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)) | `{}` |
 | `asyncBindingOperationsEnabled` | Whether or not alpha support for async binding operations is enabled | `false` |
 | `namespacedServiceBrokerDisabled` | Whether or not alpha support for namespace scoped brokers is disabled | `false` |
+| `nodeSelector` | Node labels for pod assignment (global parameter for all pods) | `{}` |
+| `podLabels`  | Additional pod labels to include for all pods | `{}` |
 | `priorityClassName` | Define PriorityClass for pods | "" |
+| `tolerations` | Tolerations for pod assignment | `[]` |
 
 Specify each parameter using the `--set key=value[,key=value]` argument to
 `helm install`.

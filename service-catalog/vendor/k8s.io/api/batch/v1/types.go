@@ -105,7 +105,7 @@ type JobSpec struct {
 	// the user is responsible for picking unique labels and specifying
 	// the selector.  Failure to pick a unique label may cause this
 	// and other jobs to not function correctly.  However, You may see
-	// `manualSelector=true` in jobs that were created with the old `extensions/v1beta1`
+	// `manualSelector=true` in jobs that were created with the old `extensions/v1`
 	// API.
 	// More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/#specifying-your-own-pod-selector
 	// +optional

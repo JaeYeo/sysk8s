@@ -20,6 +20,6 @@ package fake
 
 // FakeEvictions implements EvictionInterface
 type FakeEvictions struct {
-	Fake *FakePolicyV1beta1
+	Fake *FakePolicyv1
 	ns   string
 }

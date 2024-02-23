@@ -229,7 +229,7 @@ verify: .init verify-generated verify-client-gen verify-docs verify-modules
 	  'for i in $$(find $(TOP_SRC_DIRS) -name *.go \
 	    | grep -v ^pkg/kubernetes/ \
 	    | grep -v generated \
-	    | grep -v v1beta1/defaults.go); \
+	    | grep -v v1/defaults.go); \
 	  do \
 	   golint --set_exit_status $$i || exit 1; \
 	  done'
@@ -329,7 +329,7 @@ purge-generated: .init $(scBuildImageTarget)
 	find $(TOP_SRC_DIRS) -depth -type d -name *_generated \
 	  -exec $(DOCKER_CMD) rm -rf {} \;
 	$(DOCKER_CMD) rm -f pkg/openapi/openapi_generated.go
-	echo 'package v1beta1' > pkg/apis/servicecatalog/v1beta1/types.generated.go
+	echo 'package v1' > pkg/apis/servicecatalog/v1/types.generated.go
 	rm -f .generate_files
 
 clean-coverage:

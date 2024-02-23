@@ -19,26 +19,26 @@ limitations under the License.
 package fake
 
 import (
-	v1beta1 "k8s.io/client-go/kubernetes/typed/admissionregistration/v1beta1"
+	v1 "k8s.io/client-go/kubernetes/typed/admissionregistration/v1"
 	rest "k8s.io/client-go/rest"
 	testing "k8s.io/client-go/testing"
 )
 
-type FakeAdmissionregistrationV1beta1 struct {
+type FakeAdmissionregistrationv1 struct {
 	*testing.Fake
 }
 
-func (c *FakeAdmissionregistrationV1beta1) MutatingWebhookConfigurations() v1beta1.MutatingWebhookConfigurationInterface {
+func (c *FakeAdmissionregistrationv1) MutatingWebhookConfigurations() v1.MutatingWebhookConfigurationInterface {
 	return &FakeMutatingWebhookConfigurations{c}
 }
 
-func (c *FakeAdmissionregistrationV1beta1) ValidatingWebhookConfigurations() v1beta1.ValidatingWebhookConfigurationInterface {
+func (c *FakeAdmissionregistrationv1) ValidatingWebhookConfigurations() v1.ValidatingWebhookConfigurationInterface {
 	return &FakeValidatingWebhookConfigurations{c}
 }
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
-func (c *FakeAdmissionregistrationV1beta1) RESTClient() rest.Interface {
+func (c *FakeAdmissionregistrationv1) RESTClient() rest.Interface {
 	var ret *rest.RESTClient
 	return ret
 }

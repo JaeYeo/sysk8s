@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package v1beta1
+package v1
 
 // GetName returns the broker's name.
 func (b *ClusterServiceBroker) GetName() string {

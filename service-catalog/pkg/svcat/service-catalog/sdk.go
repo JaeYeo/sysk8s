@@ -19,9 +19,9 @@ package servicecatalog
 import (
 	"time"
 
-	apiv1beta1 "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	apiv1 "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset"
-	"github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/typed/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/typed/servicecatalog/v1"
 	apicorev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/version"
@@ -32,17 +32,17 @@ import (
 // SvcatClient is an interface containing the various actions in the svcat pkg lib
 // This interface is then faked with Counterfeiter for the cmd/svcat unit tests
 type SvcatClient interface {
-	Bind(string, string, string, string, string, interface{}, map[string]string) (*apiv1beta1.ServiceBinding, error)
-	BindingParentHierarchy(*apiv1beta1.ServiceBinding) (*apiv1beta1.ServiceInstance, *apiv1beta1.ClusterServiceClass, *apiv1beta1.ClusterServicePlan, *apiv1beta1.ClusterServiceBroker, error)
+	Bind(string, string, string, string, string, interface{}, map[string]string) (*apiv1.ServiceBinding, error)
+	BindingParentHierarchy(*apiv1.ServiceBinding) (*apiv1.ServiceInstance, *apiv1.ClusterServiceClass, *apiv1.ClusterServicePlan, *apiv1.ClusterServiceBroker, error)
 	DeleteBinding(string, string) error
 	DeleteBindings([]types.NamespacedName) ([]types.NamespacedName, error)
-	IsBindingFailed(*apiv1beta1.ServiceBinding) bool
-	IsBindingReady(*apiv1beta1.ServiceBinding) bool
-	RetrieveBinding(string, string) (*apiv1beta1.ServiceBinding, error)
-	RetrieveBindings(string) (*apiv1beta1.ServiceBindingList, error)
-	RetrieveBindingsByInstance(*apiv1beta1.ServiceInstance) ([]apiv1beta1.ServiceBinding, error)
+	IsBindingFailed(*apiv1.ServiceBinding) bool
+	IsBindingReady(*apiv1.ServiceBinding) bool
+	RetrieveBinding(string, string) (*apiv1.ServiceBinding, error)
+	RetrieveBindings(string) (*apiv1.ServiceBindingList, error)
+	RetrieveBindingsByInstance(*apiv1.ServiceInstance) ([]apiv1.ServiceBinding, error)
 	Unbind(string, string) ([]types.NamespacedName, error)
-	WaitForBinding(string, string, time.Duration, *time.Duration) (*apiv1beta1.ServiceBinding, error)
+	WaitForBinding(string, string, time.Duration, *time.Duration) (*apiv1.ServiceBinding, error)
 	RemoveBindingFinalizerByInstance(string, string) ([]types.NamespacedName, error)
 	RemoveFinalizerForBindings([]types.NamespacedName) ([]types.NamespacedName, error)
 	RemoveFinalizerForBinding(types.NamespacedName) error
@@ -51,7 +51,7 @@ type SvcatClient interface {
 	Deregister(string, *ScopeOptions) error
 	RetrieveBrokers(opts ScopeOptions) ([]Broker, error)
 	RetrieveBrokerByID(string, ScopeOptions) (Broker, error)
-	RetrieveBrokerByClass(*apiv1beta1.ClusterServiceClass) (*apiv1beta1.ClusterServiceBroker, error)
+	RetrieveBrokerByClass(*apiv1.ClusterServiceClass) (*apiv1.ClusterServiceBroker, error)
 	Register(string, string, *RegisterOptions, *ScopeOptions) (Broker, error)
 	Sync(string, ScopeOptions, int) error
 	WaitForBroker(string, *ScopeOptions, time.Duration, *time.Duration) (Broker, error)
@@ -63,18 +63,18 @@ type SvcatClient interface {
 	CreateClassFrom(CreateClassFromOptions) (Class, error)
 
 	Deprovision(string, string) error
-	InstanceParentHierarchy(*apiv1beta1.ServiceInstance) (*apiv1beta1.ClusterServiceClass, *apiv1beta1.ClusterServicePlan, *apiv1beta1.ClusterServiceBroker, error)
-	InstanceToServiceClassAndPlan(*apiv1beta1.ServiceInstance) (*apiv1beta1.ClusterServiceClass, *apiv1beta1.ClusterServicePlan, error)
-	IsInstanceFailed(*apiv1beta1.ServiceInstance) bool
-	IsInstanceReady(*apiv1beta1.ServiceInstance) bool
-	Provision(string, string, string, bool, *ProvisionOptions) (*apiv1beta1.ServiceInstance, error)
-	RetrieveInstance(string, string) (*apiv1beta1.ServiceInstance, error)
-	RetrieveInstanceByBinding(*apiv1beta1.ServiceBinding) (*apiv1beta1.ServiceInstance, error)
-	RetrieveInstances(string, string, string) (*apiv1beta1.ServiceInstanceList, error)
-	RetrieveInstancesByPlan(Plan) ([]apiv1beta1.ServiceInstance, error)
+	InstanceParentHierarchy(*apiv1.ServiceInstance) (*apiv1.ClusterServiceClass, *apiv1.ClusterServicePlan, *apiv1.ClusterServiceBroker, error)
+	InstanceToServiceClassAndPlan(*apiv1.ServiceInstance) (*apiv1.ClusterServiceClass, *apiv1.ClusterServicePlan, error)
+	IsInstanceFailed(*apiv1.ServiceInstance) bool
+	IsInstanceReady(*apiv1.ServiceInstance) bool
+	Provision(string, string, string, bool, *ProvisionOptions) (*apiv1.ServiceInstance, error)
+	RetrieveInstance(string, string) (*apiv1.ServiceInstance, error)
+	RetrieveInstanceByBinding(*apiv1.ServiceBinding) (*apiv1.ServiceInstance, error)
+	RetrieveInstances(string, string, string) (*apiv1.ServiceInstanceList, error)
+	RetrieveInstancesByPlan(Plan) ([]apiv1.ServiceInstance, error)
 	TouchInstance(string, string, int) error
-	WaitForInstance(string, string, time.Duration, *time.Duration) (*apiv1beta1.ServiceInstance, error)
-	WaitForInstanceToNotExist(string, string, time.Duration, *time.Duration) (*apiv1beta1.ServiceInstance, error)
+	WaitForInstance(string, string, time.Duration, *time.Duration) (*apiv1.ServiceInstance, error)
+	WaitForInstanceToNotExist(string, string, time.Duration, *time.Duration) (*apiv1.ServiceInstance, error)
 
 	RetrievePlans(string, ScopeOptions) ([]Plan, error)
 	RetrievePlanByName(string, ScopeOptions) (Plan, error)
@@ -82,7 +82,7 @@ type SvcatClient interface {
 	RetrievePlanByClassIDAndName(string, string, ScopeOptions) (Plan, error)
 	RetrievePlanByID(string, ScopeOptions) (Plan, error)
 
-	RetrieveSecretByBinding(*apiv1beta1.ServiceBinding) (*apicorev1.Secret, error)
+	RetrieveSecretByBinding(*apiv1.ServiceBinding) (*apicorev1.Secret, error)
 
 	ServerVersion() (*version.Info, error)
 }
@@ -95,8 +95,8 @@ type SDK struct {
 
 // ServiceCatalog is the underlying generated Service Catalog versioned interface
 // It should be used instead of accessing the client directly.
-func (sdk *SDK) ServiceCatalog() v1beta1.ServicecatalogV1beta1Interface {
-	return sdk.ServiceCatalogClient.ServicecatalogV1beta1()
+func (sdk *SDK) ServiceCatalog() v1.Servicecatalogv1Interface {
+	return sdk.ServiceCatalogClient.Servicecatalogv1()
 }
 
 // Core is the underlying generated Core API versioned interface

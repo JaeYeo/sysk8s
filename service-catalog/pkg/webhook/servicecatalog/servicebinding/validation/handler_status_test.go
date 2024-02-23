@@ -18,11 +18,11 @@ package validation_test
 
 import (
 	"context"
-	sc "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	sc "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/webhook/servicecatalog/servicebinding/validation"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	admissionv1beta1 "k8s.io/api/admission/v1beta1"
+	admissionv1 "k8s.io/api/admission/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -31,7 +31,7 @@ import (
 )
 
 // TestHandlerStatusValidate tests basic cases of ServiceBindingStatus validation. All status validations tests
-// are covered by pkg/apis/servicecatalog/v1beta1/validation package
+// are covered by pkg/apis/servicecatalog/v1/validation package
 func TestHandlerStatusValidate(t *testing.T) {
 	tests := map[string]struct {
 		givenOldRawObj  []byte
@@ -40,7 +40,7 @@ func TestHandlerStatusValidate(t *testing.T) {
 	}{
 		"Should not allow to set wrong unbind status": {
 			givenOldRawObj: []byte(`{
-  				"apiVersion": "servicecatalog.k8s.io/v1beta1",
+  				"apiVersion": "servicecatalog.k8s.io/v1",
   				"kind": "ServiceBinding",
   				"metadata": {
   				  "creationTimestamp": null,
@@ -60,7 +60,7 @@ func TestHandlerStatusValidate(t *testing.T) {
                 }
 			}`),
 			givenNewRawObj: []byte(`{
-  				"apiVersion": "servicecatalog.k8s.io/v1beta1",
+  				"apiVersion": "servicecatalog.k8s.io/v1",
   				"kind": "ServiceBinding",
   				"metadata": {
   				  "creationTimestamp": null,
@@ -83,7 +83,7 @@ func TestHandlerStatusValidate(t *testing.T) {
 		},
 		"Should not allow to set correct unbind status": {
 			givenOldRawObj: []byte(`{
-  				"apiVersion": "servicecatalog.k8s.io/v1beta1",
+  				"apiVersion": "servicecatalog.k8s.io/v1",
   				"kind": "ServiceBinding",
   				"metadata": {
   				  "creationTimestamp": null,
@@ -103,7 +103,7 @@ func TestHandlerStatusValidate(t *testing.T) {
                 }
 			}`),
 			givenNewRawObj: []byte(`{
-  				"apiVersion": "servicecatalog.k8s.io/v1beta1",
+  				"apiVersion": "servicecatalog.k8s.io/v1",
   				"kind": "ServiceBinding",
   				"metadata": {
   				  "creationTimestamp": null,
@@ -135,13 +135,13 @@ func TestHandlerStatusValidate(t *testing.T) {
 			handler.InjectDecoder(decoder)
 
 			req := admission.Request{
-				AdmissionRequest: admissionv1beta1.AdmissionRequest{
-					Operation: admissionv1beta1.Update,
+				AdmissionRequest: admissionv1.AdmissionRequest{
+					Operation: admissionv1.Update,
 					Name:      "test-binding",
 					Namespace: "system",
 					Kind: metav1.GroupVersionKind{
 						Kind:    "ServiceBinding",
-						Version: "v1beta1",
+						Version: "v1",
 						Group:   "servicecatalog.k8s.io",
 					},
 					OldObject:   runtime.RawExtension{Raw: tc.givenOldRawObj},

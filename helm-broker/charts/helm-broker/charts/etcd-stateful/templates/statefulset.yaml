@@ -7,9 +7,6 @@ metadata:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     release: "{{ .Release.Name }}"
     heritage: "{{ .Release.Service }}"
-    taskcl: "backend_service"
-    taskse: "service_catalog"
-    platform: "platform_service"
 spec:
   serviceName: {{ template "etcd-hb-fullname" . }}
   replicas: {{ .Values.replicaCount }}
@@ -26,9 +23,6 @@ spec:
         chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
         release: "{{ .Release.Name }}"
         heritage: "{{ .Release.Service }}"
-        taskcl: "backend_service"
-        taskse: "service_catalog"
-        platform: "platform_service"
     spec:
       terminationGracePeriodSeconds: 60
       restartPolicy: Always

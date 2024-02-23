@@ -25,7 +25,7 @@ import (
 	. "github.com/kubernetes-sigs/service-catalog/cmd/svcat/class"
 	"github.com/kubernetes-sigs/service-catalog/cmd/svcat/command"
 	"github.com/kubernetes-sigs/service-catalog/cmd/svcat/test"
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/svcat"
 	servicecatalog "github.com/kubernetes-sigs/service-catalog/pkg/svcat/service-catalog"
 	servicecatalogfakes "github.com/kubernetes-sigs/service-catalog/pkg/svcat/service-catalog/service-catalogfakes"
@@ -76,14 +76,14 @@ var _ = Describe("Describe Command", func() {
 			brokerName              string
 			classKubeName           string
 			className               string
-			classToReturn           *v1beta1.ClusterServiceClass
+			classToReturn           *v1.ClusterServiceClass
 			namespace               string
 			namespacedClassKubeName string
 			namespacedClassName     string
-			namespacedClassToReturn *v1beta1.ServiceClass
+			namespacedClassToReturn *v1.ServiceClass
 			planKubeName            string
 			planName                string
-			planToReturn            *v1beta1.ClusterServicePlan
+			planToReturn            *v1.ClusterServicePlan
 		)
 		BeforeEach(func() {
 			brokerName = "mysql-broker"
@@ -95,43 +95,43 @@ var _ = Describe("Describe Command", func() {
 			planKubeName = "acfhbvc-12345"
 			planName = "10mb-mysql"
 
-			classToReturn = &v1beta1.ClusterServiceClass{
+			classToReturn = &v1.ClusterServiceClass{
 				ObjectMeta: v1.ObjectMeta{
 					Name: classKubeName,
 				},
-				Spec: v1beta1.ClusterServiceClassSpec{
+				Spec: v1.ClusterServiceClassSpec{
 					ClusterServiceBrokerName: brokerName,
-					CommonServiceClassSpec: v1beta1.CommonServiceClassSpec{
+					CommonServiceClassSpec: v1.CommonServiceClassSpec{
 						ExternalName: className,
 						ExternalID:   "4f6e6cf6-ffdd-425f-a2c7-3c9258ad2468",
 						Description:  "A mysql service",
 					},
 				},
 			}
-			planToReturn = &v1beta1.ClusterServicePlan{
+			planToReturn = &v1.ClusterServicePlan{
 				ObjectMeta: v1.ObjectMeta{
 					Name: planKubeName,
 				},
-				Spec: v1beta1.ClusterServicePlanSpec{
+				Spec: v1.ClusterServicePlanSpec{
 					ClusterServiceBrokerName: brokerName,
-					CommonServicePlanSpec: v1beta1.CommonServicePlanSpec{
+					CommonServicePlanSpec: v1.CommonServicePlanSpec{
 						ExternalName: planName,
 						ExternalID:   "khabskdjasbdja",
 						Description:  "A 10 MB mysql database",
 					},
-					ClusterServiceClassRef: v1beta1.ClusterObjectReference{
+					ClusterServiceClassRef: v1.ClusterObjectReference{
 						Name: classKubeName,
 					},
 				},
 			}
-			namespacedClassToReturn = &v1beta1.ServiceClass{
+			namespacedClassToReturn = &v1.ServiceClass{
 				ObjectMeta: v1.ObjectMeta{
 					Name:      namespacedClassKubeName,
 					Namespace: namespace,
 				},
-				Spec: v1beta1.ServiceClassSpec{
+				Spec: v1.ServiceClassSpec{
 					ServiceBrokerName: brokerName,
-					CommonServiceClassSpec: v1beta1.CommonServiceClassSpec{
+					CommonServiceClassSpec: v1.CommonServiceClassSpec{
 						ExternalName: namespacedClassName,
 						ExternalID:   "qwerty-12345",
 						Description:  "A namespaced mysql service",

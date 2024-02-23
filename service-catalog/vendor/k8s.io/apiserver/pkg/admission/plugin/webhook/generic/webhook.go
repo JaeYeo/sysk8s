@@ -22,7 +22,7 @@ import (
 	"io"
 
 	admissionv1 "k8s.io/api/admission/v1"
-	admissionv1beta1 "k8s.io/api/admission/v1beta1"
+	admissionv1 "k8s.io/api/admission/v1"
 	"k8s.io/api/admissionregistration/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -68,10 +68,10 @@ func NewWebhook(handler *admission.Handler, configFile io.Reader, sourceFactory 
 
 	cm, err := webhookutil.NewClientManager(
 		[]schema.GroupVersion{
-			admissionv1beta1.SchemeGroupVersion,
+			admissionv1.SchemeGroupVersion,
 			admissionv1.SchemeGroupVersion,
 		},
-		admissionv1beta1.AddToScheme,
+		admissionv1.AddToScheme,
 		admissionv1.AddToScheme,
 	)
 	if err != nil {

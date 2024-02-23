@@ -6,7 +6,7 @@ import (
 
 	"context"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -22,7 +22,7 @@ import (
 
 func TestServiceBrokerCreateHappyPath(t *testing.T) {
 	// GIVEN
-	require.NoError(t, v1beta1.AddToScheme(scheme.Scheme))
+	require.NoError(t, v1.AddToScheme(scheme.Scheme))
 	cli := fake.NewFakeClientWithScheme(scheme.Scheme)
 
 	svcURL := fmt.Sprintf("http://%s.%s.svc.cluster.local/ns/%s", fixService(), fixWorkingNs(), "stage")
@@ -34,7 +34,7 @@ func TestServiceBrokerCreateHappyPath(t *testing.T) {
 	// THEN
 	require.NoError(t, err)
 
-	actualBroker := &v1beta1.ServiceBroker{}
+	actualBroker := &v1.ServiceBroker{}
 	err = cli.Get(context.Background(), types.NamespacedName{Name: fixBrokerName(), Namespace: fixDestNs()}, actualBroker)
 	require.NoError(t, err)
 	assert.Equal(t, "true", actualBroker.Labels["namespaced-helm-broker"])
@@ -45,7 +45,7 @@ func TestServiceBrokerCreateHappyPath(t *testing.T) {
 
 func TestServiceBrokerDeleteHappyPath(t *testing.T) {
 	// GIVEN
-	require.NoError(t, v1beta1.AddToScheme(scheme.Scheme))
+	require.NoError(t, v1.AddToScheme(scheme.Scheme))
 	cli := fake.NewFakeClientWithScheme(scheme.Scheme)
 
 	sut := NewBrokersFacade(cli, fixWorkingNs(), fixService(), logrus.New())
@@ -58,7 +58,7 @@ func TestServiceBrokerDeleteHappyPath(t *testing.T) {
 
 func TestServiceBrokerDeleteNotFoundErrorsIgnored(t *testing.T) {
 	// GIVEN
-	require.NoError(t, v1beta1.AddToScheme(scheme.Scheme))
+	require.NoError(t, v1.AddToScheme(scheme.Scheme))
 	cli := fake.NewFakeClientWithScheme(scheme.Scheme)
 
 	sut := NewBrokersFacade(cli, fixWorkingNs(), fixService(), logrus.New())
@@ -71,7 +71,7 @@ func TestServiceBrokerDeleteNotFoundErrorsIgnored(t *testing.T) {
 
 func TestServiceBrokerDoesNotExist(t *testing.T) {
 	// GIVEN
-	require.NoError(t, v1beta1.AddToScheme(scheme.Scheme))
+	require.NoError(t, v1.AddToScheme(scheme.Scheme))
 	cli := fake.NewFakeClientWithScheme(scheme.Scheme)
 
 	sut := NewBrokersFacade(cli, fixWorkingNs(), fixService(), logrus.New())
@@ -85,8 +85,8 @@ func TestServiceBrokerDoesNotExist(t *testing.T) {
 
 func TestServiceBrokerExist(t *testing.T) {
 	// GIVEN
-	require.NoError(t, v1beta1.AddToScheme(scheme.Scheme))
-	cli := fake.NewFakeClientWithScheme(scheme.Scheme, &v1beta1.ServiceBroker{
+	require.NoError(t, v1.AddToScheme(scheme.Scheme))
+	cli := fake.NewFakeClientWithScheme(scheme.Scheme, &v1.ServiceBroker{
 		ObjectMeta: meta_v1.ObjectMeta{
 			Name:      fixBrokerName(),
 			Namespace: fixDestNs(),

@@ -25,7 +25,7 @@ import (
 	"strings"
 	"time"
 
-	v1beta1 "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	v1 "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset"
 	util "github.com/kubernetes-sigs/service-catalog/test/util"
 	"github.com/spf13/cobra"
@@ -177,20 +177,20 @@ func (h *HealthCheck) verifyBrokerIsReady() error {
 
 	klog.V(4).Infof("checking for Broker %v to be ready", h.brokername)
 	if h.usenamespacedbroker {
-		err = util.WaitForBrokerCondition(h.serviceCatalogClientSet.ServicecatalogV1beta1(),
+		err = util.WaitForBrokerCondition(h.serviceCatalogClientSet.Servicecatalogv1(),
 			h.brokername,
-			v1beta1.ServiceBrokerCondition{
-				Type:   v1beta1.ServiceBrokerConditionReady,
-				Status: v1beta1.ConditionTrue,
+			v1.ServiceBrokerCondition{
+				Type:   v1.ServiceBrokerConditionReady,
+				Status: v1.ConditionTrue,
 			},
 			h.brokernamespace,
 		)
 	} else {
-		err = util.WaitForBrokerCondition(h.serviceCatalogClientSet.ServicecatalogV1beta1(),
+		err = util.WaitForBrokerCondition(h.serviceCatalogClientSet.Servicecatalogv1(),
 			h.brokername,
-			v1beta1.ServiceBrokerCondition{
-				Type:   v1beta1.ServiceBrokerConditionReady,
-				Status: v1beta1.ConditionTrue,
+			v1.ServiceBrokerCondition{
+				Type:   v1.ServiceBrokerConditionReady,
+				Status: v1.ConditionTrue,
 			},
 		)
 	}
@@ -198,7 +198,7 @@ func (h *HealthCheck) verifyBrokerIsReady() error {
 		return h.setError("broker not ready: %v", err.Error())
 	}
 
-	err = util.WaitForServiceClassToExist(h.serviceCatalogClientSet.ServicecatalogV1beta1(), h.serviceclassID)
+	err = util.WaitForServiceClassToExist(h.serviceCatalogClientSet.Servicecatalogv1(), h.serviceclassID)
 	if err != nil {
 		return h.setError("service class not found: %v", err.Error())
 	}
@@ -213,30 +213,30 @@ func (h *HealthCheck) createInstance() error {
 	}
 	klog.V(4).Info("Creating a ServiceInstance")
 	var err error
-	var planReference v1beta1.PlanReference
+	var planReference v1.PlanReference
 
 	if h.usenamespacedbroker {
-		planReference = v1beta1.PlanReference{
+		planReference = v1.PlanReference{
 			ServiceClassExternalName: h.serviceclassName,
 			ServicePlanExternalName:  "default",
 		}
 	} else {
-		planReference = v1beta1.PlanReference{
+		planReference = v1.PlanReference{
 			ClusterServiceClassExternalName: h.serviceclassName,
 			ClusterServicePlanExternalName:  "default",
 		}
 	}
-	instance := &v1beta1.ServiceInstance{
+	instance := &v1.ServiceInstance{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      h.instanceName,
 			Namespace: h.namespace.Name,
 		},
-		Spec: v1beta1.ServiceInstanceSpec{
+		Spec: v1.ServiceInstanceSpec{
 			PlanReference: planReference,
 		},
 	}
 	operationStartTime := time.Now()
-	instance, err = h.serviceCatalogClientSet.ServicecatalogV1beta1().ServiceInstances(h.namespace.Name).Create(context.Background(), instance, metav1.CreateOptions{})
+	instance, err = h.serviceCatalogClientSet.Servicecatalogv1().ServiceInstances(h.namespace.Name).Create(context.Background(), instance, metav1.CreateOptions{})
 	if err != nil {
 		return h.setError("error creating instance: %v", err.Error())
 	}
@@ -246,12 +246,12 @@ func (h *HealthCheck) createInstance() error {
 	}
 
 	klog.V(4).Info("Waiting for ServiceInstance to be ready")
-	err = util.WaitForInstanceCondition(h.serviceCatalogClientSet.ServicecatalogV1beta1(),
+	err = util.WaitForInstanceCondition(h.serviceCatalogClientSet.Servicecatalogv1(),
 		h.namespace.Name,
 		h.instanceName,
-		v1beta1.ServiceInstanceCondition{
-			Type:   v1beta1.ServiceInstanceConditionReady,
-			Status: v1beta1.ConditionTrue,
+		v1.ServiceInstanceCondition{
+			Type:   v1.ServiceInstanceConditionReady,
+			Status: v1.ConditionTrue,
 		},
 	)
 	if err != nil {
@@ -260,7 +260,7 @@ func (h *HealthCheck) createInstance() error {
 	ReportOperationCompleted("create_instance", operationStartTime)
 
 	klog.V(4).Info("Verifing references are resolved")
-	sc, err := h.serviceCatalogClientSet.ServicecatalogV1beta1().ServiceInstances(h.namespace.Name).Get(context.Background(), h.instanceName, metav1.GetOptions{})
+	sc, err := h.serviceCatalogClientSet.Servicecatalogv1().ServiceInstances(h.namespace.Name).Get(context.Background(), h.instanceName, metav1.GetOptions{})
 	if err != nil {
 		return h.setError("error getting instance: %v", err.Error())
 	}
@@ -288,20 +288,20 @@ func (h *HealthCheck) createBinding() error {
 		return h.frameworkError
 	}
 	klog.V(4).Info("Creating a ServiceBinding")
-	binding := &v1beta1.ServiceBinding{
+	binding := &v1.ServiceBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      h.bindingName,
 			Namespace: h.namespace.Name,
 		},
-		Spec: v1beta1.ServiceBindingSpec{
-			InstanceRef: v1beta1.LocalObjectReference{
+		Spec: v1.ServiceBindingSpec{
+			InstanceRef: v1.LocalObjectReference{
 				Name: h.instanceName,
 			},
 			SecretName: "my-secret",
 		},
 	}
 	operationStartTime := time.Now()
-	binding, err := h.serviceCatalogClientSet.ServicecatalogV1beta1().ServiceBindings(h.namespace.Name).Create(context.Background(), binding, metav1.CreateOptions{})
+	binding, err := h.serviceCatalogClientSet.Servicecatalogv1().ServiceBindings(h.namespace.Name).Create(context.Background(), binding, metav1.CreateOptions{})
 	if err != nil {
 		return h.setError("Error creating binding: %v", err.Error())
 	}
@@ -310,12 +310,12 @@ func (h *HealthCheck) createBinding() error {
 	}
 
 	klog.V(4).Info("Waiting for ServiceBinding to be ready")
-	_, err = util.WaitForBindingCondition(h.serviceCatalogClientSet.ServicecatalogV1beta1(),
+	_, err = util.WaitForBindingCondition(h.serviceCatalogClientSet.Servicecatalogv1(),
 		h.namespace.Name,
 		h.bindingName,
-		v1beta1.ServiceBindingCondition{
-			Type:   v1beta1.ServiceBindingConditionReady,
-			Status: v1beta1.ConditionTrue,
+		v1.ServiceBindingCondition{
+			Type:   v1.ServiceBindingConditionReady,
+			Status: v1.ConditionTrue,
 		},
 	)
 	if err != nil {
@@ -340,13 +340,13 @@ func (h *HealthCheck) deprovision() error {
 	}
 	klog.V(4).Info("Deleting the ServiceBinding.")
 	operationStartTime := time.Now()
-	err := h.serviceCatalogClientSet.ServicecatalogV1beta1().ServiceBindings(h.namespace.Name).Delete(context.Background(), h.bindingName, metav1.DeleteOptions{})
+	err := h.serviceCatalogClientSet.Servicecatalogv1().ServiceBindings(h.namespace.Name).Delete(context.Background(), h.bindingName, metav1.DeleteOptions{})
 	if err != nil {
 		return h.setError("error deleting binding: %v", err.Error())
 	}
 
 	klog.V(4).Info("Waiting for ServiceBinding to be removed")
-	err = util.WaitForBindingToNotExist(h.serviceCatalogClientSet.ServicecatalogV1beta1(), h.namespace.Name, h.bindingName)
+	err = util.WaitForBindingToNotExist(h.serviceCatalogClientSet.Servicecatalogv1(), h.namespace.Name, h.bindingName)
 	if err != nil {
 		return h.setError("binding not removed: %v", err.Error())
 	}
@@ -361,13 +361,13 @@ func (h *HealthCheck) deprovision() error {
 	// Deprovisioning the ServiceInstance
 	klog.V(4).Info("Deleting the ServiceInstance")
 	operationStartTime = time.Now()
-	err = h.serviceCatalogClientSet.ServicecatalogV1beta1().ServiceInstances(h.namespace.Name).Delete(context.Background(), h.instanceName, metav1.DeleteOptions{})
+	err = h.serviceCatalogClientSet.Servicecatalogv1().ServiceInstances(h.namespace.Name).Delete(context.Background(), h.instanceName, metav1.DeleteOptions{})
 	if err != nil {
 		return h.setError("error deleting instance: %v", err.Error())
 	}
 
 	klog.V(4).Info("Waiting for ServiceInstance to be removed")
-	err = util.WaitForInstanceToNotExist(h.serviceCatalogClientSet.ServicecatalogV1beta1(), h.namespace.Name, h.instanceName)
+	err = util.WaitForInstanceToNotExist(h.serviceCatalogClientSet.Servicecatalogv1(), h.namespace.Name, h.instanceName)
 	if err != nil {
 		return h.setError("instance not removed: %v", err.Error())
 	}
@@ -379,8 +379,8 @@ func (h *HealthCheck) deprovision() error {
 func (h *HealthCheck) cleanup() {
 	if h.frameworkError != nil && h.namespace != nil {
 		klog.V(4).Infof("Cleaning up.  Deleting the binding, instance and test namespace %v", h.namespace.Name)
-		h.serviceCatalogClientSet.ServicecatalogV1beta1().ServiceBindings(h.namespace.Name).Delete(context.Background(), h.bindingName, metav1.DeleteOptions{})
-		h.serviceCatalogClientSet.ServicecatalogV1beta1().ServiceInstances(h.namespace.Name).Delete(context.Background(), h.instanceName, metav1.DeleteOptions{})
+		h.serviceCatalogClientSet.Servicecatalogv1().ServiceBindings(h.namespace.Name).Delete(context.Background(), h.bindingName, metav1.DeleteOptions{})
+		h.serviceCatalogClientSet.Servicecatalogv1().ServiceInstances(h.namespace.Name).Delete(context.Background(), h.instanceName, metav1.DeleteOptions{})
 		DeleteKubeNamespace(h.kubeClientSet, h.namespace.Name)
 		h.namespace = nil
 	}

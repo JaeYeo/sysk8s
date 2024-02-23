@@ -19,14 +19,14 @@ limitations under the License.
 
 syntax = 'proto2';
 
-package k8s.io.apiextensions_apiserver.pkg.apis.apiextensions.v1beta1;
+package k8s.io.apiextensions_apiserver.pkg.apis.apiextensions.v1;
 
 import "k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto";
 import "k8s.io/apimachinery/pkg/runtime/generated.proto";
 import "k8s.io/apimachinery/pkg/runtime/schema/generated.proto";
 
 // Package-wide variables from generator "generated".
-option go_package = "v1beta1";
+option go_package = "v1";
 
 // ConversionRequest describes the conversion request parameters.
 message ConversionRequest {
@@ -123,7 +123,7 @@ message CustomResourceConversion {
   // are supported by API server, conversion will fail for the custom resource.
   // If a persisted Webhook configuration specifies allowed versions and does not
   // include any versions known to the API Server, calls to the webhook will fail.
-  // Defaults to `["v1beta1"]`.
+  // Defaults to `["v1"]`.
   // +optional
   repeated string conversionReviewVersions = 3;
 }

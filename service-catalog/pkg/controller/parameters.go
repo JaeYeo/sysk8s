@@ -22,7 +22,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/peterbourgon/mergemap"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -37,7 +37,7 @@ import (
 // The second return value is a map of parameters with secret values redacted,
 // replaced with "<redacted>".
 // The third return value is any error that caused the function to fail.
-func buildParameters(kubeClient kubernetes.Interface, namespace string, parametersFrom []v1beta1.ParametersFromSource, parameters *runtime.RawExtension) (map[string]interface{}, map[string]interface{}, error) {
+func buildParameters(kubeClient kubernetes.Interface, namespace string, parametersFrom []v1.ParametersFromSource, parameters *runtime.RawExtension) (map[string]interface{}, map[string]interface{}, error) {
 	params := make(map[string]interface{})
 	paramsWithSecretsRedacted := make(map[string]interface{})
 	if parametersFrom != nil {
@@ -81,7 +81,7 @@ func buildParameters(kubeClient kubernetes.Interface, namespace string, paramete
 
 // fetchParametersFromSource fetches data from a specified external source and
 // represents it in the parameters map format
-func fetchParametersFromSource(kubeClient kubernetes.Interface, namespace string, parametersFrom *v1beta1.ParametersFromSource) (map[string]interface{}, error) {
+func fetchParametersFromSource(kubeClient kubernetes.Interface, namespace string, parametersFrom *v1.ParametersFromSource) (map[string]interface{}, error) {
 	var params map[string]interface{}
 	if parametersFrom.SecretKeyRef != nil {
 		data, err := fetchSecretKeyValue(kubeClient, namespace, parametersFrom.SecretKeyRef)
@@ -127,7 +127,7 @@ func unmarshalJSON(in []byte) (map[string]interface{}, error) {
 }
 
 // fetchSecretKeyValue requests and returns the contents of the given secret key
-func fetchSecretKeyValue(kubeClient kubernetes.Interface, namespace string, secretKeyRef *v1beta1.SecretKeyReference) ([]byte, error) {
+func fetchSecretKeyValue(kubeClient kubernetes.Interface, namespace string, secretKeyRef *v1.SecretKeyReference) ([]byte, error) {
 	secret, err := kubeClient.CoreV1().Secrets(namespace).Get(context.Background(), secretKeyRef.Name, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
@@ -156,7 +156,7 @@ func generateChecksumOfParameters(params map[string]interface{}) (string, error)
 // 2 - a checksum for the map of parameters. This checksum is used to determine if parameters have changed.
 // 3 - the map of parameters marshaled into JSON as a RawExtension
 // 4 - any error that caused the function to fail.
-func prepareInProgressPropertyParameters(kubeClient kubernetes.Interface, namespace string, specParameters *runtime.RawExtension, specParametersFrom []v1beta1.ParametersFromSource) (map[string]interface{}, string, *runtime.RawExtension, error) {
+func prepareInProgressPropertyParameters(kubeClient kubernetes.Interface, namespace string, specParameters *runtime.RawExtension, specParametersFrom []v1.ParametersFromSource) (map[string]interface{}, string, *runtime.RawExtension, error) {
 	parameters, parametersWithSecretsRedacted, err := buildParameters(kubeClient, namespace, specParametersFrom, specParameters)
 	if err != nil {
 		return nil, "", nil, fmt.Errorf(

@@ -271,7 +271,7 @@ func (v *validatingWebhookAccessor) GetValidatingWebhook() (*v1.ValidatingWebhoo
 }
 
 // hookClientConfigForWebhook construct a webhookutil.ClientConfig using a WebhookAccessor to access
-// v1beta1.MutatingWebhook and v1beta1.ValidatingWebhook API objects.  webhookutil.ClientConfig is used
+// v1.MutatingWebhook and v1.ValidatingWebhook API objects.  webhookutil.ClientConfig is used
 // to create a HookClient and the purpose of the config struct is to share that with other packages
 // that need to create a HookClient.
 func hookClientConfigForWebhook(w WebhookAccessor) webhookutil.ClientConfig {

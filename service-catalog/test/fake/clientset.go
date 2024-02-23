@@ -21,7 +21,7 @@ import (
 
 	clientset "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset"
 	servicecatalogclientset "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/fake"
-	servicecatalogv1beta1 "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/typed/servicecatalog/v1beta1"
+	servicecatalogv1 "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/typed/servicecatalog/v1"
 )
 
 // Clientset is a wrapper around the generated fake clientset that clones the
@@ -38,10 +38,10 @@ func (c *Clientset) Discovery() discovery.DiscoveryInterface {
 
 var _ clientset.Interface = &Clientset{}
 
-func (c *Clientset) ServicecatalogV1beta1() servicecatalogv1beta1.ServicecatalogV1beta1Interface {
-	return &ServicecatalogV1beta1{c.Clientset.ServicecatalogV1beta1()}
+func (c *Clientset) Servicecatalogv1() servicecatalogv1.Servicecatalogv1Interface {
+	return &Servicecatalogv1{c.Clientset.Servicecatalogv1()}
 }
 
-func (c *Clientset) Servicecatalog() servicecatalogv1beta1.ServicecatalogV1beta1Interface {
-	return &ServicecatalogV1beta1{c.Clientset.ServicecatalogV1beta1()}
+func (c *Clientset) Servicecatalog() servicecatalogv1.Servicecatalogv1Interface {
+	return &Servicecatalogv1{c.Clientset.Servicecatalogv1()}
 }

@@ -23,7 +23,7 @@ import (
 	"github.com/kubernetes-sigs/service-catalog/cmd/svcat/command"
 	. "github.com/kubernetes-sigs/service-catalog/cmd/svcat/plan"
 	svcattest "github.com/kubernetes-sigs/service-catalog/cmd/svcat/test"
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/svcat"
 	servicecatalog "github.com/kubernetes-sigs/service-catalog/pkg/svcat/service-catalog"
 	servicecatalogfakes "github.com/kubernetes-sigs/service-catalog/pkg/svcat/service-catalog/service-catalogfakes"
@@ -140,12 +140,12 @@ var _ = Describe("Get Plans Command", func() {
 
 			defaultNamespace    string
 			bananaNamespace     string
-			clusterServiceClass *v1beta1.ClusterServiceClass
-			defaultServiceClass *v1beta1.ServiceClass
-			bananaServiceClass  *v1beta1.ServiceClass
-			clusterServicePlan  *v1beta1.ClusterServicePlan
-			defaultServicePlan  *v1beta1.ServicePlan
-			bananaServicePlan   *v1beta1.ServicePlan
+			clusterServiceClass *v1.ClusterServiceClass
+			defaultServiceClass *v1.ServiceClass
+			bananaServiceClass  *v1.ServiceClass
+			clusterServicePlan  *v1.ClusterServicePlan
+			defaultServicePlan  *v1.ServicePlan
+			bananaServicePlan   *v1.ServicePlan
 		)
 		BeforeEach(func() {
 			fakeSDK = new(servicecatalogfakes.FakeSvcatClient)
@@ -166,75 +166,75 @@ var _ = Describe("Get Plans Command", func() {
 				Formatted: command.NewFormatted(),
 			}
 
-			clusterServiceClass = &v1beta1.ClusterServiceClass{
+			clusterServiceClass = &v1.ClusterServiceClass{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: "csc-123",
 				},
-				Spec: v1beta1.ClusterServiceClassSpec{
-					CommonServiceClassSpec: v1beta1.CommonServiceClassSpec{
+				Spec: v1.ClusterServiceClassSpec{
+					CommonServiceClassSpec: v1.CommonServiceClassSpec{
 						ExternalName: "myclusterserviclass",
 					},
 				},
 			}
-			clusterServicePlan = &v1beta1.ClusterServicePlan{
+			clusterServicePlan = &v1.ClusterServicePlan{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: "csp-123",
 				},
-				Spec: v1beta1.ClusterServicePlanSpec{
-					ClusterServiceClassRef: v1beta1.ClusterObjectReference{
+				Spec: v1.ClusterServicePlanSpec{
+					ClusterServiceClassRef: v1.ClusterObjectReference{
 						Name: clusterServiceClass.Name,
 					},
-					CommonServicePlanSpec: v1beta1.CommonServicePlanSpec{
+					CommonServicePlanSpec: v1.CommonServicePlanSpec{
 						ExternalName: "myclusterserviceplan",
 					},
 				},
 			}
-			defaultServiceClass = &v1beta1.ServiceClass{
+			defaultServiceClass = &v1.ServiceClass{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "dsc-456",
 					Namespace: defaultNamespace,
 				},
-				Spec: v1beta1.ServiceClassSpec{
-					CommonServiceClassSpec: v1beta1.CommonServiceClassSpec{
+				Spec: v1.ServiceClassSpec{
+					CommonServiceClassSpec: v1.CommonServiceClassSpec{
 						ExternalName: "mydefaultserviceclass",
 					},
 				},
 			}
-			defaultServicePlan = &v1beta1.ServicePlan{
+			defaultServicePlan = &v1.ServicePlan{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "dsp-456",
 					Namespace: defaultNamespace,
 				},
-				Spec: v1beta1.ServicePlanSpec{
-					ServiceClassRef: v1beta1.LocalObjectReference{
+				Spec: v1.ServicePlanSpec{
+					ServiceClassRef: v1.LocalObjectReference{
 						Name: defaultServiceClass.Name,
 					},
-					CommonServicePlanSpec: v1beta1.CommonServicePlanSpec{
+					CommonServicePlanSpec: v1.CommonServicePlanSpec{
 						ExternalName: "mydefaultserviceplan",
 					},
 				},
 			}
-			bananaServiceClass = &v1beta1.ServiceClass{
+			bananaServiceClass = &v1.ServiceClass{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "bsc-456",
 					Namespace: bananaNamespace,
 				},
-				Spec: v1beta1.ServiceClassSpec{
-					CommonServiceClassSpec: v1beta1.CommonServiceClassSpec{
+				Spec: v1.ServiceClassSpec{
+					CommonServiceClassSpec: v1.CommonServiceClassSpec{
 						ExternalName: "mybananaserviceclass",
 					},
 				},
 			}
-			bananaServicePlan = &v1beta1.ServicePlan{
+			bananaServicePlan = &v1.ServicePlan{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "bsp-456",
 					Namespace: bananaNamespace,
 				},
-				Spec: v1beta1.ServicePlanSpec{
-					ServiceClassRef: v1beta1.LocalObjectReference{
+				Spec: v1.ServicePlanSpec{
+					ServiceClassRef: v1.LocalObjectReference{
 						Name: bananaServiceClass.Name,
 					},
-					CommonServicePlanSpec: v1beta1.CommonServicePlanSpec{
+					CommonServicePlanSpec: v1.CommonServicePlanSpec{
 						ExternalName: "mybananaserviceplan",
 					},
 				},

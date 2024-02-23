@@ -60,7 +60,7 @@ type APIGroupInfo struct {
 	VersionedResourcesStorageMap map[string]map[string]rest.Storage
 	// OptionsExternalVersion controls the APIVersion used for common objects in the
 	// schema like api.Status, api.DeleteOptions, and metav1.ListOptions. Other implementors may
-	// define a version "v1beta1" but want to use the Kubernetes "v1" internal objects.
+	// define a version "v1" but want to use the Kubernetes "v1" internal objects.
 	// If nil, defaults to groupMeta.GroupVersion.
 	// TODO: Remove this when https://github.com/kubernetes/kubernetes/issues/19018 is fixed.
 	OptionsExternalVersion *schema.GroupVersion

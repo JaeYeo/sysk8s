@@ -1,5 +1,5 @@
 /*
-Copyright 2020 The Kubernetes Authors.
+Copyright 2021 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ package fake
 import (
 	"context"
 
-	v1beta1 "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	v1 "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
@@ -32,29 +32,29 @@ import (
 
 // FakeServiceBindings implements ServiceBindingInterface
 type FakeServiceBindings struct {
-	Fake *FakeServicecatalogV1beta1
+	Fake *FakeServicecatalogv1
 	ns   string
 }
 
-var servicebindingsResource = schema.GroupVersionResource{Group: "servicecatalog.k8s.io", Version: "v1beta1", Resource: "servicebindings"}
+var servicebindingsResource = schema.GroupVersionResource{Group: "servicecatalog.k8s.io", Version: "v1", Resource: "servicebindings"}
 
-var servicebindingsKind = schema.GroupVersionKind{Group: "servicecatalog.k8s.io", Version: "v1beta1", Kind: "ServiceBinding"}
+var servicebindingsKind = schema.GroupVersionKind{Group: "servicecatalog.k8s.io", Version: "v1", Kind: "ServiceBinding"}
 
 // Get takes name of the serviceBinding, and returns the corresponding serviceBinding object, and an error if there is any.
-func (c *FakeServiceBindings) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1beta1.ServiceBinding, err error) {
+func (c *FakeServiceBindings) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1.ServiceBinding, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(servicebindingsResource, c.ns, name), &v1beta1.ServiceBinding{})
+		Invokes(testing.NewGetAction(servicebindingsResource, c.ns, name), &v1.ServiceBinding{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta1.ServiceBinding), err
+	return obj.(*v1.ServiceBinding), err
 }
 
 // List takes label and field selectors, and returns the list of ServiceBindings that match those selectors.
-func (c *FakeServiceBindings) List(ctx context.Context, opts v1.ListOptions) (result *v1beta1.ServiceBindingList, err error) {
+func (c *FakeServiceBindings) List(ctx context.Context, opts v1.ListOptions) (result *v1.ServiceBindingList, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewListAction(servicebindingsResource, servicebindingsKind, c.ns, opts), &v1beta1.ServiceBindingList{})
+		Invokes(testing.NewListAction(servicebindingsResource, servicebindingsKind, c.ns, opts), &v1.ServiceBindingList{})
 
 	if obj == nil {
 		return nil, err
@@ -64,8 +64,8 @@ func (c *FakeServiceBindings) List(ctx context.Context, opts v1.ListOptions) (re
 	if label == nil {
 		label = labels.Everything()
 	}
-	list := &v1beta1.ServiceBindingList{ListMeta: obj.(*v1beta1.ServiceBindingList).ListMeta}
-	for _, item := range obj.(*v1beta1.ServiceBindingList).Items {
+	list := &v1.ServiceBindingList{ListMeta: obj.(*v1.ServiceBindingList).ListMeta}
+	for _, item := range obj.(*v1.ServiceBindingList).Items {
 		if label.Matches(labels.Set(item.Labels)) {
 			list.Items = append(list.Items, item)
 		}
@@ -81,43 +81,43 @@ func (c *FakeServiceBindings) Watch(ctx context.Context, opts v1.ListOptions) (w
 }
 
 // Create takes the representation of a serviceBinding and creates it.  Returns the server's representation of the serviceBinding, and an error, if there is any.
-func (c *FakeServiceBindings) Create(ctx context.Context, serviceBinding *v1beta1.ServiceBinding, opts v1.CreateOptions) (result *v1beta1.ServiceBinding, err error) {
+func (c *FakeServiceBindings) Create(ctx context.Context, serviceBinding *v1.ServiceBinding, opts v1.CreateOptions) (result *v1.ServiceBinding, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(servicebindingsResource, c.ns, serviceBinding), &v1beta1.ServiceBinding{})
+		Invokes(testing.NewCreateAction(servicebindingsResource, c.ns, serviceBinding), &v1.ServiceBinding{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta1.ServiceBinding), err
+	return obj.(*v1.ServiceBinding), err
 }
 
 // Update takes the representation of a serviceBinding and updates it. Returns the server's representation of the serviceBinding, and an error, if there is any.
-func (c *FakeServiceBindings) Update(ctx context.Context, serviceBinding *v1beta1.ServiceBinding, opts v1.UpdateOptions) (result *v1beta1.ServiceBinding, err error) {
+func (c *FakeServiceBindings) Update(ctx context.Context, serviceBinding *v1.ServiceBinding, opts v1.UpdateOptions) (result *v1.ServiceBinding, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(servicebindingsResource, c.ns, serviceBinding), &v1beta1.ServiceBinding{})
+		Invokes(testing.NewUpdateAction(servicebindingsResource, c.ns, serviceBinding), &v1.ServiceBinding{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta1.ServiceBinding), err
+	return obj.(*v1.ServiceBinding), err
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeServiceBindings) UpdateStatus(ctx context.Context, serviceBinding *v1beta1.ServiceBinding, opts v1.UpdateOptions) (*v1beta1.ServiceBinding, error) {
+func (c *FakeServiceBindings) UpdateStatus(ctx context.Context, serviceBinding *v1.ServiceBinding, opts v1.UpdateOptions) (*v1.ServiceBinding, error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateSubresourceAction(servicebindingsResource, "status", c.ns, serviceBinding), &v1beta1.ServiceBinding{})
+		Invokes(testing.NewUpdateSubresourceAction(servicebindingsResource, "status", c.ns, serviceBinding), &v1.ServiceBinding{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta1.ServiceBinding), err
+	return obj.(*v1.ServiceBinding), err
 }
 
 // Delete takes name of the serviceBinding and deletes it. Returns an error if one occurs.
 func (c *FakeServiceBindings) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(servicebindingsResource, c.ns, name), &v1beta1.ServiceBinding{})
+		Invokes(testing.NewDeleteAction(servicebindingsResource, c.ns, name), &v1.ServiceBinding{})
 
 	return err
 }
@@ -126,17 +126,17 @@ func (c *FakeServiceBindings) Delete(ctx context.Context, name string, opts v1.D
 func (c *FakeServiceBindings) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
 	action := testing.NewDeleteCollectionAction(servicebindingsResource, c.ns, listOpts)
 
-	_, err := c.Fake.Invokes(action, &v1beta1.ServiceBindingList{})
+	_, err := c.Fake.Invokes(action, &v1.ServiceBindingList{})
 	return err
 }
 
 // Patch applies the patch and returns the patched serviceBinding.
-func (c *FakeServiceBindings) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta1.ServiceBinding, err error) {
+func (c *FakeServiceBindings) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1.ServiceBinding, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(servicebindingsResource, c.ns, name, pt, data, subresources...), &v1beta1.ServiceBinding{})
+		Invokes(testing.NewPatchSubresourceAction(servicebindingsResource, c.ns, name, pt, data, subresources...), &v1.ServiceBinding{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta1.ServiceBinding), err
+	return obj.(*v1.ServiceBinding), err
 }

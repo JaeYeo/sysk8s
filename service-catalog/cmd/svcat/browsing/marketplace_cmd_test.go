@@ -23,7 +23,7 @@ import (
 	"github.com/kubernetes-sigs/service-catalog/cmd/svcat/command"
 	svcattest "github.com/kubernetes-sigs/service-catalog/cmd/svcat/test"
 	_ "github.com/kubernetes-sigs/service-catalog/internal/test"
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/svcat"
 	servicecatalog "github.com/kubernetes-sigs/service-catalog/pkg/svcat/service-catalog"
 	servicecatalogfakes "github.com/kubernetes-sigs/service-catalog/pkg/svcat/service-catalog/service-catalogfakes"
@@ -67,68 +67,68 @@ var _ = Describe("Register Command", func() {
 			planGUID2 := "banana53"
 			planName3 := "barbazplan"
 			planGUID3 := "banana54"
-			classToReturn := &v1beta1.ClusterServiceClass{
+			classToReturn := &v1.ClusterServiceClass{
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: namespace,
 					Name:      classGUID,
 				},
-				Spec: v1beta1.ClusterServiceClassSpec{
-					CommonServiceClassSpec: v1beta1.CommonServiceClassSpec{
+				Spec: v1.ClusterServiceClassSpec{
+					CommonServiceClassSpec: v1.CommonServiceClassSpec{
 						Description:  classDescription,
 						ExternalName: className,
 					},
 				},
 			}
-			classToReturn2 := &v1beta1.ClusterServiceClass{
+			classToReturn2 := &v1.ClusterServiceClass{
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: namespace,
 					Name:      classGUID2,
 				},
-				Spec: v1beta1.ClusterServiceClassSpec{
-					CommonServiceClassSpec: v1beta1.CommonServiceClassSpec{
+				Spec: v1.ClusterServiceClassSpec{
+					CommonServiceClassSpec: v1.CommonServiceClassSpec{
 						Description:  classDescription2,
 						ExternalName: className2,
 					},
 				},
 			}
-			planToReturn := &v1beta1.ClusterServicePlan{
+			planToReturn := &v1.ClusterServicePlan{
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: namespace,
 					Name:      planGUID,
 				},
-				Spec: v1beta1.ClusterServicePlanSpec{
-					CommonServicePlanSpec: v1beta1.CommonServicePlanSpec{
+				Spec: v1.ClusterServicePlanSpec{
+					CommonServicePlanSpec: v1.CommonServicePlanSpec{
 						ExternalName: planName,
 					},
-					ClusterServiceClassRef: v1beta1.ClusterObjectReference{
+					ClusterServiceClassRef: v1.ClusterObjectReference{
 						Name: classGUID,
 					},
 				},
 			}
-			planToReturn2 := &v1beta1.ClusterServicePlan{
+			planToReturn2 := &v1.ClusterServicePlan{
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: namespace,
 					Name:      planGUID2,
 				},
-				Spec: v1beta1.ClusterServicePlanSpec{
-					CommonServicePlanSpec: v1beta1.CommonServicePlanSpec{
+				Spec: v1.ClusterServicePlanSpec{
+					CommonServicePlanSpec: v1.CommonServicePlanSpec{
 						ExternalName: planName2,
 					},
-					ClusterServiceClassRef: v1beta1.ClusterObjectReference{
+					ClusterServiceClassRef: v1.ClusterObjectReference{
 						Name: classGUID,
 					},
 				},
 			}
-			planToReturn3 := &v1beta1.ClusterServicePlan{
+			planToReturn3 := &v1.ClusterServicePlan{
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: namespace,
 					Name:      planGUID3,
 				},
-				Spec: v1beta1.ClusterServicePlanSpec{
-					CommonServicePlanSpec: v1beta1.CommonServicePlanSpec{
+				Spec: v1.ClusterServicePlanSpec{
+					CommonServicePlanSpec: v1.CommonServicePlanSpec{
 						ExternalName: planName3,
 					},
-					ClusterServiceClassRef: v1beta1.ClusterObjectReference{
+					ClusterServiceClassRef: v1.ClusterObjectReference{
 						Name: classGUID2,
 					},
 				},

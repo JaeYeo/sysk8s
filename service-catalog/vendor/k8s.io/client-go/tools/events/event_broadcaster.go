@@ -30,11 +30,11 @@ import (
 	"k8s.io/apimachinery/pkg/watch"
 	restclient "k8s.io/client-go/rest"
 
-	"k8s.io/api/events/v1beta1"
+	"k8s.io/api/events/v1"
 	"k8s.io/apimachinery/pkg/util/json"
 	"k8s.io/apimachinery/pkg/util/strategicpatch"
 	"k8s.io/apimachinery/pkg/util/wait"
-	typedv1beta1 "k8s.io/client-go/kubernetes/typed/events/v1beta1"
+	typedv1 "k8s.io/client-go/kubernetes/typed/events/v1"
 	"k8s.io/client-go/tools/record/util"
 	"k8s.io/klog"
 )
@@ -60,7 +60,7 @@ type eventKey struct {
 type eventBroadcasterImpl struct {
 	*watch.Broadcaster
 	mu            sync.Mutex
-	eventCache    map[eventKey]*v1beta1.Event
+	eventCache    map[eventKey]*v1.Event
 	sleepDuration time.Duration
 	sink          EventSink
 }
@@ -69,31 +69,31 @@ type eventBroadcasterImpl struct {
 // TODO: this makes it easier for testing purpose and masks the logic of performing API calls.
 // Note that rollbacking to raw clientset should also be transparent.
 type EventSinkImpl struct {
-	Interface typedv1beta1.EventInterface
+	Interface typedv1.EventInterface
 }
 
 // Create is the same as CreateWithEventNamespace of the EventExpansion
-func (e *EventSinkImpl) Create(event *v1beta1.Event) (*v1beta1.Event, error) {
+func (e *EventSinkImpl) Create(event *v1.Event) (*v1.Event, error) {
 	return e.Interface.CreateWithEventNamespace(event)
 }
 
 // Update is the same as UpdateithEventNamespace of the EventExpansion
-func (e *EventSinkImpl) Update(event *v1beta1.Event) (*v1beta1.Event, error) {
+func (e *EventSinkImpl) Update(event *v1.Event) (*v1.Event, error) {
 	return e.Interface.UpdateWithEventNamespace(event)
 }
 
 // Patch is the same as PatchWithEventNamespace of the EventExpansion
-func (e *EventSinkImpl) Patch(event *v1beta1.Event, data []byte) (*v1beta1.Event, error) {
+func (e *EventSinkImpl) Patch(event *v1.Event, data []byte) (*v1.Event, error) {
 	return e.Interface.PatchWithEventNamespace(event, data)
 }
 
 // NewBroadcaster Creates a new event broadcaster.
 func NewBroadcaster(sink EventSink) EventBroadcaster {
-	return newBroadcaster(sink, defaultSleepDuration, map[eventKey]*v1beta1.Event{})
+	return newBroadcaster(sink, defaultSleepDuration, map[eventKey]*v1.Event{})
 }
 
 // NewBroadcasterForTest Creates a new event broadcaster for test purposes.
-func newBroadcaster(sink EventSink, sleepDuration time.Duration, eventCache map[eventKey]*v1beta1.Event) EventBroadcaster {
+func newBroadcaster(sink EventSink, sleepDuration time.Duration, eventCache map[eventKey]*v1.Event) EventBroadcaster {
 	return &eventBroadcasterImpl{
 		Broadcaster:   watch.NewBroadcaster(maxQueuedEvents, watch.DropIfChannelFull),
 		eventCache:    eventCache,
@@ -150,11 +150,11 @@ func (e *eventBroadcasterImpl) NewRecorder(scheme *runtime.Scheme, reportingCont
 	return &recorderImpl{scheme, reportingController, reportingInstance, e.Broadcaster, clock.RealClock{}}
 }
 
-func (e *eventBroadcasterImpl) recordToSink(event *v1beta1.Event, clock clock.Clock) {
+func (e *eventBroadcasterImpl) recordToSink(event *v1.Event, clock clock.Clock) {
 	// Make a copy before modification, because there could be multiple listeners.
 	eventCopy := event.DeepCopy()
 	go func() {
-		evToRecord := func() *v1beta1.Event {
+		evToRecord := func() *v1.Event {
 			e.mu.Lock()
 			defer e.mu.Unlock()
 			eventKey := getKey(eventCopy)
@@ -165,7 +165,7 @@ func (e *eventBroadcasterImpl) recordToSink(event *v1beta1.Event, clock clock.Cl
 					isomorphicEvent.Series.LastObservedTime = metav1.MicroTime{Time: clock.Now()}
 					return nil
 				}
-				isomorphicEvent.Series = &v1beta1.EventSeries{
+				isomorphicEvent.Series = &v1.EventSeries{
 					Count:            1,
 					LastObservedTime: metav1.MicroTime{Time: clock.Now()},
 				}
@@ -186,7 +186,7 @@ func (e *eventBroadcasterImpl) recordToSink(event *v1beta1.Event, clock clock.Cl
 	}()
 }
 
-func (e *eventBroadcasterImpl) attemptRecording(event *v1beta1.Event) *v1beta1.Event {
+func (e *eventBroadcasterImpl) attemptRecording(event *v1.Event) *v1.Event {
 	tries := 0
 	for {
 		if recordedEvent, retry := recordEvent(e.sink, event); !retry {
@@ -203,8 +203,8 @@ func (e *eventBroadcasterImpl) attemptRecording(event *v1beta1.Event) *v1beta1.E
 	}
 }
 
-func recordEvent(sink EventSink, event *v1beta1.Event) (*v1beta1.Event, bool) {
-	var newEvent *v1beta1.Event
+func recordEvent(sink EventSink, event *v1.Event) (*v1.Event, bool) {
+	var newEvent *v1.Event
 	var err error
 	isEventSeries := event.Series != nil
 	if isEventSeries {
@@ -248,7 +248,7 @@ func recordEvent(sink EventSink, event *v1beta1.Event) (*v1beta1.Event, bool) {
 	return nil, true
 }
 
-func createPatchBytesForSeries(event *v1beta1.Event) ([]byte, error) {
+func createPatchBytesForSeries(event *v1.Event) ([]byte, error) {
 	oldEvent := event.DeepCopy()
 	oldEvent.Series = nil
 	oldData, err := json.Marshal(oldEvent)
@@ -259,10 +259,10 @@ func createPatchBytesForSeries(event *v1beta1.Event) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return strategicpatch.CreateTwoWayMergePatch(oldData, newData, v1beta1.Event{})
+	return strategicpatch.CreateTwoWayMergePatch(oldData, newData, v1.Event{})
 }
 
-func getKey(event *v1beta1.Event) eventKey {
+func getKey(event *v1.Event) eventKey {
 	key := eventKey{
 		action:              event.Action,
 		reason:              event.Reason,
@@ -301,9 +301,9 @@ func (e *eventBroadcasterImpl) StartRecordingToSink(stopCh <-chan struct{}) {
 		e.finishSeries()
 	}, finishTime, stopCh)
 	eventHandler := func(obj runtime.Object) {
-		event, ok := obj.(*v1beta1.Event)
+		event, ok := obj.(*v1.Event)
 		if !ok {
-			klog.Errorf("unexpected type, expected v1beta1.Event")
+			klog.Errorf("unexpected type, expected v1.Event")
 			return
 		}
 		e.recordToSink(event, clock.RealClock{})

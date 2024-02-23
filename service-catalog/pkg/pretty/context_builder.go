@@ -18,7 +18,7 @@ package pretty
 
 import (
 	"fmt"
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -35,25 +35,25 @@ type ContextBuilder struct {
 
 // NewInstanceContextBuilder returns a new ContextBuilder that can be used to format messages in the
 // form `ServiceInstance "<Namespace>/<Name>" v<ResourceVersion>: <message>`.
-func NewInstanceContextBuilder(instance *v1beta1.ServiceInstance) *ContextBuilder {
+func NewInstanceContextBuilder(instance *v1.ServiceInstance) *ContextBuilder {
 	return newResourceContextBuilder(ServiceInstance, &instance.ObjectMeta)
 }
 
 // NewBindingContextBuilder returns a new ContextBuilder that can be used to format messages in the
 // form `ServiceBinding "<Namespace>/<Name>" v<ResourceVersion>: <message>`.
-func NewBindingContextBuilder(binding *v1beta1.ServiceBinding) *ContextBuilder {
+func NewBindingContextBuilder(binding *v1.ServiceBinding) *ContextBuilder {
 	return newResourceContextBuilder(ServiceBinding, &binding.ObjectMeta)
 }
 
 // NewClusterServiceBrokerContextBuilder returns a new ContextBuilder that can be used to format messages in the
 // form `ClusterServiceBroker "<Name>" v<ResourceVersion>: <message>`.
-func NewClusterServiceBrokerContextBuilder(broker *v1beta1.ClusterServiceBroker) *ContextBuilder {
+func NewClusterServiceBrokerContextBuilder(broker *v1.ClusterServiceBroker) *ContextBuilder {
 	return newResourceContextBuilder(ClusterServiceBroker, &broker.ObjectMeta)
 }
 
 // NewServiceBrokerContextBuilder returns a new ContextBuilder that can be used to format messages in the
 // form `ServiceBroker "<Namespace>/<Name>" v<ResourceVersion>: <message>`.
-func NewServiceBrokerContextBuilder(broker *v1beta1.ServiceBroker) *ContextBuilder {
+func NewServiceBrokerContextBuilder(broker *v1.ServiceBroker) *ContextBuilder {
 	return newResourceContextBuilder(ServiceBroker, &broker.ObjectMeta)
 }
 

@@ -21,7 +21,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/util"
 	"github.com/kubernetes-sigs/service-catalog/test/fake"
 
@@ -33,7 +33,7 @@ import (
 )
 
 func TestReconcileServicePlanRemovedFromCatalog(t *testing.T) {
-	getRemovedPlan := func() *v1beta1.ServicePlan {
+	getRemovedPlan := func() *v1.ServicePlan {
 		p := getTestServicePlan()
 		p.Status.RemovedFromBrokerCatalog = true
 		return p
@@ -41,8 +41,8 @@ func TestReconcileServicePlanRemovedFromCatalog(t *testing.T) {
 
 	cases := []struct {
 		name                    string
-		plan                    *v1beta1.ServicePlan
-		instances               []v1beta1.ServiceInstance
+		plan                    *v1.ServicePlan
+		instances               []v1.ServiceInstance
 		catalogClientPrepFunc   func(*fake.Clientset)
 		shouldError             bool
 		errText                 *string
@@ -56,18 +56,18 @@ func TestReconcileServicePlanRemovedFromCatalog(t *testing.T) {
 		{
 			name:        "removed from catalog, instances left",
 			plan:        getRemovedPlan(),
-			instances:   []v1beta1.ServiceInstance{*getTestServiceInstance()},
+			instances:   []v1.ServiceInstance{*getTestServiceInstance()},
 			shouldError: false,
 			catalogActionsCheckFunc: func(t *testing.T, actions []clientgotesting.Action) {
 				listRestrictions := clientgotesting.ListRestrictions{
 					Labels: labels.SelectorFromSet(labels.Set{
-						v1beta1.GroupName + "/" + v1beta1.FilterSpecServicePlanRefName: util.GenerateSHA("spguid"),
+						v1.GroupName + "/" + v1.FilterSpecServicePlanRefName: util.GenerateSHA("spguid"),
 					}),
 					Fields: fields.Everything(),
 				}
 
 				assertNumberOfActions(t, actions, 1)
-				assertList(t, actions[0], &v1beta1.ServiceInstance{}, listRestrictions)
+				assertList(t, actions[0], &v1.ServiceInstance{}, listRestrictions)
 			},
 		},
 		{
@@ -78,13 +78,13 @@ func TestReconcileServicePlanRemovedFromCatalog(t *testing.T) {
 			catalogActionsCheckFunc: func(t *testing.T, actions []clientgotesting.Action) {
 				listRestrictions := clientgotesting.ListRestrictions{
 					Labels: labels.SelectorFromSet(labels.Set{
-						v1beta1.GroupName + "/" + v1beta1.FilterSpecServicePlanRefName: util.GenerateSHA("spguid"),
+						v1.GroupName + "/" + v1.FilterSpecServicePlanRefName: util.GenerateSHA("spguid"),
 					}),
 					Fields: fields.Everything(),
 				}
 
 				assertNumberOfActions(t, actions, 2)
-				assertList(t, actions[0], &v1beta1.ServiceInstance{}, listRestrictions)
+				assertList(t, actions[0], &v1.ServiceInstance{}, listRestrictions)
 				assertDelete(t, actions[1], getRemovedPlan())
 			},
 		},
@@ -102,13 +102,13 @@ func TestReconcileServicePlanRemovedFromCatalog(t *testing.T) {
 			catalogActionsCheckFunc: func(t *testing.T, actions []clientgotesting.Action) {
 				listRestrictions := clientgotesting.ListRestrictions{
 					Labels: labels.SelectorFromSet(labels.Set{
-						v1beta1.GroupName + "/" + v1beta1.FilterSpecServicePlanRefName: util.GenerateSHA("spguid"),
+						v1.GroupName + "/" + v1.FilterSpecServicePlanRefName: util.GenerateSHA("spguid"),
 					}),
 					Fields: fields.Everything(),
 				}
 
 				assertNumberOfActions(t, actions, 2)
-				assertList(t, actions[0], &v1beta1.ServiceInstance{}, listRestrictions)
+				assertList(t, actions[0], &v1.ServiceInstance{}, listRestrictions)
 				assertDelete(t, actions[1], getRemovedPlan())
 			},
 		},
@@ -119,7 +119,7 @@ func TestReconcileServicePlanRemovedFromCatalog(t *testing.T) {
 			_, fakeCatalogClient, _, testController, sharedInformers := newTestController(t, noFakeActions())
 
 			fakeCatalogClient.AddReactor("list", "serviceinstances", func(action clientgotesting.Action) (bool, runtime.Object, error) {
-				return true, &v1beta1.ServiceInstanceList{Items: tc.instances}, nil
+				return true, &v1.ServiceInstanceList{Items: tc.instances}, nil
 			})
 
 			if tc.catalogClientPrepFunc != nil {
@@ -154,7 +154,7 @@ func TestReconcileServicePlanRemovedFromCatalog(t *testing.T) {
 	}
 }
 
-func reconcileServicePlanKey(t *testing.T, testController *controller, servicePlan *v1beta1.ServicePlan) error {
+func reconcileServicePlanKey(t *testing.T, testController *controller, servicePlan *v1.ServicePlan) error {
 	clone := servicePlan.DeepCopy()
 	key, err := cache.MetaNamespaceKeyFunc(servicePlan)
 	if err != nil {

@@ -54,29 +54,29 @@ KUBE_AVAILABLE_GROUP_VERSIONS="${KUBE_AVAILABLE_GROUP_VERSIONS:-\
 v1 \
 admissionregistration.k8s.io/v1alpha1 \
 admission.k8s.io/v1alpha1 \
-apps/v1beta1 \
+apps/v1 \
 apps/v1beta2 \
 apps/v1 \
 authentication.k8s.io/v1 \
-authentication.k8s.io/v1beta1 \
+authentication.k8s.io/v1 \
 authorization.k8s.io/v1 \
-authorization.k8s.io/v1beta1 \
+authorization.k8s.io/v1 \
 autoscaling/v1 \
 autoscaling/v2beta1 \
 batch/v1 \
-batch/v1beta1 \
+batch/v1 \
 batch/v2alpha1 \
-certificates.k8s.io/v1beta1 \
-extensions/v1beta1 \
+certificates.k8s.io/v1 \
+extensions/v1 \
 imagepolicy.k8s.io/v1alpha1 \
 networking.k8s.io/v1 \
-policy/v1beta1 \
+policy/v1 \
 rbac.authorization.k8s.io/v1 \
-rbac.authorization.k8s.io/v1beta1 \
+rbac.authorization.k8s.io/v1 \
 rbac.authorization.k8s.io/v1alpha1 \
 scheduling.k8s.io/v1alpha1 \
 settings.k8s.io/v1alpha1 \
-storage.k8s.io/v1beta1 \
+storage.k8s.io/v1 \
 storage.k8s.io/v1 \
 }"
 
@@ -84,7 +84,7 @@ storage.k8s.io/v1 \
 # which are not available so we don't generate clients or swagger for them
 KUBE_NONSERVER_GROUP_VERSIONS="
  abac.authorization.kubernetes.io/v0 \
- abac.authorization.kubernetes.io/v1beta1 \
+ abac.authorization.kubernetes.io/v1 \
  componentconfig/v1alpha1 \
  imagepolicy.k8s.io/v1alpha1\
  admission.k8s.io/v1alpha1\

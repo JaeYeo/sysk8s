@@ -25,7 +25,7 @@ import (
 	"testing"
 
 	"github.com/kubernetes-sigs/go-open-service-broker-client/v2"
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/features"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -93,7 +93,7 @@ func TestRetryAsyncDeprovision(t *testing.T) {
 	assert.NoError(t, ct.Deprovision())
 
 	// THEN
-	assert.NoError(t, ct.WaitForDeprovisionStatus(v1beta1.ServiceInstanceDeprovisionStatusSucceeded))
+	assert.NoError(t, ct.WaitForDeprovisionStatus(v1.ServiceInstanceDeprovisionStatusSucceeded))
 	// first deprovisioning fails, expected second one
 	assert.True(t, ct.NumberOfOSBDeprovisionCalls() > 1)
 }
@@ -126,7 +126,7 @@ func TestServiceInstanceDeleteWithAsyncProvisionInProgress(t *testing.T) {
 			ct.SetOSBPollLastOperationReactionsState(state)
 
 			// THEN
-			assert.NoError(t, ct.WaitForDeprovisionStatus(v1beta1.ServiceInstanceDeprovisionStatusSucceeded))
+			assert.NoError(t, ct.WaitForDeprovisionStatus(v1.ServiceInstanceDeprovisionStatusSucceeded))
 			// at least one deprovisioning call
 			assert.NotZero(t, ct.NumberOfOSBDeprovisionCalls())
 		})
@@ -156,7 +156,7 @@ func TestServiceInstanceDeleteWithExistingServiceBindings(t *testing.T) {
 	//THEN
 	assert.NoError(t, ct.WaitForServiceBindingToNotExists())
 	ct.WaitForClusterServiceClassToNotExists()
-	assert.NoError(t, ct.WaitForDeprovisionStatus(v1beta1.ServiceInstanceDeprovisionStatusSucceeded))
+	assert.NoError(t, ct.WaitForDeprovisionStatus(v1.ServiceInstanceDeprovisionStatusSucceeded))
 	assert.NotZero(t, ct.NumberOfOSBDeprovisionCalls())
 }
 
@@ -191,7 +191,7 @@ func TestServiceInstanceDeleteWithAsyncUpdateInProgress(t *testing.T) {
 			ct.SetOSBPollLastOperationReactionsState(state)
 
 			// THEN
-			assert.NoError(t, ct.WaitForDeprovisionStatus(v1beta1.ServiceInstanceDeprovisionStatusSucceeded))
+			assert.NoError(t, ct.WaitForDeprovisionStatus(v1.ServiceInstanceDeprovisionStatusSucceeded))
 			// at least one deprovisioning call
 			assert.NotZero(t, ct.NumberOfOSBDeprovisionCalls())
 		})
@@ -215,9 +215,9 @@ func TestCreateServiceInstanceFailsWithNonexistentPlan(t *testing.T) {
 	require.NoError(t, ct.CreateServiceInstance())
 
 	// THEN
-	condition := v1beta1.ServiceInstanceCondition{
-		Type:   v1beta1.ServiceInstanceConditionReady,
-		Status: v1beta1.ConditionFalse,
+	condition := v1.ServiceInstanceCondition{
+		Type:   v1.ServiceInstanceConditionReady,
+		Status: v1.ConditionFalse,
 		Reason: "ReferencesNonexistentServicePlan",
 	}
 	require.NoError(t, ct.WaitForInstanceCondition(condition))
@@ -242,9 +242,9 @@ func TestCreateServiceInstanceNonExistentClusterServiceBroker(t *testing.T) {
 	require.NoError(t, ct.CreateServiceInstance())
 
 	// THEN
-	condition := v1beta1.ServiceInstanceCondition{
-		Type:   v1beta1.ServiceInstanceConditionReady,
-		Status: v1beta1.ConditionFalse,
+	condition := v1.ServiceInstanceCondition{
+		Type:   v1.ServiceInstanceConditionReady,
+		Status: v1.ConditionFalse,
 		Reason: "ReferencesNonexistentBroker",
 	}
 	require.NoError(t, ct.WaitForInstanceCondition(condition))
@@ -273,9 +273,9 @@ func TestCreateServiceInstanceWithInvalidParameters(t *testing.T) {
 	require.NoError(t, ct.CreateServiceInstanceWithInvalidParameters())
 
 	// THEN
-	condition := v1beta1.ServiceInstanceCondition{
-		Type:   v1beta1.ServiceInstanceConditionReady,
-		Status: v1beta1.ConditionFalse,
+	condition := v1.ServiceInstanceCondition{
+		Type:   v1.ServiceInstanceConditionReady,
+		Status: v1.ConditionFalse,
 		Reason: "ErrorWithParameters",
 	}
 	require.NoError(t, ct.WaitForInstanceCondition(condition))
@@ -292,15 +292,15 @@ func TestCreateServiceInstanceWithParameters(t *testing.T) {
 	for tn, state := range map[string]struct {
 		params                  map[string]interface{}
 		expectedParams          map[string]interface{}
-		paramsFrom              []v1beta1.ParametersFromSource
+		paramsFrom              []v1.ParametersFromSource
 		secret                  secretDef
-		expectedConditionStatus v1beta1.ConditionStatus
+		expectedConditionStatus v1.ConditionStatus
 		expectedConditionReason string
 	}{
 		"no params": {
 			params:                  nil,
 			expectedParams:          nil,
-			expectedConditionStatus: v1beta1.ConditionTrue,
+			expectedConditionStatus: v1.ConditionTrue,
 			expectedConditionReason: "ProvisionedSuccessfully",
 		},
 		"plain params": {
@@ -318,7 +318,7 @@ func TestCreateServiceInstanceWithParameters(t *testing.T) {
 					"second": "second-arg",
 				},
 			},
-			expectedConditionStatus: v1beta1.ConditionTrue,
+			expectedConditionStatus: v1.ConditionTrue,
 			expectedConditionReason: "ProvisionedSuccessfully",
 		},
 		"secret params": {
@@ -329,9 +329,9 @@ func TestCreateServiceInstanceWithParameters(t *testing.T) {
 					"F": "G",
 				},
 			},
-			paramsFrom: []v1beta1.ParametersFromSource{
+			paramsFrom: []v1.ParametersFromSource{
 				{
-					SecretKeyRef: &v1beta1.SecretKeyReference{
+					SecretKeyRef: &v1.SecretKeyReference{
 						Name: "secret-name",
 						Key:  "secret-key",
 					},
@@ -343,7 +343,7 @@ func TestCreateServiceInstanceWithParameters(t *testing.T) {
 					"secret-key": []byte(`{"A":"B","C":{"D":"E","F":"G"}}`),
 				},
 			},
-			expectedConditionStatus: v1beta1.ConditionTrue,
+			expectedConditionStatus: v1.ConditionTrue,
 			expectedConditionReason: "ProvisionedSuccessfully",
 		},
 		"plain and secret params": {
@@ -354,9 +354,9 @@ func TestCreateServiceInstanceWithParameters(t *testing.T) {
 					"second": "second-arg",
 				},
 			},
-			paramsFrom: []v1beta1.ParametersFromSource{
+			paramsFrom: []v1.ParametersFromSource{
 				{
-					SecretKeyRef: &v1beta1.SecretKeyReference{
+					SecretKeyRef: &v1.SecretKeyReference{
 						Name: "secret-name",
 						Key:  "secret-key",
 					},
@@ -380,25 +380,25 @@ func TestCreateServiceInstanceWithParameters(t *testing.T) {
 					"F": "G",
 				},
 			},
-			expectedConditionStatus: v1beta1.ConditionTrue,
+			expectedConditionStatus: v1.ConditionTrue,
 			expectedConditionReason: "ProvisionedSuccessfully",
 		},
 		"missing secret": {
-			paramsFrom: []v1beta1.ParametersFromSource{
+			paramsFrom: []v1.ParametersFromSource{
 				{
-					SecretKeyRef: &v1beta1.SecretKeyReference{
+					SecretKeyRef: &v1.SecretKeyReference{
 						Name: "secret-name",
 						Key:  "secret-key",
 					},
 				},
 			},
-			expectedConditionStatus: v1beta1.ConditionFalse,
+			expectedConditionStatus: v1.ConditionFalse,
 			expectedConditionReason: "ErrorWithParameters",
 		},
 		"missing secret key": {
-			paramsFrom: []v1beta1.ParametersFromSource{
+			paramsFrom: []v1.ParametersFromSource{
 				{
-					SecretKeyRef: &v1beta1.SecretKeyReference{
+					SecretKeyRef: &v1.SecretKeyReference{
 						Name: "secret-name",
 						Key:  "other-secret-key",
 					},
@@ -410,13 +410,13 @@ func TestCreateServiceInstanceWithParameters(t *testing.T) {
 					"secret-key": []byte(`bad`),
 				},
 			},
-			expectedConditionStatus: v1beta1.ConditionFalse,
+			expectedConditionStatus: v1.ConditionFalse,
 			expectedConditionReason: "ErrorWithParameters",
 		},
 		"empty secret data": {
-			paramsFrom: []v1beta1.ParametersFromSource{
+			paramsFrom: []v1.ParametersFromSource{
 				{
-					SecretKeyRef: &v1beta1.SecretKeyReference{
+					SecretKeyRef: &v1.SecretKeyReference{
 						Name: "secret-name",
 						Key:  "secret-key",
 					},
@@ -426,13 +426,13 @@ func TestCreateServiceInstanceWithParameters(t *testing.T) {
 				name: "secret-name",
 				data: map[string][]byte{},
 			},
-			expectedConditionStatus: v1beta1.ConditionFalse,
+			expectedConditionStatus: v1.ConditionFalse,
 			expectedConditionReason: "ErrorWithParameters",
 		},
 		"bad secret data": {
-			paramsFrom: []v1beta1.ParametersFromSource{
+			paramsFrom: []v1.ParametersFromSource{
 				{
-					SecretKeyRef: &v1beta1.SecretKeyReference{
+					SecretKeyRef: &v1.SecretKeyReference{
 						Name: "secret-name",
 						Key:  "secret-key",
 					},
@@ -444,13 +444,13 @@ func TestCreateServiceInstanceWithParameters(t *testing.T) {
 					"secret-key": []byte(`bad`),
 				},
 			},
-			expectedConditionStatus: v1beta1.ConditionFalse,
+			expectedConditionStatus: v1.ConditionFalse,
 			expectedConditionReason: "ErrorWithParameters",
 		},
 		"no params in secret data": {
-			paramsFrom: []v1beta1.ParametersFromSource{
+			paramsFrom: []v1.ParametersFromSource{
 				{
-					SecretKeyRef: &v1beta1.SecretKeyReference{
+					SecretKeyRef: &v1.SecretKeyReference{
 						Name: "secret-name",
 						Key:  "secret-key",
 					},
@@ -463,7 +463,7 @@ func TestCreateServiceInstanceWithParameters(t *testing.T) {
 				},
 			},
 			expectedParams:          nil,
-			expectedConditionStatus: v1beta1.ConditionTrue,
+			expectedConditionStatus: v1.ConditionTrue,
 			expectedConditionReason: "ProvisionedSuccessfully",
 		},
 	} {
@@ -483,14 +483,14 @@ func TestCreateServiceInstanceWithParameters(t *testing.T) {
 			require.NoError(t, ct.CreateSecret(state.secret.name, state.secret.data))
 
 			// THEN
-			condition := v1beta1.ServiceInstanceCondition{
-				Type:   v1beta1.ServiceInstanceConditionReady,
+			condition := v1.ServiceInstanceCondition{
+				Type:   v1.ServiceInstanceConditionReady,
 				Status: state.expectedConditionStatus,
 				Reason: state.expectedConditionReason,
 			}
 			require.NoError(t, ct.WaitForInstanceCondition(condition))
 
-			if state.expectedConditionStatus == v1beta1.ConditionTrue {
+			if state.expectedConditionStatus == v1.ConditionTrue {
 				ct.AssertLastBindRequest(t, state.expectedParams)
 			}
 		})
@@ -597,9 +597,9 @@ func TestCreateServiceInstanceWithProvisionFailure(t *testing.T) {
 
 			// THEN
 			// Wait for the provision to fail
-			condition := v1beta1.ServiceInstanceCondition{
-				Type:   v1beta1.ServiceInstanceConditionReady,
-				Status: v1beta1.ConditionFalse,
+			condition := v1.ServiceInstanceCondition{
+				Type:   v1.ServiceInstanceConditionReady,
+				Status: v1.ConditionFalse,
 				Reason: state.firstFailedReason,
 			}
 			require.NoError(t, ct.WaitForInstanceCondition(condition))
@@ -614,9 +614,9 @@ func TestCreateServiceInstanceWithProvisionFailure(t *testing.T) {
 
 			// If the provision failed with a terminating failure
 			if state.failReason != "" {
-				condition = v1beta1.ServiceInstanceCondition{
-					Type:   v1beta1.ServiceInstanceConditionFailed,
-					Status: v1beta1.ConditionTrue,
+				condition = v1.ServiceInstanceCondition{
+					Type:   v1.ServiceInstanceConditionFailed,
+					Status: v1.ConditionTrue,
 					Reason: state.failReason,
 				}
 				require.NoError(t, ct.WaitForInstanceCondition(condition))
@@ -630,16 +630,16 @@ func TestCreateServiceInstanceWithProvisionFailure(t *testing.T) {
 				ct.AssertServiceInstanceOrphanMitigationStatus(t, true)
 				blockDeprovisioning <- false
 
-				condition = v1beta1.ServiceInstanceCondition{
-					Type:   v1beta1.ServiceInstanceConditionReady,
-					Status: v1beta1.ConditionUnknown,
+				condition = v1.ServiceInstanceCondition{
+					Type:   v1.ServiceInstanceConditionReady,
+					Status: v1.ConditionUnknown,
 					Reason: "DeprovisionCallFailed",
 				}
 				require.NoError(t, ct.WaitForInstanceCondition(condition))
 			} else {
-				condition = v1beta1.ServiceInstanceCondition{
-					Type:   v1beta1.ServiceInstanceConditionOrphanMitigation,
-					Status: v1beta1.ConditionFalse,
+				condition = v1.ServiceInstanceCondition{
+					Type:   v1.ServiceInstanceConditionOrphanMitigation,
+					Status: v1.ConditionFalse,
 				}
 				ct.AssertServiceInstanceHasNoCondition(t, condition)
 				ct.AssertServiceInstanceOrphanMitigationStatus(t, false)
@@ -649,9 +649,9 @@ func TestCreateServiceInstanceWithProvisionFailure(t *testing.T) {
 			ct.SetSuccessfullyReactionForDeprovisioningToOSBClient()
 
 			// Wait for the instance to be provisioned successfully
-			condition = v1beta1.ServiceInstanceCondition{
-				Type:   v1beta1.ServiceInstanceConditionReady,
-				Status: v1beta1.ConditionTrue,
+			condition = v1.ServiceInstanceCondition{
+				Type:   v1.ServiceInstanceConditionReady,
+				Status: v1.ConditionTrue,
 				Reason: "ProvisionedSuccessfully",
 			}
 			require.NoError(t, ct.WaitForInstanceCondition(condition))
@@ -660,9 +660,9 @@ func TestCreateServiceInstanceWithProvisionFailure(t *testing.T) {
 			// and that the instance is not in a failed state.
 			ct.AssertObservedGenerationIsCorrect(t)
 			ct.AssertServiceInstanceOrphanMitigationStatus(t, false)
-			condition = v1beta1.ServiceInstanceCondition{
-				Type:   v1beta1.ServiceInstanceConditionFailed,
-				Status: v1beta1.ConditionFalse,
+			condition = v1.ServiceInstanceCondition{
+				Type:   v1.ServiceInstanceConditionFailed,
+				Status: v1.ConditionFalse,
 			}
 			ct.AssertServiceInstanceHasNoCondition(t, condition)
 			assert.NotZero(t, ct.NumberOfOSBProvisionCalls())
@@ -768,9 +768,9 @@ func TestUpdateServiceInstanceChangePlansToNonexistentPlan(t *testing.T) {
 	require.NoError(t, err)
 
 	// THEN
-	condition := v1beta1.ServiceInstanceCondition{
-		Type:   v1beta1.ServiceInstanceConditionReady,
-		Status: v1beta1.ConditionFalse,
+	condition := v1.ServiceInstanceCondition{
+		Type:   v1.ServiceInstanceConditionReady,
+		Status: v1.ConditionFalse,
 		Reason: "ReferencesNonexistentServicePlan",
 	}
 	require.NoError(t, ct.WaitForInstanceCondition(condition))

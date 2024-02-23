@@ -29,7 +29,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/apitesting/fuzzer"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	metav1beta1 "k8s.io/apimachinery/pkg/apis/meta/v1beta1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	runtimeserializer "k8s.io/apimachinery/pkg/runtime/serializer"
 	"k8s.io/apimachinery/pkg/types"
@@ -277,15 +277,15 @@ func v1FuzzerFuncs(codecs runtimeserializer.CodecFactory) []interface{} {
 	}
 }
 
-func v1beta1FuzzerFuncs(codecs runtimeserializer.CodecFactory) []interface{} {
+func v1FuzzerFuncs(codecs runtimeserializer.CodecFactory) []interface{} {
 	return []interface{}{
-		func(r *metav1beta1.TableOptions, c fuzz.Continue) {
+		func(r *metav1.TableOptions, c fuzz.Continue) {
 			c.FuzzNoCustom(r)
 			// NoHeaders is not serialized to the wire but is allowed within the versioned
 			// type because we don't use meta internal types in the client and API server.
 			r.NoHeaders = false
 		},
-		func(r *metav1beta1.TableRow, c fuzz.Continue) {
+		func(r *metav1.TableRow, c fuzz.Continue) {
 			c.Fuzz(&r.Object)
 			c.Fuzz(&r.Conditions)
 			if len(r.Conditions) == 0 {
@@ -327,5 +327,5 @@ func v1beta1FuzzerFuncs(codecs runtimeserializer.CodecFactory) []interface{} {
 var Funcs = fuzzer.MergeFuzzerFuncs(
 	genericFuzzerFuncs,
 	v1FuzzerFuncs,
-	v1beta1FuzzerFuncs,
+	v1FuzzerFuncs,
 )

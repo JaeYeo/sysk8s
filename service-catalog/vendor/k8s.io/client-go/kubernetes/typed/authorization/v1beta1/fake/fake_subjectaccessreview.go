@@ -21,7 +21,7 @@ package fake
 import (
 	"context"
 
-	v1beta1 "k8s.io/api/authorization/v1beta1"
+	v1 "k8s.io/api/authorization/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	testing "k8s.io/client-go/testing"
@@ -29,19 +29,19 @@ import (
 
 // FakeSubjectAccessReviews implements SubjectAccessReviewInterface
 type FakeSubjectAccessReviews struct {
-	Fake *FakeAuthorizationV1beta1
+	Fake *FakeAuthorizationv1
 }
 
-var subjectaccessreviewsResource = schema.GroupVersionResource{Group: "authorization.k8s.io", Version: "v1beta1", Resource: "subjectaccessreviews"}
+var subjectaccessreviewsResource = schema.GroupVersionResource{Group: "authorization.k8s.io", Version: "v1", Resource: "subjectaccessreviews"}
 
-var subjectaccessreviewsKind = schema.GroupVersionKind{Group: "authorization.k8s.io", Version: "v1beta1", Kind: "SubjectAccessReview"}
+var subjectaccessreviewsKind = schema.GroupVersionKind{Group: "authorization.k8s.io", Version: "v1", Kind: "SubjectAccessReview"}
 
 // Create takes the representation of a subjectAccessReview and creates it.  Returns the server's representation of the subjectAccessReview, and an error, if there is any.
-func (c *FakeSubjectAccessReviews) Create(ctx context.Context, subjectAccessReview *v1beta1.SubjectAccessReview, opts v1.CreateOptions) (result *v1beta1.SubjectAccessReview, err error) {
+func (c *FakeSubjectAccessReviews) Create(ctx context.Context, subjectAccessReview *v1.SubjectAccessReview, opts v1.CreateOptions) (result *v1.SubjectAccessReview, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewRootCreateAction(subjectaccessreviewsResource, subjectAccessReview), &v1beta1.SubjectAccessReview{})
+		Invokes(testing.NewRootCreateAction(subjectaccessreviewsResource, subjectAccessReview), &v1.SubjectAccessReview{})
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta1.SubjectAccessReview), err
+	return obj.(*v1.SubjectAccessReview), err
 }

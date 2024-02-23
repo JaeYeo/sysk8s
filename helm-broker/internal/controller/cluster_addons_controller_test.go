@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kyma-project/helm-broker/internal/controller/automock"
 	"github.com/kyma-project/helm-broker/internal/controller/repository"
 	"github.com/kyma-project/helm-broker/internal/platform/logger/spy"
@@ -249,7 +249,7 @@ func getClusterTestSuite(t *testing.T, objects ...runtime.Object) *clusterTestSu
 	sch, err := v1alpha1.SchemeBuilder.Build()
 	require.NoError(t, err)
 	require.NoError(t, apis.AddToScheme(sch))
-	require.NoError(t, v1beta1.AddToScheme(sch))
+	require.NoError(t, v1.AddToScheme(sch))
 	require.NoError(t, v1.AddToScheme(sch))
 
 	sFact, err := storage.NewFactory(storage.NewConfigListAllMemory())

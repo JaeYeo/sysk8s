@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kyma-project/helm-broker/internal/controller"
 	"github.com/kyma-project/helm-broker/internal/controller/broker"
 	"github.com/kyma-project/helm-broker/internal/controller/instance"
@@ -67,8 +67,8 @@ func TestBrokerControllerReconcile_BlockDeletionByExistingInstances(t *testing.T
 	assert.NoError(t, err)
 }
 
-func getServiceBroker(cli client.Client, ns string) (*v1beta1.ServiceBroker, error) {
-	var obj v1beta1.ServiceBroker
+func getServiceBroker(cli client.Client, ns string) (*v1.ServiceBroker, error) {
+	var obj v1.ServiceBroker
 	err := cli.Get(context.TODO(), client.ObjectKey{Namespace: "default", Name: broker.NamespacedBrokerName}, &obj)
 	return &obj, err
 }
@@ -90,42 +90,42 @@ func fixReadyAddonsConfiguration() *v1alpha1.AddonsConfiguration {
 	}
 }
 
-func fixServiceBroker() *v1beta1.ServiceBroker {
-	return &v1beta1.ServiceBroker{
+func fixServiceBroker() *v1.ServiceBroker {
+	return &v1.ServiceBroker{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      broker.NamespacedBrokerName,
 			Namespace: "default",
 		},
-		Spec: v1beta1.ServiceBrokerSpec{},
+		Spec: v1.ServiceBrokerSpec{},
 	}
 }
 
-func fixServiceInstance() *v1beta1.ServiceInstance {
-	return &v1beta1.ServiceInstance{
+func fixServiceInstance() *v1.ServiceInstance {
+	return &v1.ServiceInstance{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "si",
 			Namespace: "default",
 		},
-		Spec: v1beta1.ServiceInstanceSpec{
-			ServiceClassRef: &v1beta1.LocalObjectReference{
+		Spec: v1.ServiceInstanceSpec{
+			ServiceClassRef: &v1.LocalObjectReference{
 				Name: "sc-service",
 			},
 		}}
 }
 
-func fixServiceClass() *v1beta1.ServiceClass {
-	return &v1beta1.ServiceClass{
+func fixServiceClass() *v1.ServiceClass {
+	return &v1.ServiceClass{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "sc-service",
 			Namespace: "default",
 		},
-		Spec: v1beta1.ServiceClassSpec{
+		Spec: v1.ServiceClassSpec{
 			ServiceBrokerName: broker.NamespacedBrokerName,
 		}}
 }
 
 func prepareBrokerController(t *testing.T, initObjs ...runtime.Object) (*controller.BrokerController, client.Client) {
-	require.NoError(t, v1beta1.AddToScheme(scheme.Scheme))
+	require.NoError(t, v1.AddToScheme(scheme.Scheme))
 	require.NoError(t, v1alpha1.AddToScheme(scheme.Scheme))
 	cli := fake.NewFakeClientWithScheme(scheme.Scheme, initObjs...)
 	iChecker := instance.New(cli, broker.NamespacedBrokerName)

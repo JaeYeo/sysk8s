@@ -18,8 +18,8 @@ package clusterbroker
 
 import (
 	"context"
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
-	scClientset "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/typed/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
+	scClientset "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/typed/servicecatalog/v1"
 	"github.com/pkg/errors"
 	apiErr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -29,16 +29,16 @@ import (
 
 type tester struct {
 	common
-	c         scClientset.ServicecatalogV1beta1Interface
+	c         scClientset.Servicecatalogv1Interface
 	namespace string
 }
 
 func newTester(cli ClientGetter, ns string) *tester {
 	return &tester{
-		c:         cli.ServiceCatalogClient().ServicecatalogV1beta1(),
+		c:         cli.ServiceCatalogClient().Servicecatalogv1(),
 		namespace: ns,
 		common: common{
-			sc:        cli.ServiceCatalogClient().ServicecatalogV1beta1(),
+			sc:        cli.ServiceCatalogClient().Servicecatalogv1(),
 			namespace: ns,
 		},
 	}
@@ -76,9 +76,9 @@ func (t *tester) assertClusterServiceBrokerIsReady() error {
 			return false, err
 		}
 
-		condition := v1beta1.ServiceBrokerCondition{
-			Type:    v1beta1.ServiceBrokerConditionReady,
-			Status:  v1beta1.ConditionTrue,
+		condition := v1.ServiceBrokerCondition{
+			Type:    v1.ServiceBrokerConditionReady,
+			Status:  v1.ConditionTrue,
 			Message: successFetchedCatalogMessage,
 		}
 		for _, cond := range broker.Status.Conditions {

@@ -31,6 +31,13 @@ Otherwise, to install with sensible defaults, run the following command:
 
 ```console
 helm repo add minibroker https://minibroker.blob.core.windows.net/charts
+```
+If you are using Helm v3, run this command:
+```console
+helm install minibroker minibroker/minibroker --namespace minibroker --create-namespace
+```
+For older versions of Helm, use the --name option:
+```console
 helm install --name minibroker --namespace minibroker minibroker/minibroker
 ```
 
@@ -98,20 +105,20 @@ Plans:
 .
 .
 $ kubectl get clusterserviceclasses mariadb -o yaml
-apiVersion: servicecatalog.k8s.io/v1beta1
+apiVersion: servicecatalog.k8s.io/v1
 kind: ClusterServiceClass
 metadata:
   creationTimestamp: "2019-06-18T01:52:07Z"
   name: mariadb
   ownerReferences:
-  - apiVersion: servicecatalog.k8s.io/v1beta1
+  - apiVersion: servicecatalog.k8s.io/v1
     blockOwnerDeletion: false
     controller: true
     kind: ClusterServiceBroker
     name: minibroker
     uid: 6a9a047e-916b-11e9-bfe5-0242ac110008
   resourceVersion: "9"
-  selfLink: /apis/servicecatalog.k8s.io/v1beta1/clusterserviceclasses/mariadb
+  selfLink: /apis/servicecatalog.k8s.io/v1/clusterserviceclasses/mariadb
   uid: adf6e194-916b-11e9-bfe5-0242ac110008
 spec:
   bindable: true
@@ -185,20 +192,20 @@ Instances:
 No instances defined
 
 $ kubectl get clusterserviceplans mariadb-10-3-22 -o yaml
-apiVersion: servicecatalog.k8s.io/v1beta1
+apiVersion: servicecatalog.k8s.io/v1
 kind: ClusterServicePlan
 metadata:
   creationTimestamp: "2019-06-18T03:32:31Z"
   name: mariadb-10-3-22
   ownerReferences:
-  - apiVersion: servicecatalog.k8s.io/v1beta1
+  - apiVersion: servicecatalog.k8s.io/v1
     blockOwnerDeletion: false
     controller: true
     kind: ClusterServiceBroker
     name: minibroker
     uid: 6ee99fc5-9179-11e9-8cb6-0242ac110009
   resourceVersion: "28"
-  selfLink: /apis/servicecatalog.k8s.io/v1beta1/clusterserviceplans/mariadb-10-3-22
+  selfLink: /apis/servicecatalog.k8s.io/v1/clusterserviceplans/mariadb-10-3-22
   uid: b496eaf5-9179-11e9-8cb6-0242ac110009
 spec:
   clusterServiceBrokerName: minibroker
@@ -255,7 +262,7 @@ Bindings:
 No bindings defined
 
 $ kubectl get serviceinstances -n test-ns mini-instance -o yaml
-apiVersion: servicecatalog.k8s.io/v1beta1
+apiVersion: servicecatalog.k8s.io/v1
 kind: ServiceInstance
 metadata:
   creationTimestamp: "2019-06-18T02:42:50Z"
@@ -265,7 +272,7 @@ metadata:
   name: mini-instance
   namespace: test-ns
   resourceVersion: "93"
-  selfLink: /apis/servicecatalog.k8s.io/v1beta1/namespaces/test-ns/serviceinstances/mini-instance
+  selfLink: /apis/servicecatalog.k8s.io/v1/namespaces/test-ns/serviceinstances/mini-instance
   uid: c3b56b7e-9172-11e9-bfe5-0242ac110008
 spec:
   clusterServiceClassExternalName: mariadb
@@ -351,7 +358,7 @@ Secret Data:
   username                4 bytes
 
 $ kubectl get servicebindings -n test-ns mini-binding -o yaml
-apiVersion: servicecatalog.k8s.io/v1beta1
+apiVersion: servicecatalog.k8s.io/v1
 kind: ServiceBinding
 metadata:
   creationTimestamp: "2019-06-18T02:45:40Z"
@@ -361,7 +368,7 @@ metadata:
   name: mini-binding
   namespace: test-ns
   resourceVersion: "97"
-  selfLink: /apis/servicecatalog.k8s.io/v1beta1/namespaces/test-ns/servicebindings/mini-binding
+  selfLink: /apis/servicecatalog.k8s.io/v1/namespaces/test-ns/servicebindings/mini-binding
   uid: 28d115b0-9173-11e9-bfe5-0242ac110008
 spec:
   externalID: 28d11555-9173-11e9-bfe5-0242ac110008
@@ -459,7 +466,14 @@ No resources found.
 
 # Step 9 - Final Cleanup
 
-To clean up minibroker deployment, delete the helm release:
+To clean up minibroker deployment, delete the helm release.
+
+If you are using Helm v3, run this command:
+
+```console
+helm delete minibroker
+```
+For older versions of Helm, use the --purge option:
 
 ```console
 helm delete --purge minibroker

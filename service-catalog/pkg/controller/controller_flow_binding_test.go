@@ -25,7 +25,7 @@ import (
 	"time"
 
 	"github.com/kubernetes-sigs/go-open-service-broker-client/v2"
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	scfeatures "github.com/kubernetes-sigs/service-catalog/pkg/features"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -129,7 +129,7 @@ func TestServiceBindingDeleteWithAsyncBindInProgress(t *testing.T) {
 			ct.SetOSBPollBindingLastOperationReactionsState(state)
 
 			// THEN
-			assert.NoError(t, ct.WaitForUnbindStatus(v1beta1.ServiceBindingUnbindStatusSucceeded))
+			assert.NoError(t, ct.WaitForUnbindStatus(v1.ServiceBindingUnbindStatusSucceeded))
 			// at least one unbind call
 			assert.NotZero(t, ct.NumberOfOSBUnbindingCalls())
 		})
@@ -155,7 +155,7 @@ func TestDeleteServiceBindingFailureRetry(t *testing.T) {
 	assert.NoError(t, ct.Unbind())
 
 	// THEN
-	assert.NoError(t, ct.WaitForUnbindStatus(v1beta1.ServiceBindingUnbindStatusSucceeded))
+	assert.NoError(t, ct.WaitForUnbindStatus(v1.ServiceBindingUnbindStatusSucceeded))
 	// at least two unbind calls
 	assert.True(t, ct.NumberOfOSBUnbindingCalls() > 1)
 }
@@ -186,10 +186,10 @@ func TestDeleteServiceBindingFailureRetryAsync(t *testing.T) {
 	// This is the reason we need to look at every change instead of polling the resource
 	// Set up a Service Binding change listener which signals condition with reason "UnbindCallFailed"
 	callFailedCh := make(chan struct{})
-	ct.SetServiceBindingOnChangeListener(func(oldSb, newSb *v1beta1.ServiceBinding) {
+	ct.SetServiceBindingOnChangeListener(func(oldSb, newSb *v1.ServiceBinding) {
 		for _, c := range newSb.Status.Conditions {
 
-			if c.Reason == "UnbindCallFailed" && c.Type == v1beta1.ServiceBindingConditionReady && c.Status == v1beta1.ConditionUnknown {
+			if c.Reason == "UnbindCallFailed" && c.Type == v1.ServiceBindingConditionReady && c.Status == v1.ConditionUnknown {
 				callFailedCh <- struct{}{}
 			}
 		}
@@ -213,7 +213,7 @@ func TestDeleteServiceBindingFailureRetryAsync(t *testing.T) {
 
 	// THEN
 	// we expect to retry unbind with a success
-	assert.NoError(t, ct.WaitForUnbindStatus(v1beta1.ServiceBindingUnbindStatusSucceeded))
+	assert.NoError(t, ct.WaitForUnbindStatus(v1.ServiceBindingUnbindStatusSucceeded))
 	assert.True(t, ct.NumberOfOSBUnbindingCalls() > 1)
 
 }
@@ -234,9 +234,9 @@ func TestCreateServiceBindingInstanceNotReady(t *testing.T) {
 	assert.NoError(t, ct.CreateBinding())
 
 	// THEN
-	assert.NoError(t, ct.waitForBindingStatusCondition(v1beta1.ServiceBindingCondition{
-		Type:   v1beta1.ServiceBindingConditionReady,
-		Status: v1beta1.ConditionFalse,
+	assert.NoError(t, ct.waitForBindingStatusCondition(v1.ServiceBindingCondition{
+		Type:   v1.ServiceBindingConditionReady,
+		Status: v1.ConditionFalse,
 		Reason: "ErrorInstanceNotReady",
 	}))
 }
@@ -257,9 +257,9 @@ func TestCreateServiceBindingInvalidInstanceFailure(t *testing.T) {
 	assert.NoError(t, ct.CreateBinding())
 
 	// THEN
-	assert.NoError(t, ct.waitForBindingStatusCondition(v1beta1.ServiceBindingCondition{
-		Type:   v1beta1.ServiceBindingConditionReady,
-		Status: v1beta1.ConditionFalse,
+	assert.NoError(t, ct.waitForBindingStatusCondition(v1.ServiceBindingCondition{
+		Type:   v1.ServiceBindingConditionReady,
+		Status: v1.ConditionFalse,
 		Reason: "ErrorInstanceNotReady",
 	}))
 }
@@ -278,9 +278,9 @@ func TestCreateServiceBindingNonBindable(t *testing.T) {
 	assert.NoError(t, ct.CreateBinding())
 
 	// THEN
-	assert.NoError(t, ct.waitForBindingStatusCondition(v1beta1.ServiceBindingCondition{
-		Type:   v1beta1.ServiceBindingConditionReady,
-		Status: v1beta1.ConditionFalse,
+	assert.NoError(t, ct.waitForBindingStatusCondition(v1.ServiceBindingCondition{
+		Type:   v1.ServiceBindingConditionReady,
+		Status: v1.ConditionFalse,
 		Reason: "ErrorNonbindableServiceClass",
 	}))
 }
@@ -295,7 +295,7 @@ func TestCreateServiceBindingWithParameters(t *testing.T) {
 	cases := []struct {
 		name           string
 		params         map[string]interface{}
-		paramsFrom     []v1beta1.ParametersFromSource
+		paramsFrom     []v1.ParametersFromSource
 		secrets        []secretDef
 		expectedParams map[string]interface{}
 		expectedError  bool
@@ -323,9 +323,9 @@ func TestCreateServiceBindingWithParameters(t *testing.T) {
 		},
 		{
 			name: "secret params",
-			paramsFrom: []v1beta1.ParametersFromSource{
+			paramsFrom: []v1.ParametersFromSource{
 				{
-					SecretKeyRef: &v1beta1.SecretKeyReference{
+					SecretKeyRef: &v1.SecretKeyReference{
 						Name: "secret-name",
 						Key:  "secret-key",
 					},
@@ -356,9 +356,9 @@ func TestCreateServiceBindingWithParameters(t *testing.T) {
 					"second": "second-arg",
 				},
 			},
-			paramsFrom: []v1beta1.ParametersFromSource{
+			paramsFrom: []v1.ParametersFromSource{
 				{
-					SecretKeyRef: &v1beta1.SecretKeyReference{
+					SecretKeyRef: &v1.SecretKeyReference{
 						Name: "secret-name",
 						Key:  "secret-key",
 					},
@@ -387,9 +387,9 @@ func TestCreateServiceBindingWithParameters(t *testing.T) {
 		},
 		{
 			name: "missing secret",
-			paramsFrom: []v1beta1.ParametersFromSource{
+			paramsFrom: []v1.ParametersFromSource{
 				{
-					SecretKeyRef: &v1beta1.SecretKeyReference{
+					SecretKeyRef: &v1.SecretKeyReference{
 						Name: "secret-name",
 						Key:  "secret-key",
 					},
@@ -399,9 +399,9 @@ func TestCreateServiceBindingWithParameters(t *testing.T) {
 		},
 		{
 			name: "missing secret key",
-			paramsFrom: []v1beta1.ParametersFromSource{
+			paramsFrom: []v1.ParametersFromSource{
 				{
-					SecretKeyRef: &v1beta1.SecretKeyReference{
+					SecretKeyRef: &v1.SecretKeyReference{
 						Name: "secret-name",
 						Key:  "other-secret-key",
 					},
@@ -419,9 +419,9 @@ func TestCreateServiceBindingWithParameters(t *testing.T) {
 		},
 		{
 			name: "empty secret data",
-			paramsFrom: []v1beta1.ParametersFromSource{
+			paramsFrom: []v1.ParametersFromSource{
 				{
-					SecretKeyRef: &v1beta1.SecretKeyReference{
+					SecretKeyRef: &v1.SecretKeyReference{
 						Name: "secret-name",
 						Key:  "secret-key",
 					},
@@ -437,9 +437,9 @@ func TestCreateServiceBindingWithParameters(t *testing.T) {
 		},
 		{
 			name: "bad secret data",
-			paramsFrom: []v1beta1.ParametersFromSource{
+			paramsFrom: []v1.ParametersFromSource{
 				{
-					SecretKeyRef: &v1beta1.SecretKeyReference{
+					SecretKeyRef: &v1.SecretKeyReference{
 						Name: "secret-name",
 						Key:  "secret-key",
 					},
@@ -457,9 +457,9 @@ func TestCreateServiceBindingWithParameters(t *testing.T) {
 		},
 		{
 			name: "no params in secret data",
-			paramsFrom: []v1beta1.ParametersFromSource{
+			paramsFrom: []v1.ParametersFromSource{
 				{
-					SecretKeyRef: &v1beta1.SecretKeyReference{
+					SecretKeyRef: &v1.SecretKeyReference{
 						Name: "secret-name",
 						Key:  "secret-key",
 					},
@@ -497,9 +497,9 @@ func TestCreateServiceBindingWithParameters(t *testing.T) {
 
 			// THEN
 			if tc.expectedError {
-				assert.NoError(t, ct.waitForBindingStatusCondition(v1beta1.ServiceBindingCondition{
-					Type:   v1beta1.ServiceBindingConditionReady,
-					Status: v1beta1.ConditionFalse,
+				assert.NoError(t, ct.waitForBindingStatusCondition(v1.ServiceBindingCondition{
+					Type:   v1.ServiceBindingConditionReady,
+					Status: v1.ConditionFalse,
 					Reason: "ErrorWithParameters",
 				}))
 			} else {
@@ -520,7 +520,7 @@ func TestCreateServiceBindingWithSecretTransform(t *testing.T) {
 	cases := []struct {
 		name               string
 		secrets            []secretDef
-		secretTransforms   []v1beta1.SecretTransform
+		secretTransforms   []v1.SecretTransform
 		expectedSecretData map[string][]byte
 	}{
 		{
@@ -533,9 +533,9 @@ func TestCreateServiceBindingWithSecretTransform(t *testing.T) {
 		},
 		{
 			name: "rename non-existent key",
-			secretTransforms: []v1beta1.SecretTransform{
+			secretTransforms: []v1.SecretTransform{
 				{
-					RenameKey: &v1beta1.RenameKeyTransform{
+					RenameKey: &v1.RenameKeyTransform{
 						From: "non-existent-key",
 						To:   "bar",
 					},
@@ -556,41 +556,41 @@ func TestCreateServiceBindingWithSecretTransform(t *testing.T) {
 					},
 				},
 			},
-			secretTransforms: []v1beta1.SecretTransform{
+			secretTransforms: []v1.SecretTransform{
 				{
-					AddKey: &v1beta1.AddKeyTransform{
+					AddKey: &v1.AddKeyTransform{
 						Key:         "addedStringValue",
 						StringValue: strPtr("stringValue"),
 					},
 				},
 				{
-					AddKey: &v1beta1.AddKeyTransform{
+					AddKey: &v1.AddKeyTransform{
 						Key:   "addedByteArray",
 						Value: []byte("byteArray"),
 					},
 				},
 				{
-					AddKey: &v1beta1.AddKeyTransform{
+					AddKey: &v1.AddKeyTransform{
 						Key:                "valueFromJSONPath",
 						JSONPathExpression: strPtr("{.foo}"),
 					},
 				},
 				{
-					RenameKey: &v1beta1.RenameKeyTransform{
+					RenameKey: &v1.RenameKeyTransform{
 						From: "foo",
 						To:   "bar",
 					},
 				},
 				{
-					AddKeysFrom: &v1beta1.AddKeysFromTransform{
-						SecretRef: &v1beta1.ObjectReference{
+					AddKeysFrom: &v1.AddKeysFromTransform{
+						SecretRef: &v1.ObjectReference{
 							Name:      "other-secret",
 							Namespace: testNamespace,
 						},
 					},
 				},
 				{
-					RemoveKey: &v1beta1.RemoveKeyTransform{
+					RemoveKey: &v1.RemoveKeyTransform{
 						Key: "baz",
 					},
 				},

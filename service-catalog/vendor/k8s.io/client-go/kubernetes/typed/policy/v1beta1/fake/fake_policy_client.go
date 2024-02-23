@@ -19,30 +19,30 @@ limitations under the License.
 package fake
 
 import (
-	v1beta1 "k8s.io/client-go/kubernetes/typed/policy/v1beta1"
+	v1 "k8s.io/client-go/kubernetes/typed/policy/v1"
 	rest "k8s.io/client-go/rest"
 	testing "k8s.io/client-go/testing"
 )
 
-type FakePolicyV1beta1 struct {
+type FakePolicyv1 struct {
 	*testing.Fake
 }
 
-func (c *FakePolicyV1beta1) Evictions(namespace string) v1beta1.EvictionInterface {
+func (c *FakePolicyv1) Evictions(namespace string) v1.EvictionInterface {
 	return &FakeEvictions{c, namespace}
 }
 
-func (c *FakePolicyV1beta1) PodDisruptionBudgets(namespace string) v1beta1.PodDisruptionBudgetInterface {
+func (c *FakePolicyv1) PodDisruptionBudgets(namespace string) v1.PodDisruptionBudgetInterface {
 	return &FakePodDisruptionBudgets{c, namespace}
 }
 
-func (c *FakePolicyV1beta1) PodSecurityPolicies() v1beta1.PodSecurityPolicyInterface {
+func (c *FakePolicyv1) PodSecurityPolicies() v1.PodSecurityPolicyInterface {
 	return &FakePodSecurityPolicies{c}
 }
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
-func (c *FakePolicyV1beta1) RESTClient() rest.Interface {
+func (c *FakePolicyv1) RESTClient() rest.Interface {
 	var ret *rest.RESTClient
 	return ret
 }

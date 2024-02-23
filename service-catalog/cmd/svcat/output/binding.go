@@ -21,22 +21,22 @@ import (
 	"io"
 	"sort"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	svcatsdk "github.com/kubernetes-sigs/service-catalog/pkg/svcat/service-catalog"
 	"k8s.io/api/core/v1"
 )
 
-func getBindingStatusShort(status v1beta1.ServiceBindingStatus) string {
+func getBindingStatusShort(status v1.ServiceBindingStatus) string {
 	lastCond := svcatsdk.GetBindingStatusCondition(status)
 	return formatStatusShort(string(lastCond.Type), lastCond.Status, lastCond.Reason)
 }
 
-func getBindingStatusFull(status v1beta1.ServiceBindingStatus) string {
+func getBindingStatusFull(status v1.ServiceBindingStatus) string {
 	lastCond := svcatsdk.GetBindingStatusCondition(status)
 	return formatStatusFull(string(lastCond.Type), lastCond.Status, lastCond.Reason, lastCond.Message, lastCond.LastTransitionTime)
 }
 
-func writeBindingListTable(w io.Writer, bindingList *v1beta1.ServiceBindingList) {
+func writeBindingListTable(w io.Writer, bindingList *v1.ServiceBindingList) {
 	t := NewListTable(w)
 	t.SetHeader([]string{
 		"Name",
@@ -57,7 +57,7 @@ func writeBindingListTable(w io.Writer, bindingList *v1beta1.ServiceBindingList)
 }
 
 // WriteBindingList prints a list of bindings in the specified output format.
-func WriteBindingList(w io.Writer, outputFormat string, bindingList *v1beta1.ServiceBindingList) {
+func WriteBindingList(w io.Writer, outputFormat string, bindingList *v1.ServiceBindingList) {
 	switch outputFormat {
 	case FormatJSON:
 		writeJSON(w, bindingList)
@@ -69,22 +69,22 @@ func WriteBindingList(w io.Writer, outputFormat string, bindingList *v1beta1.Ser
 }
 
 // WriteBinding prints a single bindings in the specified output format.
-func WriteBinding(w io.Writer, outputFormat string, binding v1beta1.ServiceBinding) {
+func WriteBinding(w io.Writer, outputFormat string, binding v1.ServiceBinding) {
 	switch outputFormat {
 	case FormatJSON:
 		writeJSON(w, binding)
 	case FormatYAML:
 		writeYAML(w, binding, 0)
 	case FormatTable:
-		l := v1beta1.ServiceBindingList{
-			Items: []v1beta1.ServiceBinding{binding},
+		l := v1.ServiceBindingList{
+			Items: []v1.ServiceBinding{binding},
 		}
 		writeBindingListTable(w, &l)
 	}
 }
 
 // WriteBindingDetails prints details for a single binding.
-func WriteBindingDetails(w io.Writer, binding *v1beta1.ServiceBinding) {
+func WriteBindingDetails(w io.Writer, binding *v1.ServiceBinding) {
 	t := NewDetailsTable(w)
 	t.AppendBulk([][]string{
 		{"Name:", binding.Name},
@@ -100,7 +100,7 @@ func WriteBindingDetails(w io.Writer, binding *v1beta1.ServiceBinding) {
 }
 
 // WriteAssociatedBindings prints a list of bindings associated with an instance.
-func WriteAssociatedBindings(w io.Writer, bindings []v1beta1.ServiceBinding) {
+func WriteAssociatedBindings(w io.Writer, bindings []v1.ServiceBinding) {
 	fmt.Fprintln(w, "\nBindings:")
 	if len(bindings) == 0 {
 		fmt.Fprintln(w, "No bindings defined")
@@ -155,7 +155,7 @@ func WriteAssociatedSecret(w io.Writer, secret *v1.Secret, err error, showSecret
 }
 
 // WriteDeletedBindingNames prints the names of a list of bindings
-func WriteDeletedBindingNames(w io.Writer, bindings []v1beta1.ServiceBinding) {
+func WriteDeletedBindingNames(w io.Writer, bindings []v1.ServiceBinding) {
 	for _, binding := range bindings {
 		WriteDeletedResourceName(w, binding.Name)
 	}

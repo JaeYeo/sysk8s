@@ -63,7 +63,7 @@ func parseKubeVersion(v string) (majorVersion int, vType versionType, minorVersi
 // CompareKubeAwareVersionStrings compares two kube-like version strings.
 // Kube-like version strings are starting with a v, followed by a major version, optional "alpha" or "beta" strings
 // followed by a minor version (e.g. v1, v2beta1). Versions will be sorted based on GA/alpha/beta first and then major
-// and minor versions. e.g. v2, v1, v1beta2, v1beta1, v1alpha1.
+// and minor versions. e.g. v2, v1, v1beta2, v1, v1alpha1.
 func CompareKubeAwareVersionStrings(v1, v2 string) int {
 	if v1 == v2 {
 		return 0

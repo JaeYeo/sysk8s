@@ -25,8 +25,8 @@ import (
 	"k8s.io/apimachinery/pkg/api/meta"
 	metainternalversionscheme "k8s.io/apimachinery/pkg/apis/meta/internalversion/scheme"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	metav1beta1 "k8s.io/apimachinery/pkg/apis/meta/v1beta1"
-	"k8s.io/apimachinery/pkg/apis/meta/v1beta1/validation"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/validation"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/endpoints/handlers/negotiation"
@@ -92,7 +92,7 @@ func doTransformObject(ctx context.Context, obj runtime.Object, opts interface{}
 func optionsForTransform(mediaType negotiation.MediaTypeOptions, req *http.Request) (interface{}, error) {
 	switch target := mediaType.Convert; {
 	case target == nil:
-	case target.Kind == "Table" && (target.GroupVersion() == metav1beta1.SchemeGroupVersion || target.GroupVersion() == metav1.SchemeGroupVersion):
+	case target.Kind == "Table" && (target.GroupVersion() == metav1.SchemeGroupVersion || target.GroupVersion() == metav1.SchemeGroupVersion):
 		opts := &metav1.TableOptions{}
 		if err := metainternalversionscheme.ParameterCodec.DecodeParameters(req.URL.Query(), metav1.SchemeGroupVersion, opts); err != nil {
 			return nil, err
@@ -114,7 +114,7 @@ func targetEncodingForTransform(scope *RequestScope, mediaType negotiation.Media
 	switch target := mediaType.Convert; {
 	case target == nil:
 	case (target.Kind == "PartialObjectMetadata" || target.Kind == "PartialObjectMetadataList" || target.Kind == "Table") &&
-		(target.GroupVersion() == metav1beta1.SchemeGroupVersion || target.GroupVersion() == metav1.SchemeGroupVersion):
+		(target.GroupVersion() == metav1.SchemeGroupVersion || target.GroupVersion() == metav1.SchemeGroupVersion):
 		return *target, metainternalversionscheme.Codecs, true
 	}
 	return scope.Kind, scope.Serializer, false
@@ -161,7 +161,7 @@ func (e errNotAcceptable) Status() metav1.Status {
 
 func asTable(ctx context.Context, result runtime.Object, opts *metav1.TableOptions, scope *RequestScope, groupVersion schema.GroupVersion) (runtime.Object, error) {
 	switch groupVersion {
-	case metav1beta1.SchemeGroupVersion, metav1.SchemeGroupVersion:
+	case metav1.SchemeGroupVersion, metav1.SchemeGroupVersion:
 	default:
 		return nil, newNotAcceptableError(fmt.Sprintf("no Table exists in group version %s", groupVersion))
 	}
@@ -208,7 +208,7 @@ func asPartialObjectMetadata(result runtime.Object, groupVersion schema.GroupVer
 		return nil, err
 	}
 	switch groupVersion {
-	case metav1beta1.SchemeGroupVersion, metav1.SchemeGroupVersion:
+	case metav1.SchemeGroupVersion, metav1.SchemeGroupVersion:
 	default:
 		return nil, newNotAcceptableError(fmt.Sprintf("no PartialObjectMetadataList exists in group version %s", groupVersion))
 	}
@@ -229,8 +229,8 @@ func asPartialObjectMetadataList(result runtime.Object, groupVersion schema.Grou
 
 	gvk := groupVersion.WithKind("PartialObjectMetadata")
 	switch {
-	case groupVersion == metav1beta1.SchemeGroupVersion:
-		list := &metav1beta1.PartialObjectMetadataList{}
+	case groupVersion == metav1.SchemeGroupVersion:
+		list := &metav1.PartialObjectMetadataList{}
 		err := meta.EachListItem(result, func(obj runtime.Object) error {
 			m, err := meta.Accessor(obj)
 			if err != nil {

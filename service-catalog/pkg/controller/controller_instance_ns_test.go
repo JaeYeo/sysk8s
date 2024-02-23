@@ -23,7 +23,7 @@ import (
 	osb "github.com/kubernetes-sigs/go-open-service-broker-client/v2"
 	fakeosb "github.com/kubernetes-sigs/go-open-service-broker-client/v2/fake"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/util"
 
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
@@ -105,7 +105,7 @@ func TestReconcileServiceInstanceNamespacedRefs(t *testing.T) {
 	}
 
 	updatedServiceInstance := assertUpdateStatus(t, actions[0], instance)
-	assertServiceInstanceOperationSuccess(t, updatedServiceInstance, v1beta1.ServiceInstanceOperationProvision, testServicePlanName, testServicePlanGUID, instance)
+	assertServiceInstanceOperationSuccess(t, updatedServiceInstance, v1.ServiceInstanceOperationProvision, testServicePlanName, testServicePlanGUID, instance)
 	assertServiceInstanceDashboardURL(t, updatedServiceInstance, testDashboardURL)
 
 	events := getRecordedEvents(testController)
@@ -181,7 +181,7 @@ func TestReconcileServiceInstanceAsynchronousNamespacedRefs(t *testing.T) {
 	assertNumberOfActions(t, actions, 1)
 
 	updatedServiceInstance := assertUpdateStatus(t, actions[0], instance)
-	assertServiceInstanceAsyncStartInProgress(t, updatedServiceInstance, v1beta1.ServiceInstanceOperationProvision, testOperation, testServicePlanName, testServicePlanGUID, instance)
+	assertServiceInstanceAsyncStartInProgress(t, updatedServiceInstance, v1.ServiceInstanceOperationProvision, testOperation, testServicePlanName, testServicePlanGUID, instance)
 	assertServiceInstanceDashboardURL(t, updatedServiceInstance, testDashboardURL)
 
 	// verify no kube resources created.
@@ -251,8 +251,8 @@ func TestPollServiceInstanceInProgressProvisioningWithOperationNamespacedRefs(t 
 	assertNumberOfActions(t, actions, 1)
 
 	updatedServiceInstance := assertUpdateStatus(t, actions[0], instance)
-	assertServiceInstanceAsyncStartInProgress(t, updatedServiceInstance, v1beta1.ServiceInstanceOperationProvision, testOperation, testServicePlanName, testServicePlanGUID, instance)
-	assertServiceInstanceConditionHasLastOperationDescription(t, updatedServiceInstance, v1beta1.ServiceInstanceOperationProvision, lastOperationDescription)
+	assertServiceInstanceAsyncStartInProgress(t, updatedServiceInstance, v1.ServiceInstanceOperationProvision, testOperation, testServicePlanName, testServicePlanGUID, instance)
+	assertServiceInstanceConditionHasLastOperationDescription(t, updatedServiceInstance, v1.ServiceInstanceOperationProvision, lastOperationDescription)
 
 	// verify no kube resources created.
 	// No actions
@@ -318,7 +318,7 @@ func TestPollServiceInstanceSuccessProvisioningWithOperationNamespacedRefs(t *te
 	assertNumberOfActions(t, actions, 1)
 
 	updatedServiceInstance := assertUpdateStatus(t, actions[0], instance)
-	assertServiceInstanceOperationSuccess(t, updatedServiceInstance, v1beta1.ServiceInstanceOperationProvision, testServicePlanName, testServicePlanGUID, instance)
+	assertServiceInstanceOperationSuccess(t, updatedServiceInstance, v1.ServiceInstanceOperationProvision, testServicePlanName, testServicePlanGUID, instance)
 }
 
 // TestPollServiceInstanceFailureProvisioningWithOperationNamespacedRefs tests
@@ -381,7 +381,7 @@ func TestPollServiceInstanceFailureProvisioningWithOperationNamespacedRefs(t *te
 	assertServiceInstanceRequestFailingErrorStartOrphanMitigation(
 		t,
 		updatedServiceInstance,
-		v1beta1.ServiceInstanceOperationProvision,
+		v1.ServiceInstanceOperationProvision,
 		startingInstanceOrphanMitigationReason,
 		errorProvisionCallFailedReason,
 		errorProvisionCallFailedReason,
@@ -410,18 +410,18 @@ func TestReconcileServiceInstanceDeleteWithNamespacedRefs(t *testing.T) {
 
 	instance := getTestServiceInstanceWithNamespacedRefs()
 	instance.ObjectMeta.DeletionTimestamp = &metav1.Time{}
-	instance.ObjectMeta.Finalizers = []string{v1beta1.FinalizerServiceCatalog}
+	instance.ObjectMeta.Finalizers = []string{v1.FinalizerServiceCatalog}
 	// we only invoke the broker client to deprovision if we have a reconciled generation set
 	// as that implies a previous success.
 	instance.Generation = 2
 	instance.Status.ReconciledGeneration = 1
 	instance.Status.ObservedGeneration = 1
-	instance.Status.ProvisionStatus = v1beta1.ServiceInstanceProvisionStatusProvisioned
-	instance.Status.ExternalProperties = &v1beta1.ServiceInstancePropertiesState{
+	instance.Status.ProvisionStatus = v1.ServiceInstanceProvisionStatusProvisioned
+	instance.Status.ExternalProperties = &v1.ServiceInstancePropertiesState{
 		ServicePlanExternalName: testServicePlanName,
 		ServicePlanExternalID:   testServicePlanGUID,
 	}
-	instance.Status.DeprovisionStatus = v1beta1.ServiceInstanceDeprovisionStatusRequired
+	instance.Status.DeprovisionStatus = v1.ServiceInstanceDeprovisionStatusRequired
 
 	fakeCatalogClient.AddReactor("get", "serviceinstances", func(action clientgotesting.Action) (bool, runtime.Object, error) {
 		return true, instance, nil
@@ -461,7 +461,7 @@ func TestReconcileServiceInstanceDeleteWithNamespacedRefs(t *testing.T) {
 
 	assertUpdateStatus(t, actions[0], instance)
 	updatedServiceInstance := assertUpdate(t, actions[1], instance)
-	assertServiceInstanceOperationSuccess(t, updatedServiceInstance, v1beta1.ServiceInstanceOperationDeprovision, testClusterServicePlanName, testClusterServicePlanGUID, instance)
+	assertServiceInstanceOperationSuccess(t, updatedServiceInstance, v1.ServiceInstanceOperationDeprovision, testClusterServicePlanName, testClusterServicePlanGUID, instance)
 
 	events := getRecordedEvents(testController)
 
@@ -494,18 +494,18 @@ func TestReconcileServiceInstanceDeleteAsynchronousWithNamespacedRefs(t *testing
 
 	instance := getTestServiceInstanceWithNamespacedRefs()
 	instance.ObjectMeta.DeletionTimestamp = &metav1.Time{}
-	instance.ObjectMeta.Finalizers = []string{v1beta1.FinalizerServiceCatalog}
+	instance.ObjectMeta.Finalizers = []string{v1.FinalizerServiceCatalog}
 	// we only invoke the broker client to deprovision if we have a reconciled generation set
 	// as that implies a previous success.
 	instance.Generation = 2
 	instance.Status.ReconciledGeneration = 1
 	instance.Status.ObservedGeneration = 1
-	instance.Status.ProvisionStatus = v1beta1.ServiceInstanceProvisionStatusProvisioned
-	instance.Status.ExternalProperties = &v1beta1.ServiceInstancePropertiesState{
+	instance.Status.ProvisionStatus = v1.ServiceInstanceProvisionStatusProvisioned
+	instance.Status.ExternalProperties = &v1.ServiceInstancePropertiesState{
 		ServicePlanExternalName: testServicePlanName,
 		ServicePlanExternalID:   testServicePlanGUID,
 	}
-	instance.Status.DeprovisionStatus = v1beta1.ServiceInstanceDeprovisionStatusRequired
+	instance.Status.DeprovisionStatus = v1.ServiceInstanceDeprovisionStatusRequired
 
 	fakeCatalogClient.AddReactor("get", "serviceinstances", func(action clientgotesting.Action) (bool, runtime.Object, error) {
 		return true, instance, nil
@@ -552,7 +552,7 @@ func TestReconcileServiceInstanceDeleteAsynchronousWithNamespacedRefs(t *testing
 	assertNumberOfActions(t, actions, 1)
 
 	updatedServiceInstance := assertUpdateStatus(t, actions[0], instance)
-	assertServiceInstanceAsyncStartInProgress(t, updatedServiceInstance, v1beta1.ServiceInstanceOperationDeprovision, testOperation, testServicePlanName, testServicePlanGUID, instance)
+	assertServiceInstanceAsyncStartInProgress(t, updatedServiceInstance, v1.ServiceInstanceOperationDeprovision, testOperation, testServicePlanName, testServicePlanGUID, instance)
 
 	events := getRecordedEvents(testController)
 
@@ -574,19 +574,19 @@ func TestPollServiceInstanceInProgressDeprovisioningWithOperationNoFinalizerName
 
 	cases := []struct {
 		name  string
-		setup func(instance *v1beta1.ServiceInstance)
+		setup func(instance *v1.ServiceInstance)
 	}{
 		{
 			// simulates deprovision after user changed plan to non-existing plan
 			name: "nil plan",
-			setup: func(instance *v1beta1.ServiceInstance) {
+			setup: func(instance *v1.ServiceInstance) {
 				instance.Spec.ServicePlanExternalName = "plan-that-does-not-exist"
 				instance.Spec.ServicePlanRef = nil
 			},
 		},
 		{
 			name:  "With plan",
-			setup: func(instance *v1beta1.ServiceInstance) {},
+			setup: func(instance *v1.ServiceInstance) {},
 		},
 	}
 
@@ -638,8 +638,8 @@ func TestPollServiceInstanceInProgressDeprovisioningWithOperationNoFinalizerName
 			assertNumberOfActions(t, actions, 1)
 
 			updatedServiceInstance := assertUpdateStatus(t, actions[0], instance)
-			assertServiceInstanceAsyncStillInProgress(t, updatedServiceInstance, v1beta1.ServiceInstanceOperationDeprovision, testOperation, testServicePlanName, testServicePlanGUID, instance)
-			assertServiceInstanceConditionHasLastOperationDescription(t, updatedServiceInstance, v1beta1.ServiceInstanceOperationDeprovision, lastOperationDescription)
+			assertServiceInstanceAsyncStillInProgress(t, updatedServiceInstance, v1.ServiceInstanceOperationDeprovision, testOperation, testServicePlanName, testServicePlanGUID, instance)
+			assertServiceInstanceConditionHasLastOperationDescription(t, updatedServiceInstance, v1.ServiceInstanceOperationDeprovision, lastOperationDescription)
 
 			// verify no kube resources created.
 			// No actions
@@ -711,7 +711,7 @@ func TestPollServiceInstanceSuccessDeprovisioningWithOperationNoFinalizerNamespa
 
 	assertUpdateStatus(t, actions[0], instance)
 	updatedServiceInstance := assertUpdate(t, actions[1], instance)
-	assertServiceInstanceOperationSuccess(t, updatedServiceInstance, v1beta1.ServiceInstanceOperationDeprovision, testServicePlanName, testServicePlanGUID, instance)
+	assertServiceInstanceOperationSuccess(t, updatedServiceInstance, v1.ServiceInstanceOperationDeprovision, testServicePlanName, testServicePlanGUID, instance)
 
 	events := getRecordedEvents(testController)
 
@@ -781,7 +781,7 @@ func TestPollServiceInstanceFailureDeprovisioningNamespacedRefs(t *testing.T) {
 	assertServiceInstanceRequestRetriableError(
 		t,
 		updatedServiceInstance,
-		v1beta1.ServiceInstanceOperationDeprovision,
+		v1.ServiceInstanceOperationDeprovision,
 		errorDeprovisionCallFailedReason,
 		testServicePlanName,
 		testServicePlanGUID,
@@ -804,16 +804,16 @@ func TestResolveNamespacedReferencesWorks(t *testing.T) {
 	instance := getTestServiceInstanceWithNamespacedPlanReference()
 
 	sc := getTestServiceClass()
-	var scItems []v1beta1.ServiceClass
+	var scItems []v1.ServiceClass
 	scItems = append(scItems, *sc)
 	fakeCatalogClient.AddReactor("list", "serviceclasses", func(action clientgotesting.Action) (bool, runtime.Object, error) {
-		return true, &v1beta1.ServiceClassList{Items: scItems}, nil
+		return true, &v1.ServiceClassList{Items: scItems}, nil
 	})
 	sp := getTestServicePlan()
-	var spItems []v1beta1.ServicePlan
+	var spItems []v1.ServicePlan
 	spItems = append(spItems, *sp)
 	fakeCatalogClient.AddReactor("list", "serviceplans", func(action clientgotesting.Action) (bool, runtime.Object, error) {
-		return true, &v1beta1.ServicePlanList{Items: spItems}, nil
+		return true, &v1.ServicePlanList{Items: spItems}, nil
 	})
 
 	modified, err := testController.resolveReferences(instance)
@@ -834,26 +834,26 @@ func TestResolveNamespacedReferencesWorks(t *testing.T) {
 
 	listRestrictions := clientgotesting.ListRestrictions{
 		Labels: labels.SelectorFromSet(labels.Set{
-			v1beta1.GroupName + "/" + v1beta1.FilterSpecExternalName: util.GenerateSHA(instance.Spec.ServiceClassExternalName),
+			v1.GroupName + "/" + v1.FilterSpecExternalName: util.GenerateSHA(instance.Spec.ServiceClassExternalName),
 		}),
 		Fields: fields.Everything(),
 	}
-	assertList(t, actions[0], &v1beta1.ServiceClass{}, listRestrictions)
+	assertList(t, actions[0], &v1.ServiceClass{}, listRestrictions)
 
 	listRestrictions = clientgotesting.ListRestrictions{
 		Labels: labels.SelectorFromSet(labels.Set{
-			v1beta1.GroupName + "/" + v1beta1.FilterSpecExternalName:        util.GenerateSHA("test-serviceplan"),
-			v1beta1.GroupName + "/" + v1beta1.FilterSpecServiceBrokerName:   util.GenerateSHA("test-servicebroker"),
-			v1beta1.GroupName + "/" + v1beta1.FilterSpecServiceClassRefName: util.GenerateSHA("scguid"),
+			v1.GroupName + "/" + v1.FilterSpecExternalName:        util.GenerateSHA("test-serviceplan"),
+			v1.GroupName + "/" + v1.FilterSpecServiceBrokerName:   util.GenerateSHA("test-servicebroker"),
+			v1.GroupName + "/" + v1.FilterSpecServiceClassRefName: util.GenerateSHA("scguid"),
 		}),
 		Fields: fields.Everything(),
 	}
-	assertList(t, actions[1], &v1beta1.ServicePlan{}, listRestrictions)
+	assertList(t, actions[1], &v1.ServicePlan{}, listRestrictions)
 
 	updatedServiceInstance := assertUpdate(t, actions[2], instance)
-	updateObject, ok := updatedServiceInstance.(*v1beta1.ServiceInstance)
+	updateObject, ok := updatedServiceInstance.(*v1.ServiceInstance)
 	if !ok {
-		t.Fatalf("couldn't convert to *v1beta1.ServiceInstance")
+		t.Fatalf("couldn't convert to *v1.ServiceInstance")
 	}
 	if updateObject.Spec.ServiceClassRef == nil || updateObject.Spec.ServiceClassRef.Name != testServiceClassGUID {
 		t.Fatalf("ServiceClassRef was not resolved correctly during reconcile")

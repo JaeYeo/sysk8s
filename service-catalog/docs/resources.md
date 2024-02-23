@@ -9,7 +9,7 @@ The Service Catalog resource model specifies all the behaviors that
 Service Catalog supports. This document details each resource.
 
 All of these resources are also defined in Go code at
-[`pkg/apis/servicecatalog/v1beta1/types.go`](https://github.com/kubernetes-sigs/service-catalog/blob/master/pkg/apis/servicecatalog/v1beta1/types.go).
+[`pkg/apis/servicecatalog/v1/types.go`](https://github.com/kubernetes-sigs/service-catalog/blob/master/pkg/apis/servicecatalog/v1/types.go).
 
 
 ## Service Brokers
@@ -33,7 +33,7 @@ kubectl create -f broker.yaml
 The `broker.yaml` looks similar to this:
 
 ```yaml
-apiVersion: servicecatalog.k8s.io/v1beta1
+apiVersion: servicecatalog.k8s.io/v1
 kind: ClusterServiceBroker
   metadata:
     name: broker-name
@@ -54,7 +54,7 @@ kubectl create -f broker.yaml
 The `broker.yaml` looks similar to this:
 
 ```yaml
-apiVersion: servicecatalog.k8s.io/v1beta1
+apiVersion: servicecatalog.k8s.io/v1
 kind: ServiceBroker
   metadata:
     name: broker-name
@@ -76,7 +76,7 @@ After a `ClusterServiceBroker` resource is created, each service provided by the
 `ClusterServiceClass` resource created. These resources will also be cluster-scoped. A `ClusterServiceClass` looks similar to this example:
 
 ```yaml
-apiVersion: servicecatalog.k8s.io/v1beta1
+apiVersion: servicecatalog.k8s.io/v1
 kind: ClusterServiceClass
 metadata:
   name: 4f6e6cf6-ffdd-425f-a2c7-3c9258ad2468
@@ -95,7 +95,7 @@ After a `ServiceBroker` resource is created, each service provided by the broker
 `ServiceClass` resource created. These resources will also be namespaced-scoped. A `ServiceClass` looks similar to this example:
 
 ```yaml
-apiVersion: servicecatalog.k8s.io/v1beta1
+apiVersion: servicecatalog.k8s.io/v1
 kind: ServiceClass
 metadata:
   name: 4f6e6cf6-ffdd-425f-a2c7-3c9258ad2468
@@ -140,7 +140,7 @@ kubectl create -f instance.yaml
 where `instance.yaml` might look like:
 
 ```yaml
-apiVersion: servicecatalog.k8s.io/v1beta1
+apiVersion: servicecatalog.k8s.io/v1
 kind: ServiceInstance
 metadata:
   namespace: example-ns
@@ -153,7 +153,7 @@ spec:
 or
 
 ```yaml
-apiVersion: servicecatalog.k8s.io/v1beta1
+apiVersion: servicecatalog.k8s.io/v1
 kind: ServiceInstance
 metadata:
   namespace: default
@@ -206,7 +206,7 @@ kubectl create -f binding.yaml
 where `binding.yaml` might look like:
 
 ```yaml
-apiVersion: servicecatalog.k8s.io/v1beta1
+apiVersion: servicecatalog.k8s.io/v1
 kind: ServiceBinding
 metadata:
   namespace: example-ns

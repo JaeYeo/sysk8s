@@ -1,5 +1,5 @@
 /*
-Copyright 2020 The Kubernetes Authors.
+Copyright 2021 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ package fake
 
 import (
 	clientset "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset"
-	servicecatalogv1beta1 "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/typed/servicecatalog/v1beta1"
-	fakeservicecatalogv1beta1 "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/typed/servicecatalog/v1beta1/fake"
+	servicecatalogv1 "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/typed/servicecatalog/v1"
+	fakeservicecatalogv1 "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/typed/servicecatalog/v1/fake"
 	settingsv1alpha1 "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/typed/settings/v1alpha1"
 	fakesettingsv1alpha1 "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/typed/settings/v1alpha1/fake"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -78,9 +78,9 @@ func (c *Clientset) Tracker() testing.ObjectTracker {
 
 var _ clientset.Interface = &Clientset{}
 
-// ServicecatalogV1beta1 retrieves the ServicecatalogV1beta1Client
-func (c *Clientset) ServicecatalogV1beta1() servicecatalogv1beta1.ServicecatalogV1beta1Interface {
-	return &fakeservicecatalogv1beta1.FakeServicecatalogV1beta1{Fake: &c.Fake}
+// Servicecatalogv1 retrieves the Servicecatalogv1Client
+func (c *Clientset) Servicecatalogv1() servicecatalogv1.Servicecatalogv1Interface {
+	return &fakeservicecatalogv1.FakeServicecatalogv1{Fake: &c.Fake}
 }
 
 // SettingsV1alpha1 retrieves the SettingsV1alpha1Client

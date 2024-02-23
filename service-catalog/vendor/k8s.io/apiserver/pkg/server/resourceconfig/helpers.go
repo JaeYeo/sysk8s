@@ -121,9 +121,9 @@ func MergeAPIResourceConfigs(
 			return nil, fmt.Errorf("invalid key %s", key)
 		}
 
-		// individual resource enablement/disablement is only supported in the extensions/v1beta1 API group for legacy reasons.
+		// individual resource enablement/disablement is only supported in the extensions/v1 API group for legacy reasons.
 		// all other API groups are expected to contain coherent sets of resources that are enabled/disabled together.
-		if len(tokens) > 2 && (groupVersion != schema.GroupVersion{Group: "extensions", Version: "v1beta1"}) {
+		if len(tokens) > 2 && (groupVersion != schema.GroupVersion{Group: "extensions", Version: "v1"}) {
 			klog.Warningf("ignoring invalid key %s, individual resource enablement/disablement is not supported in %s, and will prevent starting in future releases", key, groupVersion.String())
 			continue
 		}

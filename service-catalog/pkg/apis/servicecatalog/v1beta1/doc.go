@@ -19,7 +19,7 @@ limitations under the License.
 // +k8s:openapi-gen=true
 // +k8s:defaulter-gen=TypeMeta
 
-// Package v1beta1 defines all of the versioned (v1beta1) definitions
+// Package v1 defines all of the versioned (v1) definitions
 // of the service catalog model.
 // +groupName=servicecatalog.k8s.io
-package v1beta1
+package v1

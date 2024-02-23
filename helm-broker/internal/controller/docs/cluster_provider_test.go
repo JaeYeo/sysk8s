@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/kyma-project/helm-broker/internal"
-	"github.com/kyma-project/rafter/pkg/apis/rafter/v1beta1"
+	"github.com/kyma-project/rafter/pkg/apis/rafter/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -18,7 +18,7 @@ import (
 
 func TestProvider_EnsureClusterAssetGroup(t *testing.T) {
 	// given
-	err := v1beta1.AddToScheme(scheme.Scheme)
+	err := v1.AddToScheme(scheme.Scheme)
 	require.NoError(t, err)
 	const id = "123"
 
@@ -47,7 +47,7 @@ func TestProvider_EnsureClusterAssetGroup(t *testing.T) {
 
 func TestProvider_EnsureClusterAssetGroup_UpdateIfExist(t *testing.T) {
 	// given
-	err := v1beta1.AddToScheme(scheme.Scheme)
+	err := v1.AddToScheme(scheme.Scheme)
 	require.NoError(t, err)
 
 	const id = "123"
@@ -70,7 +70,7 @@ func TestProvider_EnsureClusterAssetGroup_UpdateIfExist(t *testing.T) {
 
 func TestDocsProvider_EnsureClusterAssetGroupRemoved(t *testing.T) {
 	// given
-	err := v1beta1.AddToScheme(scheme.Scheme)
+	err := v1.AddToScheme(scheme.Scheme)
 	require.NoError(t, err)
 
 	const id = "123"
@@ -89,7 +89,7 @@ func TestDocsProvider_EnsureClusterAssetGroupRemoved(t *testing.T) {
 
 func TestDocsProvider_EnsureClusterAssetGroupRemoved_NotExists(t *testing.T) {
 	// given
-	err := v1beta1.AddToScheme(scheme.Scheme)
+	err := v1.AddToScheme(scheme.Scheme)
 	require.NoError(t, err)
 
 	const id = "123"
@@ -106,8 +106,8 @@ func TestDocsProvider_EnsureClusterAssetGroupRemoved_NotExists(t *testing.T) {
 	assert.True(t, errors.IsNotFound(err))
 }
 
-func fixClusterAssetGroup(id string) *v1beta1.ClusterAssetGroup {
-	return &v1beta1.ClusterAssetGroup{
+func fixClusterAssetGroup(id string) *v1.ClusterAssetGroup {
+	return &v1.ClusterAssetGroup{
 		ObjectMeta: v1.ObjectMeta{
 			Name: id,
 		},

@@ -3,7 +3,7 @@ package controller
 import (
 	"context"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kyma-project/helm-broker/internal/controller/broker"
 	"github.com/kyma-project/helm-broker/pkg/apis/addons/v1alpha1"
 	"k8s.io/apimachinery/pkg/types"
@@ -57,7 +57,7 @@ func (sbc *BrokerController) Start(mgr manager.Manager) error {
 	}
 
 	// Watch for changes to ServiceInstance
-	err = c.Watch(&source.Kind{Type: &v1beta1.ServiceInstance{}}, eventHandler, createDeletePredicate)
+	err = c.Watch(&source.Kind{Type: &v1.ServiceInstance{}}, eventHandler, createDeletePredicate)
 	if err != nil {
 		return err
 	}
@@ -67,7 +67,7 @@ func (sbc *BrokerController) Start(mgr manager.Manager) error {
 		return err
 	}
 
-	err = c.Watch(&source.Kind{Type: &v1beta1.ServiceBroker{}}, eventHandler, predicate.Funcs{
+	err = c.Watch(&source.Kind{Type: &v1.ServiceBroker{}}, eventHandler, predicate.Funcs{
 		CreateFunc: func(e event.CreateEvent) bool { return e.Meta.GetName() == broker.NamespacedBrokerName },
 		DeleteFunc: func(e event.DeleteEvent) bool { return e.Meta.GetName() == broker.NamespacedBrokerName },
 		UpdateFunc: func(_ event.UpdateEvent) bool { return false },

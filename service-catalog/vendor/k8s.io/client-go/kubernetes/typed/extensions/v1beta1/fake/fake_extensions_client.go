@@ -19,42 +19,42 @@ limitations under the License.
 package fake
 
 import (
-	v1beta1 "k8s.io/client-go/kubernetes/typed/extensions/v1beta1"
+	v1 "k8s.io/client-go/kubernetes/typed/extensions/v1"
 	rest "k8s.io/client-go/rest"
 	testing "k8s.io/client-go/testing"
 )
 
-type FakeExtensionsV1beta1 struct {
+type FakeExtensionsv1 struct {
 	*testing.Fake
 }
 
-func (c *FakeExtensionsV1beta1) DaemonSets(namespace string) v1beta1.DaemonSetInterface {
+func (c *FakeExtensionsv1) DaemonSets(namespace string) v1.DaemonSetInterface {
 	return &FakeDaemonSets{c, namespace}
 }
 
-func (c *FakeExtensionsV1beta1) Deployments(namespace string) v1beta1.DeploymentInterface {
+func (c *FakeExtensionsv1) Deployments(namespace string) v1.DeploymentInterface {
 	return &FakeDeployments{c, namespace}
 }
 
-func (c *FakeExtensionsV1beta1) Ingresses(namespace string) v1beta1.IngressInterface {
+func (c *FakeExtensionsv1) Ingresses(namespace string) v1.IngressInterface {
 	return &FakeIngresses{c, namespace}
 }
 
-func (c *FakeExtensionsV1beta1) NetworkPolicies(namespace string) v1beta1.NetworkPolicyInterface {
+func (c *FakeExtensionsv1) NetworkPolicies(namespace string) v1.NetworkPolicyInterface {
 	return &FakeNetworkPolicies{c, namespace}
 }
 
-func (c *FakeExtensionsV1beta1) PodSecurityPolicies() v1beta1.PodSecurityPolicyInterface {
+func (c *FakeExtensionsv1) PodSecurityPolicies() v1.PodSecurityPolicyInterface {
 	return &FakePodSecurityPolicies{c}
 }
 
-func (c *FakeExtensionsV1beta1) ReplicaSets(namespace string) v1beta1.ReplicaSetInterface {
+func (c *FakeExtensionsv1) ReplicaSets(namespace string) v1.ReplicaSetInterface {
 	return &FakeReplicaSets{c, namespace}
 }
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
-func (c *FakeExtensionsV1beta1) RESTClient() rest.Interface {
+func (c *FakeExtensionsv1) RESTClient() rest.Interface {
 	var ret *rest.RESTClient
 	return ret
 }

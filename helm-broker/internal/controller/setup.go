@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kyma-project/helm-broker/internal/addon"
 	"github.com/kyma-project/helm-broker/internal/addon/provider"
 	"github.com/kyma-project/helm-broker/internal/config"
@@ -15,7 +15,7 @@ import (
 	"github.com/kyma-project/helm-broker/internal/rafter"
 	"github.com/kyma-project/helm-broker/internal/storage"
 	"github.com/kyma-project/helm-broker/pkg/apis"
-	rafterv1beta1 "github.com/kyma-project/rafter/pkg/apis/rafter/v1beta1"
+	rafterv1 "github.com/kyma-project/rafter/pkg/apis/rafter/v1"
 	"github.com/sirupsen/logrus"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
@@ -40,8 +40,8 @@ func SetupAndStartController(cfg *rest.Config, ctrCfg *config.ControllerConfig, 
 	// Setup Scheme for all resources
 	lg.Info("Setting up schemes")
 	fatalOnError(apis.AddToScheme(mgr.GetScheme()), "while adding AC scheme")
-	fatalOnError(v1beta1.AddToScheme(mgr.GetScheme()), "while adding SC scheme")
-	fatalOnError(rafterv1beta1.AddToScheme(mgr.GetScheme()), "while adding RAFTER scheme")
+	fatalOnError(v1.AddToScheme(mgr.GetScheme()), "while adding SC scheme")
+	fatalOnError(rafterv1.AddToScheme(mgr.GetScheme()), "while adding RAFTER scheme")
 
 	// Setup dependencies
 

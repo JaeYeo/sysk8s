@@ -21,7 +21,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	servicecatalog "github.com/kubernetes-sigs/service-catalog/pkg/svcat/service-catalog"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -29,7 +29,7 @@ import (
 )
 
 type FakeSvcatClient struct {
-	BindStub        func(string, string, string, string, string, interface{}, map[string]string) (*v1beta1.ServiceBinding, error)
+	BindStub        func(string, string, string, string, string, interface{}, map[string]string) (*v1.ServiceBinding, error)
 	bindMutex       sync.RWMutex
 	bindArgsForCall []struct {
 		arg1 string
@@ -41,30 +41,30 @@ type FakeSvcatClient struct {
 		arg7 map[string]string
 	}
 	bindReturns struct {
-		result1 *v1beta1.ServiceBinding
+		result1 *v1.ServiceBinding
 		result2 error
 	}
 	bindReturnsOnCall map[int]struct {
-		result1 *v1beta1.ServiceBinding
+		result1 *v1.ServiceBinding
 		result2 error
 	}
-	BindingParentHierarchyStub        func(*v1beta1.ServiceBinding) (*v1beta1.ServiceInstance, *v1beta1.ClusterServiceClass, *v1beta1.ClusterServicePlan, *v1beta1.ClusterServiceBroker, error)
+	BindingParentHierarchyStub        func(*v1.ServiceBinding) (*v1.ServiceInstance, *v1.ClusterServiceClass, *v1.ClusterServicePlan, *v1.ClusterServiceBroker, error)
 	bindingParentHierarchyMutex       sync.RWMutex
 	bindingParentHierarchyArgsForCall []struct {
-		arg1 *v1beta1.ServiceBinding
+		arg1 *v1.ServiceBinding
 	}
 	bindingParentHierarchyReturns struct {
-		result1 *v1beta1.ServiceInstance
-		result2 *v1beta1.ClusterServiceClass
-		result3 *v1beta1.ClusterServicePlan
-		result4 *v1beta1.ClusterServiceBroker
+		result1 *v1.ServiceInstance
+		result2 *v1.ClusterServiceClass
+		result3 *v1.ClusterServicePlan
+		result4 *v1.ClusterServiceBroker
 		result5 error
 	}
 	bindingParentHierarchyReturnsOnCall map[int]struct {
-		result1 *v1beta1.ServiceInstance
-		result2 *v1beta1.ClusterServiceClass
-		result3 *v1beta1.ClusterServicePlan
-		result4 *v1beta1.ClusterServiceBroker
+		result1 *v1.ServiceInstance
+		result2 *v1.ClusterServiceClass
+		result3 *v1.ClusterServicePlan
+		result4 *v1.ClusterServiceBroker
 		result5 error
 	}
 	CreateClassFromStub        func(servicecatalog.CreateClassFromOptions) (servicecatalog.Class, error)
@@ -129,42 +129,42 @@ type FakeSvcatClient struct {
 	deregisterReturnsOnCall map[int]struct {
 		result1 error
 	}
-	InstanceParentHierarchyStub        func(*v1beta1.ServiceInstance) (*v1beta1.ClusterServiceClass, *v1beta1.ClusterServicePlan, *v1beta1.ClusterServiceBroker, error)
+	InstanceParentHierarchyStub        func(*v1.ServiceInstance) (*v1.ClusterServiceClass, *v1.ClusterServicePlan, *v1.ClusterServiceBroker, error)
 	instanceParentHierarchyMutex       sync.RWMutex
 	instanceParentHierarchyArgsForCall []struct {
-		arg1 *v1beta1.ServiceInstance
+		arg1 *v1.ServiceInstance
 	}
 	instanceParentHierarchyReturns struct {
-		result1 *v1beta1.ClusterServiceClass
-		result2 *v1beta1.ClusterServicePlan
-		result3 *v1beta1.ClusterServiceBroker
+		result1 *v1.ClusterServiceClass
+		result2 *v1.ClusterServicePlan
+		result3 *v1.ClusterServiceBroker
 		result4 error
 	}
 	instanceParentHierarchyReturnsOnCall map[int]struct {
-		result1 *v1beta1.ClusterServiceClass
-		result2 *v1beta1.ClusterServicePlan
-		result3 *v1beta1.ClusterServiceBroker
+		result1 *v1.ClusterServiceClass
+		result2 *v1.ClusterServicePlan
+		result3 *v1.ClusterServiceBroker
 		result4 error
 	}
-	InstanceToServiceClassAndPlanStub        func(*v1beta1.ServiceInstance) (*v1beta1.ClusterServiceClass, *v1beta1.ClusterServicePlan, error)
+	InstanceToServiceClassAndPlanStub        func(*v1.ServiceInstance) (*v1.ClusterServiceClass, *v1.ClusterServicePlan, error)
 	instanceToServiceClassAndPlanMutex       sync.RWMutex
 	instanceToServiceClassAndPlanArgsForCall []struct {
-		arg1 *v1beta1.ServiceInstance
+		arg1 *v1.ServiceInstance
 	}
 	instanceToServiceClassAndPlanReturns struct {
-		result1 *v1beta1.ClusterServiceClass
-		result2 *v1beta1.ClusterServicePlan
+		result1 *v1.ClusterServiceClass
+		result2 *v1.ClusterServicePlan
 		result3 error
 	}
 	instanceToServiceClassAndPlanReturnsOnCall map[int]struct {
-		result1 *v1beta1.ClusterServiceClass
-		result2 *v1beta1.ClusterServicePlan
+		result1 *v1.ClusterServiceClass
+		result2 *v1.ClusterServicePlan
 		result3 error
 	}
-	IsBindingFailedStub        func(*v1beta1.ServiceBinding) bool
+	IsBindingFailedStub        func(*v1.ServiceBinding) bool
 	isBindingFailedMutex       sync.RWMutex
 	isBindingFailedArgsForCall []struct {
-		arg1 *v1beta1.ServiceBinding
+		arg1 *v1.ServiceBinding
 	}
 	isBindingFailedReturns struct {
 		result1 bool
@@ -172,10 +172,10 @@ type FakeSvcatClient struct {
 	isBindingFailedReturnsOnCall map[int]struct {
 		result1 bool
 	}
-	IsBindingReadyStub        func(*v1beta1.ServiceBinding) bool
+	IsBindingReadyStub        func(*v1.ServiceBinding) bool
 	isBindingReadyMutex       sync.RWMutex
 	isBindingReadyArgsForCall []struct {
-		arg1 *v1beta1.ServiceBinding
+		arg1 *v1.ServiceBinding
 	}
 	isBindingReadyReturns struct {
 		result1 bool
@@ -183,10 +183,10 @@ type FakeSvcatClient struct {
 	isBindingReadyReturnsOnCall map[int]struct {
 		result1 bool
 	}
-	IsInstanceFailedStub        func(*v1beta1.ServiceInstance) bool
+	IsInstanceFailedStub        func(*v1.ServiceInstance) bool
 	isInstanceFailedMutex       sync.RWMutex
 	isInstanceFailedArgsForCall []struct {
-		arg1 *v1beta1.ServiceInstance
+		arg1 *v1.ServiceInstance
 	}
 	isInstanceFailedReturns struct {
 		result1 bool
@@ -194,10 +194,10 @@ type FakeSvcatClient struct {
 	isInstanceFailedReturnsOnCall map[int]struct {
 		result1 bool
 	}
-	IsInstanceReadyStub        func(*v1beta1.ServiceInstance) bool
+	IsInstanceReadyStub        func(*v1.ServiceInstance) bool
 	isInstanceReadyMutex       sync.RWMutex
 	isInstanceReadyArgsForCall []struct {
-		arg1 *v1beta1.ServiceInstance
+		arg1 *v1.ServiceInstance
 	}
 	isInstanceReadyReturns struct {
 		result1 bool
@@ -205,7 +205,7 @@ type FakeSvcatClient struct {
 	isInstanceReadyReturnsOnCall map[int]struct {
 		result1 bool
 	}
-	ProvisionStub        func(string, string, string, bool, *servicecatalog.ProvisionOptions) (*v1beta1.ServiceInstance, error)
+	ProvisionStub        func(string, string, string, bool, *servicecatalog.ProvisionOptions) (*v1.ServiceInstance, error)
 	provisionMutex       sync.RWMutex
 	provisionArgsForCall []struct {
 		arg1 string
@@ -215,11 +215,11 @@ type FakeSvcatClient struct {
 		arg5 *servicecatalog.ProvisionOptions
 	}
 	provisionReturns struct {
-		result1 *v1beta1.ServiceInstance
+		result1 *v1.ServiceInstance
 		result2 error
 	}
 	provisionReturnsOnCall map[int]struct {
-		result1 *v1beta1.ServiceInstance
+		result1 *v1.ServiceInstance
 		result2 error
 	}
 	RegisterStub        func(string, string, *servicecatalog.RegisterOptions, *servicecatalog.ScopeOptions) (servicecatalog.Broker, error)
@@ -288,57 +288,57 @@ type FakeSvcatClient struct {
 	removeFinalizerForInstanceReturnsOnCall map[int]struct {
 		result1 error
 	}
-	RetrieveBindingStub        func(string, string) (*v1beta1.ServiceBinding, error)
+	RetrieveBindingStub        func(string, string) (*v1.ServiceBinding, error)
 	retrieveBindingMutex       sync.RWMutex
 	retrieveBindingArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
 	retrieveBindingReturns struct {
-		result1 *v1beta1.ServiceBinding
+		result1 *v1.ServiceBinding
 		result2 error
 	}
 	retrieveBindingReturnsOnCall map[int]struct {
-		result1 *v1beta1.ServiceBinding
+		result1 *v1.ServiceBinding
 		result2 error
 	}
-	RetrieveBindingsStub        func(string) (*v1beta1.ServiceBindingList, error)
+	RetrieveBindingsStub        func(string) (*v1.ServiceBindingList, error)
 	retrieveBindingsMutex       sync.RWMutex
 	retrieveBindingsArgsForCall []struct {
 		arg1 string
 	}
 	retrieveBindingsReturns struct {
-		result1 *v1beta1.ServiceBindingList
+		result1 *v1.ServiceBindingList
 		result2 error
 	}
 	retrieveBindingsReturnsOnCall map[int]struct {
-		result1 *v1beta1.ServiceBindingList
+		result1 *v1.ServiceBindingList
 		result2 error
 	}
-	RetrieveBindingsByInstanceStub        func(*v1beta1.ServiceInstance) ([]v1beta1.ServiceBinding, error)
+	RetrieveBindingsByInstanceStub        func(*v1.ServiceInstance) ([]v1.ServiceBinding, error)
 	retrieveBindingsByInstanceMutex       sync.RWMutex
 	retrieveBindingsByInstanceArgsForCall []struct {
-		arg1 *v1beta1.ServiceInstance
+		arg1 *v1.ServiceInstance
 	}
 	retrieveBindingsByInstanceReturns struct {
-		result1 []v1beta1.ServiceBinding
+		result1 []v1.ServiceBinding
 		result2 error
 	}
 	retrieveBindingsByInstanceReturnsOnCall map[int]struct {
-		result1 []v1beta1.ServiceBinding
+		result1 []v1.ServiceBinding
 		result2 error
 	}
-	RetrieveBrokerByClassStub        func(*v1beta1.ClusterServiceClass) (*v1beta1.ClusterServiceBroker, error)
+	RetrieveBrokerByClassStub        func(*v1.ClusterServiceClass) (*v1.ClusterServiceBroker, error)
 	retrieveBrokerByClassMutex       sync.RWMutex
 	retrieveBrokerByClassArgsForCall []struct {
-		arg1 *v1beta1.ClusterServiceClass
+		arg1 *v1.ClusterServiceClass
 	}
 	retrieveBrokerByClassReturns struct {
-		result1 *v1beta1.ClusterServiceBroker
+		result1 *v1.ClusterServiceBroker
 		result2 error
 	}
 	retrieveBrokerByClassReturnsOnCall map[int]struct {
-		result1 *v1beta1.ClusterServiceBroker
+		result1 *v1.ClusterServiceBroker
 		result2 error
 	}
 	RetrieveBrokerByIDStub        func(string, servicecatalog.ScopeOptions) (servicecatalog.Broker, error)
@@ -423,34 +423,34 @@ type FakeSvcatClient struct {
 		result1 []servicecatalog.Class
 		result2 error
 	}
-	RetrieveInstanceStub        func(string, string) (*v1beta1.ServiceInstance, error)
+	RetrieveInstanceStub        func(string, string) (*v1.ServiceInstance, error)
 	retrieveInstanceMutex       sync.RWMutex
 	retrieveInstanceArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
 	retrieveInstanceReturns struct {
-		result1 *v1beta1.ServiceInstance
+		result1 *v1.ServiceInstance
 		result2 error
 	}
 	retrieveInstanceReturnsOnCall map[int]struct {
-		result1 *v1beta1.ServiceInstance
+		result1 *v1.ServiceInstance
 		result2 error
 	}
-	RetrieveInstanceByBindingStub        func(*v1beta1.ServiceBinding) (*v1beta1.ServiceInstance, error)
+	RetrieveInstanceByBindingStub        func(*v1.ServiceBinding) (*v1.ServiceInstance, error)
 	retrieveInstanceByBindingMutex       sync.RWMutex
 	retrieveInstanceByBindingArgsForCall []struct {
-		arg1 *v1beta1.ServiceBinding
+		arg1 *v1.ServiceBinding
 	}
 	retrieveInstanceByBindingReturns struct {
-		result1 *v1beta1.ServiceInstance
+		result1 *v1.ServiceInstance
 		result2 error
 	}
 	retrieveInstanceByBindingReturnsOnCall map[int]struct {
-		result1 *v1beta1.ServiceInstance
+		result1 *v1.ServiceInstance
 		result2 error
 	}
-	RetrieveInstancesStub        func(string, string, string) (*v1beta1.ServiceInstanceList, error)
+	RetrieveInstancesStub        func(string, string, string) (*v1.ServiceInstanceList, error)
 	retrieveInstancesMutex       sync.RWMutex
 	retrieveInstancesArgsForCall []struct {
 		arg1 string
@@ -458,24 +458,24 @@ type FakeSvcatClient struct {
 		arg3 string
 	}
 	retrieveInstancesReturns struct {
-		result1 *v1beta1.ServiceInstanceList
+		result1 *v1.ServiceInstanceList
 		result2 error
 	}
 	retrieveInstancesReturnsOnCall map[int]struct {
-		result1 *v1beta1.ServiceInstanceList
+		result1 *v1.ServiceInstanceList
 		result2 error
 	}
-	RetrieveInstancesByPlanStub        func(servicecatalog.Plan) ([]v1beta1.ServiceInstance, error)
+	RetrieveInstancesByPlanStub        func(servicecatalog.Plan) ([]v1.ServiceInstance, error)
 	retrieveInstancesByPlanMutex       sync.RWMutex
 	retrieveInstancesByPlanArgsForCall []struct {
 		arg1 servicecatalog.Plan
 	}
 	retrieveInstancesByPlanReturns struct {
-		result1 []v1beta1.ServiceInstance
+		result1 []v1.ServiceInstance
 		result2 error
 	}
 	retrieveInstancesByPlanReturnsOnCall map[int]struct {
-		result1 []v1beta1.ServiceInstance
+		result1 []v1.ServiceInstance
 		result2 error
 	}
 	RetrievePlanByClassAndNameStub        func(string, string, servicecatalog.ScopeOptions) (servicecatalog.Plan, error)
@@ -550,10 +550,10 @@ type FakeSvcatClient struct {
 		result1 []servicecatalog.Plan
 		result2 error
 	}
-	RetrieveSecretByBindingStub        func(*v1beta1.ServiceBinding) (*v1.Secret, error)
+	RetrieveSecretByBindingStub        func(*v1.ServiceBinding) (*v1.Secret, error)
 	retrieveSecretByBindingMutex       sync.RWMutex
 	retrieveSecretByBindingArgsForCall []struct {
-		arg1 *v1beta1.ServiceBinding
+		arg1 *v1.ServiceBinding
 	}
 	retrieveSecretByBindingReturns struct {
 		result1 *v1.Secret
@@ -615,7 +615,7 @@ type FakeSvcatClient struct {
 		result1 []types.NamespacedName
 		result2 error
 	}
-	WaitForBindingStub        func(string, string, time.Duration, *time.Duration) (*v1beta1.ServiceBinding, error)
+	WaitForBindingStub        func(string, string, time.Duration, *time.Duration) (*v1.ServiceBinding, error)
 	waitForBindingMutex       sync.RWMutex
 	waitForBindingArgsForCall []struct {
 		arg1 string
@@ -624,11 +624,11 @@ type FakeSvcatClient struct {
 		arg4 *time.Duration
 	}
 	waitForBindingReturns struct {
-		result1 *v1beta1.ServiceBinding
+		result1 *v1.ServiceBinding
 		result2 error
 	}
 	waitForBindingReturnsOnCall map[int]struct {
-		result1 *v1beta1.ServiceBinding
+		result1 *v1.ServiceBinding
 		result2 error
 	}
 	WaitForBrokerStub        func(string, *servicecatalog.ScopeOptions, time.Duration, *time.Duration) (servicecatalog.Broker, error)
@@ -647,7 +647,7 @@ type FakeSvcatClient struct {
 		result1 servicecatalog.Broker
 		result2 error
 	}
-	WaitForInstanceStub        func(string, string, time.Duration, *time.Duration) (*v1beta1.ServiceInstance, error)
+	WaitForInstanceStub        func(string, string, time.Duration, *time.Duration) (*v1.ServiceInstance, error)
 	waitForInstanceMutex       sync.RWMutex
 	waitForInstanceArgsForCall []struct {
 		arg1 string
@@ -656,14 +656,14 @@ type FakeSvcatClient struct {
 		arg4 *time.Duration
 	}
 	waitForInstanceReturns struct {
-		result1 *v1beta1.ServiceInstance
+		result1 *v1.ServiceInstance
 		result2 error
 	}
 	waitForInstanceReturnsOnCall map[int]struct {
-		result1 *v1beta1.ServiceInstance
+		result1 *v1.ServiceInstance
 		result2 error
 	}
-	WaitForInstanceToNotExistStub        func(string, string, time.Duration, *time.Duration) (*v1beta1.ServiceInstance, error)
+	WaitForInstanceToNotExistStub        func(string, string, time.Duration, *time.Duration) (*v1.ServiceInstance, error)
 	waitForInstanceToNotExistMutex       sync.RWMutex
 	waitForInstanceToNotExistArgsForCall []struct {
 		arg1 string
@@ -672,18 +672,18 @@ type FakeSvcatClient struct {
 		arg4 *time.Duration
 	}
 	waitForInstanceToNotExistReturns struct {
-		result1 *v1beta1.ServiceInstance
+		result1 *v1.ServiceInstance
 		result2 error
 	}
 	waitForInstanceToNotExistReturnsOnCall map[int]struct {
-		result1 *v1beta1.ServiceInstance
+		result1 *v1.ServiceInstance
 		result2 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeSvcatClient) Bind(arg1 string, arg2 string, arg3 string, arg4 string, arg5 string, arg6 interface{}, arg7 map[string]string) (*v1beta1.ServiceBinding, error) {
+func (fake *FakeSvcatClient) Bind(arg1 string, arg2 string, arg3 string, arg4 string, arg5 string, arg6 interface{}, arg7 map[string]string) (*v1.ServiceBinding, error) {
 	fake.bindMutex.Lock()
 	ret, specificReturn := fake.bindReturnsOnCall[len(fake.bindArgsForCall)]
 	fake.bindArgsForCall = append(fake.bindArgsForCall, struct {
@@ -713,7 +713,7 @@ func (fake *FakeSvcatClient) BindCallCount() int {
 	return len(fake.bindArgsForCall)
 }
 
-func (fake *FakeSvcatClient) BindCalls(stub func(string, string, string, string, string, interface{}, map[string]string) (*v1beta1.ServiceBinding, error)) {
+func (fake *FakeSvcatClient) BindCalls(stub func(string, string, string, string, string, interface{}, map[string]string) (*v1.ServiceBinding, error)) {
 	fake.bindMutex.Lock()
 	defer fake.bindMutex.Unlock()
 	fake.BindStub = stub
@@ -726,37 +726,37 @@ func (fake *FakeSvcatClient) BindArgsForCall(i int) (string, string, string, str
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5, argsForCall.arg6, argsForCall.arg7
 }
 
-func (fake *FakeSvcatClient) BindReturns(result1 *v1beta1.ServiceBinding, result2 error) {
+func (fake *FakeSvcatClient) BindReturns(result1 *v1.ServiceBinding, result2 error) {
 	fake.bindMutex.Lock()
 	defer fake.bindMutex.Unlock()
 	fake.BindStub = nil
 	fake.bindReturns = struct {
-		result1 *v1beta1.ServiceBinding
+		result1 *v1.ServiceBinding
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeSvcatClient) BindReturnsOnCall(i int, result1 *v1beta1.ServiceBinding, result2 error) {
+func (fake *FakeSvcatClient) BindReturnsOnCall(i int, result1 *v1.ServiceBinding, result2 error) {
 	fake.bindMutex.Lock()
 	defer fake.bindMutex.Unlock()
 	fake.BindStub = nil
 	if fake.bindReturnsOnCall == nil {
 		fake.bindReturnsOnCall = make(map[int]struct {
-			result1 *v1beta1.ServiceBinding
+			result1 *v1.ServiceBinding
 			result2 error
 		})
 	}
 	fake.bindReturnsOnCall[i] = struct {
-		result1 *v1beta1.ServiceBinding
+		result1 *v1.ServiceBinding
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeSvcatClient) BindingParentHierarchy(arg1 *v1beta1.ServiceBinding) (*v1beta1.ServiceInstance, *v1beta1.ClusterServiceClass, *v1beta1.ClusterServicePlan, *v1beta1.ClusterServiceBroker, error) {
+func (fake *FakeSvcatClient) BindingParentHierarchy(arg1 *v1.ServiceBinding) (*v1.ServiceInstance, *v1.ClusterServiceClass, *v1.ClusterServicePlan, *v1.ClusterServiceBroker, error) {
 	fake.bindingParentHierarchyMutex.Lock()
 	ret, specificReturn := fake.bindingParentHierarchyReturnsOnCall[len(fake.bindingParentHierarchyArgsForCall)]
 	fake.bindingParentHierarchyArgsForCall = append(fake.bindingParentHierarchyArgsForCall, struct {
-		arg1 *v1beta1.ServiceBinding
+		arg1 *v1.ServiceBinding
 	}{arg1})
 	fake.recordInvocation("BindingParentHierarchy", []interface{}{arg1})
 	fake.bindingParentHierarchyMutex.Unlock()
@@ -776,50 +776,50 @@ func (fake *FakeSvcatClient) BindingParentHierarchyCallCount() int {
 	return len(fake.bindingParentHierarchyArgsForCall)
 }
 
-func (fake *FakeSvcatClient) BindingParentHierarchyCalls(stub func(*v1beta1.ServiceBinding) (*v1beta1.ServiceInstance, *v1beta1.ClusterServiceClass, *v1beta1.ClusterServicePlan, *v1beta1.ClusterServiceBroker, error)) {
+func (fake *FakeSvcatClient) BindingParentHierarchyCalls(stub func(*v1.ServiceBinding) (*v1.ServiceInstance, *v1.ClusterServiceClass, *v1.ClusterServicePlan, *v1.ClusterServiceBroker, error)) {
 	fake.bindingParentHierarchyMutex.Lock()
 	defer fake.bindingParentHierarchyMutex.Unlock()
 	fake.BindingParentHierarchyStub = stub
 }
 
-func (fake *FakeSvcatClient) BindingParentHierarchyArgsForCall(i int) *v1beta1.ServiceBinding {
+func (fake *FakeSvcatClient) BindingParentHierarchyArgsForCall(i int) *v1.ServiceBinding {
 	fake.bindingParentHierarchyMutex.RLock()
 	defer fake.bindingParentHierarchyMutex.RUnlock()
 	argsForCall := fake.bindingParentHierarchyArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeSvcatClient) BindingParentHierarchyReturns(result1 *v1beta1.ServiceInstance, result2 *v1beta1.ClusterServiceClass, result3 *v1beta1.ClusterServicePlan, result4 *v1beta1.ClusterServiceBroker, result5 error) {
+func (fake *FakeSvcatClient) BindingParentHierarchyReturns(result1 *v1.ServiceInstance, result2 *v1.ClusterServiceClass, result3 *v1.ClusterServicePlan, result4 *v1.ClusterServiceBroker, result5 error) {
 	fake.bindingParentHierarchyMutex.Lock()
 	defer fake.bindingParentHierarchyMutex.Unlock()
 	fake.BindingParentHierarchyStub = nil
 	fake.bindingParentHierarchyReturns = struct {
-		result1 *v1beta1.ServiceInstance
-		result2 *v1beta1.ClusterServiceClass
-		result3 *v1beta1.ClusterServicePlan
-		result4 *v1beta1.ClusterServiceBroker
+		result1 *v1.ServiceInstance
+		result2 *v1.ClusterServiceClass
+		result3 *v1.ClusterServicePlan
+		result4 *v1.ClusterServiceBroker
 		result5 error
 	}{result1, result2, result3, result4, result5}
 }
 
-func (fake *FakeSvcatClient) BindingParentHierarchyReturnsOnCall(i int, result1 *v1beta1.ServiceInstance, result2 *v1beta1.ClusterServiceClass, result3 *v1beta1.ClusterServicePlan, result4 *v1beta1.ClusterServiceBroker, result5 error) {
+func (fake *FakeSvcatClient) BindingParentHierarchyReturnsOnCall(i int, result1 *v1.ServiceInstance, result2 *v1.ClusterServiceClass, result3 *v1.ClusterServicePlan, result4 *v1.ClusterServiceBroker, result5 error) {
 	fake.bindingParentHierarchyMutex.Lock()
 	defer fake.bindingParentHierarchyMutex.Unlock()
 	fake.BindingParentHierarchyStub = nil
 	if fake.bindingParentHierarchyReturnsOnCall == nil {
 		fake.bindingParentHierarchyReturnsOnCall = make(map[int]struct {
-			result1 *v1beta1.ServiceInstance
-			result2 *v1beta1.ClusterServiceClass
-			result3 *v1beta1.ClusterServicePlan
-			result4 *v1beta1.ClusterServiceBroker
+			result1 *v1.ServiceInstance
+			result2 *v1.ClusterServiceClass
+			result3 *v1.ClusterServicePlan
+			result4 *v1.ClusterServiceBroker
 			result5 error
 		})
 	}
 	fake.bindingParentHierarchyReturnsOnCall[i] = struct {
-		result1 *v1beta1.ServiceInstance
-		result2 *v1beta1.ClusterServiceClass
-		result3 *v1beta1.ClusterServicePlan
-		result4 *v1beta1.ClusterServiceBroker
+		result1 *v1.ServiceInstance
+		result2 *v1.ClusterServiceClass
+		result3 *v1.ClusterServicePlan
+		result4 *v1.ClusterServiceBroker
 		result5 error
 	}{result1, result2, result3, result4, result5}
 }
@@ -1138,11 +1138,11 @@ func (fake *FakeSvcatClient) DeregisterReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *FakeSvcatClient) InstanceParentHierarchy(arg1 *v1beta1.ServiceInstance) (*v1beta1.ClusterServiceClass, *v1beta1.ClusterServicePlan, *v1beta1.ClusterServiceBroker, error) {
+func (fake *FakeSvcatClient) InstanceParentHierarchy(arg1 *v1.ServiceInstance) (*v1.ClusterServiceClass, *v1.ClusterServicePlan, *v1.ClusterServiceBroker, error) {
 	fake.instanceParentHierarchyMutex.Lock()
 	ret, specificReturn := fake.instanceParentHierarchyReturnsOnCall[len(fake.instanceParentHierarchyArgsForCall)]
 	fake.instanceParentHierarchyArgsForCall = append(fake.instanceParentHierarchyArgsForCall, struct {
-		arg1 *v1beta1.ServiceInstance
+		arg1 *v1.ServiceInstance
 	}{arg1})
 	fake.recordInvocation("InstanceParentHierarchy", []interface{}{arg1})
 	fake.instanceParentHierarchyMutex.Unlock()
@@ -1162,56 +1162,56 @@ func (fake *FakeSvcatClient) InstanceParentHierarchyCallCount() int {
 	return len(fake.instanceParentHierarchyArgsForCall)
 }
 
-func (fake *FakeSvcatClient) InstanceParentHierarchyCalls(stub func(*v1beta1.ServiceInstance) (*v1beta1.ClusterServiceClass, *v1beta1.ClusterServicePlan, *v1beta1.ClusterServiceBroker, error)) {
+func (fake *FakeSvcatClient) InstanceParentHierarchyCalls(stub func(*v1.ServiceInstance) (*v1.ClusterServiceClass, *v1.ClusterServicePlan, *v1.ClusterServiceBroker, error)) {
 	fake.instanceParentHierarchyMutex.Lock()
 	defer fake.instanceParentHierarchyMutex.Unlock()
 	fake.InstanceParentHierarchyStub = stub
 }
 
-func (fake *FakeSvcatClient) InstanceParentHierarchyArgsForCall(i int) *v1beta1.ServiceInstance {
+func (fake *FakeSvcatClient) InstanceParentHierarchyArgsForCall(i int) *v1.ServiceInstance {
 	fake.instanceParentHierarchyMutex.RLock()
 	defer fake.instanceParentHierarchyMutex.RUnlock()
 	argsForCall := fake.instanceParentHierarchyArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeSvcatClient) InstanceParentHierarchyReturns(result1 *v1beta1.ClusterServiceClass, result2 *v1beta1.ClusterServicePlan, result3 *v1beta1.ClusterServiceBroker, result4 error) {
+func (fake *FakeSvcatClient) InstanceParentHierarchyReturns(result1 *v1.ClusterServiceClass, result2 *v1.ClusterServicePlan, result3 *v1.ClusterServiceBroker, result4 error) {
 	fake.instanceParentHierarchyMutex.Lock()
 	defer fake.instanceParentHierarchyMutex.Unlock()
 	fake.InstanceParentHierarchyStub = nil
 	fake.instanceParentHierarchyReturns = struct {
-		result1 *v1beta1.ClusterServiceClass
-		result2 *v1beta1.ClusterServicePlan
-		result3 *v1beta1.ClusterServiceBroker
+		result1 *v1.ClusterServiceClass
+		result2 *v1.ClusterServicePlan
+		result3 *v1.ClusterServiceBroker
 		result4 error
 	}{result1, result2, result3, result4}
 }
 
-func (fake *FakeSvcatClient) InstanceParentHierarchyReturnsOnCall(i int, result1 *v1beta1.ClusterServiceClass, result2 *v1beta1.ClusterServicePlan, result3 *v1beta1.ClusterServiceBroker, result4 error) {
+func (fake *FakeSvcatClient) InstanceParentHierarchyReturnsOnCall(i int, result1 *v1.ClusterServiceClass, result2 *v1.ClusterServicePlan, result3 *v1.ClusterServiceBroker, result4 error) {
 	fake.instanceParentHierarchyMutex.Lock()
 	defer fake.instanceParentHierarchyMutex.Unlock()
 	fake.InstanceParentHierarchyStub = nil
 	if fake.instanceParentHierarchyReturnsOnCall == nil {
 		fake.instanceParentHierarchyReturnsOnCall = make(map[int]struct {
-			result1 *v1beta1.ClusterServiceClass
-			result2 *v1beta1.ClusterServicePlan
-			result3 *v1beta1.ClusterServiceBroker
+			result1 *v1.ClusterServiceClass
+			result2 *v1.ClusterServicePlan
+			result3 *v1.ClusterServiceBroker
 			result4 error
 		})
 	}
 	fake.instanceParentHierarchyReturnsOnCall[i] = struct {
-		result1 *v1beta1.ClusterServiceClass
-		result2 *v1beta1.ClusterServicePlan
-		result3 *v1beta1.ClusterServiceBroker
+		result1 *v1.ClusterServiceClass
+		result2 *v1.ClusterServicePlan
+		result3 *v1.ClusterServiceBroker
 		result4 error
 	}{result1, result2, result3, result4}
 }
 
-func (fake *FakeSvcatClient) InstanceToServiceClassAndPlan(arg1 *v1beta1.ServiceInstance) (*v1beta1.ClusterServiceClass, *v1beta1.ClusterServicePlan, error) {
+func (fake *FakeSvcatClient) InstanceToServiceClassAndPlan(arg1 *v1.ServiceInstance) (*v1.ClusterServiceClass, *v1.ClusterServicePlan, error) {
 	fake.instanceToServiceClassAndPlanMutex.Lock()
 	ret, specificReturn := fake.instanceToServiceClassAndPlanReturnsOnCall[len(fake.instanceToServiceClassAndPlanArgsForCall)]
 	fake.instanceToServiceClassAndPlanArgsForCall = append(fake.instanceToServiceClassAndPlanArgsForCall, struct {
-		arg1 *v1beta1.ServiceInstance
+		arg1 *v1.ServiceInstance
 	}{arg1})
 	fake.recordInvocation("InstanceToServiceClassAndPlan", []interface{}{arg1})
 	fake.instanceToServiceClassAndPlanMutex.Unlock()
@@ -1231,53 +1231,53 @@ func (fake *FakeSvcatClient) InstanceToServiceClassAndPlanCallCount() int {
 	return len(fake.instanceToServiceClassAndPlanArgsForCall)
 }
 
-func (fake *FakeSvcatClient) InstanceToServiceClassAndPlanCalls(stub func(*v1beta1.ServiceInstance) (*v1beta1.ClusterServiceClass, *v1beta1.ClusterServicePlan, error)) {
+func (fake *FakeSvcatClient) InstanceToServiceClassAndPlanCalls(stub func(*v1.ServiceInstance) (*v1.ClusterServiceClass, *v1.ClusterServicePlan, error)) {
 	fake.instanceToServiceClassAndPlanMutex.Lock()
 	defer fake.instanceToServiceClassAndPlanMutex.Unlock()
 	fake.InstanceToServiceClassAndPlanStub = stub
 }
 
-func (fake *FakeSvcatClient) InstanceToServiceClassAndPlanArgsForCall(i int) *v1beta1.ServiceInstance {
+func (fake *FakeSvcatClient) InstanceToServiceClassAndPlanArgsForCall(i int) *v1.ServiceInstance {
 	fake.instanceToServiceClassAndPlanMutex.RLock()
 	defer fake.instanceToServiceClassAndPlanMutex.RUnlock()
 	argsForCall := fake.instanceToServiceClassAndPlanArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeSvcatClient) InstanceToServiceClassAndPlanReturns(result1 *v1beta1.ClusterServiceClass, result2 *v1beta1.ClusterServicePlan, result3 error) {
+func (fake *FakeSvcatClient) InstanceToServiceClassAndPlanReturns(result1 *v1.ClusterServiceClass, result2 *v1.ClusterServicePlan, result3 error) {
 	fake.instanceToServiceClassAndPlanMutex.Lock()
 	defer fake.instanceToServiceClassAndPlanMutex.Unlock()
 	fake.InstanceToServiceClassAndPlanStub = nil
 	fake.instanceToServiceClassAndPlanReturns = struct {
-		result1 *v1beta1.ClusterServiceClass
-		result2 *v1beta1.ClusterServicePlan
+		result1 *v1.ClusterServiceClass
+		result2 *v1.ClusterServicePlan
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeSvcatClient) InstanceToServiceClassAndPlanReturnsOnCall(i int, result1 *v1beta1.ClusterServiceClass, result2 *v1beta1.ClusterServicePlan, result3 error) {
+func (fake *FakeSvcatClient) InstanceToServiceClassAndPlanReturnsOnCall(i int, result1 *v1.ClusterServiceClass, result2 *v1.ClusterServicePlan, result3 error) {
 	fake.instanceToServiceClassAndPlanMutex.Lock()
 	defer fake.instanceToServiceClassAndPlanMutex.Unlock()
 	fake.InstanceToServiceClassAndPlanStub = nil
 	if fake.instanceToServiceClassAndPlanReturnsOnCall == nil {
 		fake.instanceToServiceClassAndPlanReturnsOnCall = make(map[int]struct {
-			result1 *v1beta1.ClusterServiceClass
-			result2 *v1beta1.ClusterServicePlan
+			result1 *v1.ClusterServiceClass
+			result2 *v1.ClusterServicePlan
 			result3 error
 		})
 	}
 	fake.instanceToServiceClassAndPlanReturnsOnCall[i] = struct {
-		result1 *v1beta1.ClusterServiceClass
-		result2 *v1beta1.ClusterServicePlan
+		result1 *v1.ClusterServiceClass
+		result2 *v1.ClusterServicePlan
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeSvcatClient) IsBindingFailed(arg1 *v1beta1.ServiceBinding) bool {
+func (fake *FakeSvcatClient) IsBindingFailed(arg1 *v1.ServiceBinding) bool {
 	fake.isBindingFailedMutex.Lock()
 	ret, specificReturn := fake.isBindingFailedReturnsOnCall[len(fake.isBindingFailedArgsForCall)]
 	fake.isBindingFailedArgsForCall = append(fake.isBindingFailedArgsForCall, struct {
-		arg1 *v1beta1.ServiceBinding
+		arg1 *v1.ServiceBinding
 	}{arg1})
 	fake.recordInvocation("IsBindingFailed", []interface{}{arg1})
 	fake.isBindingFailedMutex.Unlock()
@@ -1297,13 +1297,13 @@ func (fake *FakeSvcatClient) IsBindingFailedCallCount() int {
 	return len(fake.isBindingFailedArgsForCall)
 }
 
-func (fake *FakeSvcatClient) IsBindingFailedCalls(stub func(*v1beta1.ServiceBinding) bool) {
+func (fake *FakeSvcatClient) IsBindingFailedCalls(stub func(*v1.ServiceBinding) bool) {
 	fake.isBindingFailedMutex.Lock()
 	defer fake.isBindingFailedMutex.Unlock()
 	fake.IsBindingFailedStub = stub
 }
 
-func (fake *FakeSvcatClient) IsBindingFailedArgsForCall(i int) *v1beta1.ServiceBinding {
+func (fake *FakeSvcatClient) IsBindingFailedArgsForCall(i int) *v1.ServiceBinding {
 	fake.isBindingFailedMutex.RLock()
 	defer fake.isBindingFailedMutex.RUnlock()
 	argsForCall := fake.isBindingFailedArgsForCall[i]
@@ -1333,11 +1333,11 @@ func (fake *FakeSvcatClient) IsBindingFailedReturnsOnCall(i int, result1 bool) {
 	}{result1}
 }
 
-func (fake *FakeSvcatClient) IsBindingReady(arg1 *v1beta1.ServiceBinding) bool {
+func (fake *FakeSvcatClient) IsBindingReady(arg1 *v1.ServiceBinding) bool {
 	fake.isBindingReadyMutex.Lock()
 	ret, specificReturn := fake.isBindingReadyReturnsOnCall[len(fake.isBindingReadyArgsForCall)]
 	fake.isBindingReadyArgsForCall = append(fake.isBindingReadyArgsForCall, struct {
-		arg1 *v1beta1.ServiceBinding
+		arg1 *v1.ServiceBinding
 	}{arg1})
 	fake.recordInvocation("IsBindingReady", []interface{}{arg1})
 	fake.isBindingReadyMutex.Unlock()
@@ -1357,13 +1357,13 @@ func (fake *FakeSvcatClient) IsBindingReadyCallCount() int {
 	return len(fake.isBindingReadyArgsForCall)
 }
 
-func (fake *FakeSvcatClient) IsBindingReadyCalls(stub func(*v1beta1.ServiceBinding) bool) {
+func (fake *FakeSvcatClient) IsBindingReadyCalls(stub func(*v1.ServiceBinding) bool) {
 	fake.isBindingReadyMutex.Lock()
 	defer fake.isBindingReadyMutex.Unlock()
 	fake.IsBindingReadyStub = stub
 }
 
-func (fake *FakeSvcatClient) IsBindingReadyArgsForCall(i int) *v1beta1.ServiceBinding {
+func (fake *FakeSvcatClient) IsBindingReadyArgsForCall(i int) *v1.ServiceBinding {
 	fake.isBindingReadyMutex.RLock()
 	defer fake.isBindingReadyMutex.RUnlock()
 	argsForCall := fake.isBindingReadyArgsForCall[i]
@@ -1393,11 +1393,11 @@ func (fake *FakeSvcatClient) IsBindingReadyReturnsOnCall(i int, result1 bool) {
 	}{result1}
 }
 
-func (fake *FakeSvcatClient) IsInstanceFailed(arg1 *v1beta1.ServiceInstance) bool {
+func (fake *FakeSvcatClient) IsInstanceFailed(arg1 *v1.ServiceInstance) bool {
 	fake.isInstanceFailedMutex.Lock()
 	ret, specificReturn := fake.isInstanceFailedReturnsOnCall[len(fake.isInstanceFailedArgsForCall)]
 	fake.isInstanceFailedArgsForCall = append(fake.isInstanceFailedArgsForCall, struct {
-		arg1 *v1beta1.ServiceInstance
+		arg1 *v1.ServiceInstance
 	}{arg1})
 	fake.recordInvocation("IsInstanceFailed", []interface{}{arg1})
 	fake.isInstanceFailedMutex.Unlock()
@@ -1417,13 +1417,13 @@ func (fake *FakeSvcatClient) IsInstanceFailedCallCount() int {
 	return len(fake.isInstanceFailedArgsForCall)
 }
 
-func (fake *FakeSvcatClient) IsInstanceFailedCalls(stub func(*v1beta1.ServiceInstance) bool) {
+func (fake *FakeSvcatClient) IsInstanceFailedCalls(stub func(*v1.ServiceInstance) bool) {
 	fake.isInstanceFailedMutex.Lock()
 	defer fake.isInstanceFailedMutex.Unlock()
 	fake.IsInstanceFailedStub = stub
 }
 
-func (fake *FakeSvcatClient) IsInstanceFailedArgsForCall(i int) *v1beta1.ServiceInstance {
+func (fake *FakeSvcatClient) IsInstanceFailedArgsForCall(i int) *v1.ServiceInstance {
 	fake.isInstanceFailedMutex.RLock()
 	defer fake.isInstanceFailedMutex.RUnlock()
 	argsForCall := fake.isInstanceFailedArgsForCall[i]
@@ -1453,11 +1453,11 @@ func (fake *FakeSvcatClient) IsInstanceFailedReturnsOnCall(i int, result1 bool) 
 	}{result1}
 }
 
-func (fake *FakeSvcatClient) IsInstanceReady(arg1 *v1beta1.ServiceInstance) bool {
+func (fake *FakeSvcatClient) IsInstanceReady(arg1 *v1.ServiceInstance) bool {
 	fake.isInstanceReadyMutex.Lock()
 	ret, specificReturn := fake.isInstanceReadyReturnsOnCall[len(fake.isInstanceReadyArgsForCall)]
 	fake.isInstanceReadyArgsForCall = append(fake.isInstanceReadyArgsForCall, struct {
-		arg1 *v1beta1.ServiceInstance
+		arg1 *v1.ServiceInstance
 	}{arg1})
 	fake.recordInvocation("IsInstanceReady", []interface{}{arg1})
 	fake.isInstanceReadyMutex.Unlock()
@@ -1477,13 +1477,13 @@ func (fake *FakeSvcatClient) IsInstanceReadyCallCount() int {
 	return len(fake.isInstanceReadyArgsForCall)
 }
 
-func (fake *FakeSvcatClient) IsInstanceReadyCalls(stub func(*v1beta1.ServiceInstance) bool) {
+func (fake *FakeSvcatClient) IsInstanceReadyCalls(stub func(*v1.ServiceInstance) bool) {
 	fake.isInstanceReadyMutex.Lock()
 	defer fake.isInstanceReadyMutex.Unlock()
 	fake.IsInstanceReadyStub = stub
 }
 
-func (fake *FakeSvcatClient) IsInstanceReadyArgsForCall(i int) *v1beta1.ServiceInstance {
+func (fake *FakeSvcatClient) IsInstanceReadyArgsForCall(i int) *v1.ServiceInstance {
 	fake.isInstanceReadyMutex.RLock()
 	defer fake.isInstanceReadyMutex.RUnlock()
 	argsForCall := fake.isInstanceReadyArgsForCall[i]
@@ -1513,7 +1513,7 @@ func (fake *FakeSvcatClient) IsInstanceReadyReturnsOnCall(i int, result1 bool) {
 	}{result1}
 }
 
-func (fake *FakeSvcatClient) Provision(arg1 string, arg2 string, arg3 string, arg4 bool, arg5 *servicecatalog.ProvisionOptions) (*v1beta1.ServiceInstance, error) {
+func (fake *FakeSvcatClient) Provision(arg1 string, arg2 string, arg3 string, arg4 bool, arg5 *servicecatalog.ProvisionOptions) (*v1.ServiceInstance, error) {
 	fake.provisionMutex.Lock()
 	ret, specificReturn := fake.provisionReturnsOnCall[len(fake.provisionArgsForCall)]
 	fake.provisionArgsForCall = append(fake.provisionArgsForCall, struct {
@@ -1541,7 +1541,7 @@ func (fake *FakeSvcatClient) ProvisionCallCount() int {
 	return len(fake.provisionArgsForCall)
 }
 
-func (fake *FakeSvcatClient) ProvisionCalls(stub func(string, string, string, bool, *servicecatalog.ProvisionOptions) (*v1beta1.ServiceInstance, error)) {
+func (fake *FakeSvcatClient) ProvisionCalls(stub func(string, string, string, bool, *servicecatalog.ProvisionOptions) (*v1.ServiceInstance, error)) {
 	fake.provisionMutex.Lock()
 	defer fake.provisionMutex.Unlock()
 	fake.ProvisionStub = stub
@@ -1554,28 +1554,28 @@ func (fake *FakeSvcatClient) ProvisionArgsForCall(i int) (string, string, string
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
 }
 
-func (fake *FakeSvcatClient) ProvisionReturns(result1 *v1beta1.ServiceInstance, result2 error) {
+func (fake *FakeSvcatClient) ProvisionReturns(result1 *v1.ServiceInstance, result2 error) {
 	fake.provisionMutex.Lock()
 	defer fake.provisionMutex.Unlock()
 	fake.ProvisionStub = nil
 	fake.provisionReturns = struct {
-		result1 *v1beta1.ServiceInstance
+		result1 *v1.ServiceInstance
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeSvcatClient) ProvisionReturnsOnCall(i int, result1 *v1beta1.ServiceInstance, result2 error) {
+func (fake *FakeSvcatClient) ProvisionReturnsOnCall(i int, result1 *v1.ServiceInstance, result2 error) {
 	fake.provisionMutex.Lock()
 	defer fake.provisionMutex.Unlock()
 	fake.ProvisionStub = nil
 	if fake.provisionReturnsOnCall == nil {
 		fake.provisionReturnsOnCall = make(map[int]struct {
-			result1 *v1beta1.ServiceInstance
+			result1 *v1.ServiceInstance
 			result2 error
 		})
 	}
 	fake.provisionReturnsOnCall[i] = struct {
-		result1 *v1beta1.ServiceInstance
+		result1 *v1.ServiceInstance
 		result2 error
 	}{result1, result2}
 }
@@ -1899,7 +1899,7 @@ func (fake *FakeSvcatClient) RemoveFinalizerForInstanceReturnsOnCall(i int, resu
 	}{result1}
 }
 
-func (fake *FakeSvcatClient) RetrieveBinding(arg1 string, arg2 string) (*v1beta1.ServiceBinding, error) {
+func (fake *FakeSvcatClient) RetrieveBinding(arg1 string, arg2 string) (*v1.ServiceBinding, error) {
 	fake.retrieveBindingMutex.Lock()
 	ret, specificReturn := fake.retrieveBindingReturnsOnCall[len(fake.retrieveBindingArgsForCall)]
 	fake.retrieveBindingArgsForCall = append(fake.retrieveBindingArgsForCall, struct {
@@ -1924,7 +1924,7 @@ func (fake *FakeSvcatClient) RetrieveBindingCallCount() int {
 	return len(fake.retrieveBindingArgsForCall)
 }
 
-func (fake *FakeSvcatClient) RetrieveBindingCalls(stub func(string, string) (*v1beta1.ServiceBinding, error)) {
+func (fake *FakeSvcatClient) RetrieveBindingCalls(stub func(string, string) (*v1.ServiceBinding, error)) {
 	fake.retrieveBindingMutex.Lock()
 	defer fake.retrieveBindingMutex.Unlock()
 	fake.RetrieveBindingStub = stub
@@ -1937,33 +1937,33 @@ func (fake *FakeSvcatClient) RetrieveBindingArgsForCall(i int) (string, string) 
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeSvcatClient) RetrieveBindingReturns(result1 *v1beta1.ServiceBinding, result2 error) {
+func (fake *FakeSvcatClient) RetrieveBindingReturns(result1 *v1.ServiceBinding, result2 error) {
 	fake.retrieveBindingMutex.Lock()
 	defer fake.retrieveBindingMutex.Unlock()
 	fake.RetrieveBindingStub = nil
 	fake.retrieveBindingReturns = struct {
-		result1 *v1beta1.ServiceBinding
+		result1 *v1.ServiceBinding
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeSvcatClient) RetrieveBindingReturnsOnCall(i int, result1 *v1beta1.ServiceBinding, result2 error) {
+func (fake *FakeSvcatClient) RetrieveBindingReturnsOnCall(i int, result1 *v1.ServiceBinding, result2 error) {
 	fake.retrieveBindingMutex.Lock()
 	defer fake.retrieveBindingMutex.Unlock()
 	fake.RetrieveBindingStub = nil
 	if fake.retrieveBindingReturnsOnCall == nil {
 		fake.retrieveBindingReturnsOnCall = make(map[int]struct {
-			result1 *v1beta1.ServiceBinding
+			result1 *v1.ServiceBinding
 			result2 error
 		})
 	}
 	fake.retrieveBindingReturnsOnCall[i] = struct {
-		result1 *v1beta1.ServiceBinding
+		result1 *v1.ServiceBinding
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeSvcatClient) RetrieveBindings(arg1 string) (*v1beta1.ServiceBindingList, error) {
+func (fake *FakeSvcatClient) RetrieveBindings(arg1 string) (*v1.ServiceBindingList, error) {
 	fake.retrieveBindingsMutex.Lock()
 	ret, specificReturn := fake.retrieveBindingsReturnsOnCall[len(fake.retrieveBindingsArgsForCall)]
 	fake.retrieveBindingsArgsForCall = append(fake.retrieveBindingsArgsForCall, struct {
@@ -1987,7 +1987,7 @@ func (fake *FakeSvcatClient) RetrieveBindingsCallCount() int {
 	return len(fake.retrieveBindingsArgsForCall)
 }
 
-func (fake *FakeSvcatClient) RetrieveBindingsCalls(stub func(string) (*v1beta1.ServiceBindingList, error)) {
+func (fake *FakeSvcatClient) RetrieveBindingsCalls(stub func(string) (*v1.ServiceBindingList, error)) {
 	fake.retrieveBindingsMutex.Lock()
 	defer fake.retrieveBindingsMutex.Unlock()
 	fake.RetrieveBindingsStub = stub
@@ -2000,37 +2000,37 @@ func (fake *FakeSvcatClient) RetrieveBindingsArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeSvcatClient) RetrieveBindingsReturns(result1 *v1beta1.ServiceBindingList, result2 error) {
+func (fake *FakeSvcatClient) RetrieveBindingsReturns(result1 *v1.ServiceBindingList, result2 error) {
 	fake.retrieveBindingsMutex.Lock()
 	defer fake.retrieveBindingsMutex.Unlock()
 	fake.RetrieveBindingsStub = nil
 	fake.retrieveBindingsReturns = struct {
-		result1 *v1beta1.ServiceBindingList
+		result1 *v1.ServiceBindingList
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeSvcatClient) RetrieveBindingsReturnsOnCall(i int, result1 *v1beta1.ServiceBindingList, result2 error) {
+func (fake *FakeSvcatClient) RetrieveBindingsReturnsOnCall(i int, result1 *v1.ServiceBindingList, result2 error) {
 	fake.retrieveBindingsMutex.Lock()
 	defer fake.retrieveBindingsMutex.Unlock()
 	fake.RetrieveBindingsStub = nil
 	if fake.retrieveBindingsReturnsOnCall == nil {
 		fake.retrieveBindingsReturnsOnCall = make(map[int]struct {
-			result1 *v1beta1.ServiceBindingList
+			result1 *v1.ServiceBindingList
 			result2 error
 		})
 	}
 	fake.retrieveBindingsReturnsOnCall[i] = struct {
-		result1 *v1beta1.ServiceBindingList
+		result1 *v1.ServiceBindingList
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeSvcatClient) RetrieveBindingsByInstance(arg1 *v1beta1.ServiceInstance) ([]v1beta1.ServiceBinding, error) {
+func (fake *FakeSvcatClient) RetrieveBindingsByInstance(arg1 *v1.ServiceInstance) ([]v1.ServiceBinding, error) {
 	fake.retrieveBindingsByInstanceMutex.Lock()
 	ret, specificReturn := fake.retrieveBindingsByInstanceReturnsOnCall[len(fake.retrieveBindingsByInstanceArgsForCall)]
 	fake.retrieveBindingsByInstanceArgsForCall = append(fake.retrieveBindingsByInstanceArgsForCall, struct {
-		arg1 *v1beta1.ServiceInstance
+		arg1 *v1.ServiceInstance
 	}{arg1})
 	fake.recordInvocation("RetrieveBindingsByInstance", []interface{}{arg1})
 	fake.retrieveBindingsByInstanceMutex.Unlock()
@@ -2050,50 +2050,50 @@ func (fake *FakeSvcatClient) RetrieveBindingsByInstanceCallCount() int {
 	return len(fake.retrieveBindingsByInstanceArgsForCall)
 }
 
-func (fake *FakeSvcatClient) RetrieveBindingsByInstanceCalls(stub func(*v1beta1.ServiceInstance) ([]v1beta1.ServiceBinding, error)) {
+func (fake *FakeSvcatClient) RetrieveBindingsByInstanceCalls(stub func(*v1.ServiceInstance) ([]v1.ServiceBinding, error)) {
 	fake.retrieveBindingsByInstanceMutex.Lock()
 	defer fake.retrieveBindingsByInstanceMutex.Unlock()
 	fake.RetrieveBindingsByInstanceStub = stub
 }
 
-func (fake *FakeSvcatClient) RetrieveBindingsByInstanceArgsForCall(i int) *v1beta1.ServiceInstance {
+func (fake *FakeSvcatClient) RetrieveBindingsByInstanceArgsForCall(i int) *v1.ServiceInstance {
 	fake.retrieveBindingsByInstanceMutex.RLock()
 	defer fake.retrieveBindingsByInstanceMutex.RUnlock()
 	argsForCall := fake.retrieveBindingsByInstanceArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeSvcatClient) RetrieveBindingsByInstanceReturns(result1 []v1beta1.ServiceBinding, result2 error) {
+func (fake *FakeSvcatClient) RetrieveBindingsByInstanceReturns(result1 []v1.ServiceBinding, result2 error) {
 	fake.retrieveBindingsByInstanceMutex.Lock()
 	defer fake.retrieveBindingsByInstanceMutex.Unlock()
 	fake.RetrieveBindingsByInstanceStub = nil
 	fake.retrieveBindingsByInstanceReturns = struct {
-		result1 []v1beta1.ServiceBinding
+		result1 []v1.ServiceBinding
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeSvcatClient) RetrieveBindingsByInstanceReturnsOnCall(i int, result1 []v1beta1.ServiceBinding, result2 error) {
+func (fake *FakeSvcatClient) RetrieveBindingsByInstanceReturnsOnCall(i int, result1 []v1.ServiceBinding, result2 error) {
 	fake.retrieveBindingsByInstanceMutex.Lock()
 	defer fake.retrieveBindingsByInstanceMutex.Unlock()
 	fake.RetrieveBindingsByInstanceStub = nil
 	if fake.retrieveBindingsByInstanceReturnsOnCall == nil {
 		fake.retrieveBindingsByInstanceReturnsOnCall = make(map[int]struct {
-			result1 []v1beta1.ServiceBinding
+			result1 []v1.ServiceBinding
 			result2 error
 		})
 	}
 	fake.retrieveBindingsByInstanceReturnsOnCall[i] = struct {
-		result1 []v1beta1.ServiceBinding
+		result1 []v1.ServiceBinding
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeSvcatClient) RetrieveBrokerByClass(arg1 *v1beta1.ClusterServiceClass) (*v1beta1.ClusterServiceBroker, error) {
+func (fake *FakeSvcatClient) RetrieveBrokerByClass(arg1 *v1.ClusterServiceClass) (*v1.ClusterServiceBroker, error) {
 	fake.retrieveBrokerByClassMutex.Lock()
 	ret, specificReturn := fake.retrieveBrokerByClassReturnsOnCall[len(fake.retrieveBrokerByClassArgsForCall)]
 	fake.retrieveBrokerByClassArgsForCall = append(fake.retrieveBrokerByClassArgsForCall, struct {
-		arg1 *v1beta1.ClusterServiceClass
+		arg1 *v1.ClusterServiceClass
 	}{arg1})
 	fake.recordInvocation("RetrieveBrokerByClass", []interface{}{arg1})
 	fake.retrieveBrokerByClassMutex.Unlock()
@@ -2113,41 +2113,41 @@ func (fake *FakeSvcatClient) RetrieveBrokerByClassCallCount() int {
 	return len(fake.retrieveBrokerByClassArgsForCall)
 }
 
-func (fake *FakeSvcatClient) RetrieveBrokerByClassCalls(stub func(*v1beta1.ClusterServiceClass) (*v1beta1.ClusterServiceBroker, error)) {
+func (fake *FakeSvcatClient) RetrieveBrokerByClassCalls(stub func(*v1.ClusterServiceClass) (*v1.ClusterServiceBroker, error)) {
 	fake.retrieveBrokerByClassMutex.Lock()
 	defer fake.retrieveBrokerByClassMutex.Unlock()
 	fake.RetrieveBrokerByClassStub = stub
 }
 
-func (fake *FakeSvcatClient) RetrieveBrokerByClassArgsForCall(i int) *v1beta1.ClusterServiceClass {
+func (fake *FakeSvcatClient) RetrieveBrokerByClassArgsForCall(i int) *v1.ClusterServiceClass {
 	fake.retrieveBrokerByClassMutex.RLock()
 	defer fake.retrieveBrokerByClassMutex.RUnlock()
 	argsForCall := fake.retrieveBrokerByClassArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeSvcatClient) RetrieveBrokerByClassReturns(result1 *v1beta1.ClusterServiceBroker, result2 error) {
+func (fake *FakeSvcatClient) RetrieveBrokerByClassReturns(result1 *v1.ClusterServiceBroker, result2 error) {
 	fake.retrieveBrokerByClassMutex.Lock()
 	defer fake.retrieveBrokerByClassMutex.Unlock()
 	fake.RetrieveBrokerByClassStub = nil
 	fake.retrieveBrokerByClassReturns = struct {
-		result1 *v1beta1.ClusterServiceBroker
+		result1 *v1.ClusterServiceBroker
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeSvcatClient) RetrieveBrokerByClassReturnsOnCall(i int, result1 *v1beta1.ClusterServiceBroker, result2 error) {
+func (fake *FakeSvcatClient) RetrieveBrokerByClassReturnsOnCall(i int, result1 *v1.ClusterServiceBroker, result2 error) {
 	fake.retrieveBrokerByClassMutex.Lock()
 	defer fake.retrieveBrokerByClassMutex.Unlock()
 	fake.RetrieveBrokerByClassStub = nil
 	if fake.retrieveBrokerByClassReturnsOnCall == nil {
 		fake.retrieveBrokerByClassReturnsOnCall = make(map[int]struct {
-			result1 *v1beta1.ClusterServiceBroker
+			result1 *v1.ClusterServiceBroker
 			result2 error
 		})
 	}
 	fake.retrieveBrokerByClassReturnsOnCall[i] = struct {
-		result1 *v1beta1.ClusterServiceBroker
+		result1 *v1.ClusterServiceBroker
 		result2 error
 	}{result1, result2}
 }
@@ -2534,7 +2534,7 @@ func (fake *FakeSvcatClient) RetrieveClassesReturnsOnCall(i int, result1 []servi
 	}{result1, result2}
 }
 
-func (fake *FakeSvcatClient) RetrieveInstance(arg1 string, arg2 string) (*v1beta1.ServiceInstance, error) {
+func (fake *FakeSvcatClient) RetrieveInstance(arg1 string, arg2 string) (*v1.ServiceInstance, error) {
 	fake.retrieveInstanceMutex.Lock()
 	ret, specificReturn := fake.retrieveInstanceReturnsOnCall[len(fake.retrieveInstanceArgsForCall)]
 	fake.retrieveInstanceArgsForCall = append(fake.retrieveInstanceArgsForCall, struct {
@@ -2559,7 +2559,7 @@ func (fake *FakeSvcatClient) RetrieveInstanceCallCount() int {
 	return len(fake.retrieveInstanceArgsForCall)
 }
 
-func (fake *FakeSvcatClient) RetrieveInstanceCalls(stub func(string, string) (*v1beta1.ServiceInstance, error)) {
+func (fake *FakeSvcatClient) RetrieveInstanceCalls(stub func(string, string) (*v1.ServiceInstance, error)) {
 	fake.retrieveInstanceMutex.Lock()
 	defer fake.retrieveInstanceMutex.Unlock()
 	fake.RetrieveInstanceStub = stub
@@ -2572,37 +2572,37 @@ func (fake *FakeSvcatClient) RetrieveInstanceArgsForCall(i int) (string, string)
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeSvcatClient) RetrieveInstanceReturns(result1 *v1beta1.ServiceInstance, result2 error) {
+func (fake *FakeSvcatClient) RetrieveInstanceReturns(result1 *v1.ServiceInstance, result2 error) {
 	fake.retrieveInstanceMutex.Lock()
 	defer fake.retrieveInstanceMutex.Unlock()
 	fake.RetrieveInstanceStub = nil
 	fake.retrieveInstanceReturns = struct {
-		result1 *v1beta1.ServiceInstance
+		result1 *v1.ServiceInstance
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeSvcatClient) RetrieveInstanceReturnsOnCall(i int, result1 *v1beta1.ServiceInstance, result2 error) {
+func (fake *FakeSvcatClient) RetrieveInstanceReturnsOnCall(i int, result1 *v1.ServiceInstance, result2 error) {
 	fake.retrieveInstanceMutex.Lock()
 	defer fake.retrieveInstanceMutex.Unlock()
 	fake.RetrieveInstanceStub = nil
 	if fake.retrieveInstanceReturnsOnCall == nil {
 		fake.retrieveInstanceReturnsOnCall = make(map[int]struct {
-			result1 *v1beta1.ServiceInstance
+			result1 *v1.ServiceInstance
 			result2 error
 		})
 	}
 	fake.retrieveInstanceReturnsOnCall[i] = struct {
-		result1 *v1beta1.ServiceInstance
+		result1 *v1.ServiceInstance
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeSvcatClient) RetrieveInstanceByBinding(arg1 *v1beta1.ServiceBinding) (*v1beta1.ServiceInstance, error) {
+func (fake *FakeSvcatClient) RetrieveInstanceByBinding(arg1 *v1.ServiceBinding) (*v1.ServiceInstance, error) {
 	fake.retrieveInstanceByBindingMutex.Lock()
 	ret, specificReturn := fake.retrieveInstanceByBindingReturnsOnCall[len(fake.retrieveInstanceByBindingArgsForCall)]
 	fake.retrieveInstanceByBindingArgsForCall = append(fake.retrieveInstanceByBindingArgsForCall, struct {
-		arg1 *v1beta1.ServiceBinding
+		arg1 *v1.ServiceBinding
 	}{arg1})
 	fake.recordInvocation("RetrieveInstanceByBinding", []interface{}{arg1})
 	fake.retrieveInstanceByBindingMutex.Unlock()
@@ -2622,46 +2622,46 @@ func (fake *FakeSvcatClient) RetrieveInstanceByBindingCallCount() int {
 	return len(fake.retrieveInstanceByBindingArgsForCall)
 }
 
-func (fake *FakeSvcatClient) RetrieveInstanceByBindingCalls(stub func(*v1beta1.ServiceBinding) (*v1beta1.ServiceInstance, error)) {
+func (fake *FakeSvcatClient) RetrieveInstanceByBindingCalls(stub func(*v1.ServiceBinding) (*v1.ServiceInstance, error)) {
 	fake.retrieveInstanceByBindingMutex.Lock()
 	defer fake.retrieveInstanceByBindingMutex.Unlock()
 	fake.RetrieveInstanceByBindingStub = stub
 }
 
-func (fake *FakeSvcatClient) RetrieveInstanceByBindingArgsForCall(i int) *v1beta1.ServiceBinding {
+func (fake *FakeSvcatClient) RetrieveInstanceByBindingArgsForCall(i int) *v1.ServiceBinding {
 	fake.retrieveInstanceByBindingMutex.RLock()
 	defer fake.retrieveInstanceByBindingMutex.RUnlock()
 	argsForCall := fake.retrieveInstanceByBindingArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeSvcatClient) RetrieveInstanceByBindingReturns(result1 *v1beta1.ServiceInstance, result2 error) {
+func (fake *FakeSvcatClient) RetrieveInstanceByBindingReturns(result1 *v1.ServiceInstance, result2 error) {
 	fake.retrieveInstanceByBindingMutex.Lock()
 	defer fake.retrieveInstanceByBindingMutex.Unlock()
 	fake.RetrieveInstanceByBindingStub = nil
 	fake.retrieveInstanceByBindingReturns = struct {
-		result1 *v1beta1.ServiceInstance
+		result1 *v1.ServiceInstance
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeSvcatClient) RetrieveInstanceByBindingReturnsOnCall(i int, result1 *v1beta1.ServiceInstance, result2 error) {
+func (fake *FakeSvcatClient) RetrieveInstanceByBindingReturnsOnCall(i int, result1 *v1.ServiceInstance, result2 error) {
 	fake.retrieveInstanceByBindingMutex.Lock()
 	defer fake.retrieveInstanceByBindingMutex.Unlock()
 	fake.RetrieveInstanceByBindingStub = nil
 	if fake.retrieveInstanceByBindingReturnsOnCall == nil {
 		fake.retrieveInstanceByBindingReturnsOnCall = make(map[int]struct {
-			result1 *v1beta1.ServiceInstance
+			result1 *v1.ServiceInstance
 			result2 error
 		})
 	}
 	fake.retrieveInstanceByBindingReturnsOnCall[i] = struct {
-		result1 *v1beta1.ServiceInstance
+		result1 *v1.ServiceInstance
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeSvcatClient) RetrieveInstances(arg1 string, arg2 string, arg3 string) (*v1beta1.ServiceInstanceList, error) {
+func (fake *FakeSvcatClient) RetrieveInstances(arg1 string, arg2 string, arg3 string) (*v1.ServiceInstanceList, error) {
 	fake.retrieveInstancesMutex.Lock()
 	ret, specificReturn := fake.retrieveInstancesReturnsOnCall[len(fake.retrieveInstancesArgsForCall)]
 	fake.retrieveInstancesArgsForCall = append(fake.retrieveInstancesArgsForCall, struct {
@@ -2687,7 +2687,7 @@ func (fake *FakeSvcatClient) RetrieveInstancesCallCount() int {
 	return len(fake.retrieveInstancesArgsForCall)
 }
 
-func (fake *FakeSvcatClient) RetrieveInstancesCalls(stub func(string, string, string) (*v1beta1.ServiceInstanceList, error)) {
+func (fake *FakeSvcatClient) RetrieveInstancesCalls(stub func(string, string, string) (*v1.ServiceInstanceList, error)) {
 	fake.retrieveInstancesMutex.Lock()
 	defer fake.retrieveInstancesMutex.Unlock()
 	fake.RetrieveInstancesStub = stub
@@ -2700,33 +2700,33 @@ func (fake *FakeSvcatClient) RetrieveInstancesArgsForCall(i int) (string, string
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
-func (fake *FakeSvcatClient) RetrieveInstancesReturns(result1 *v1beta1.ServiceInstanceList, result2 error) {
+func (fake *FakeSvcatClient) RetrieveInstancesReturns(result1 *v1.ServiceInstanceList, result2 error) {
 	fake.retrieveInstancesMutex.Lock()
 	defer fake.retrieveInstancesMutex.Unlock()
 	fake.RetrieveInstancesStub = nil
 	fake.retrieveInstancesReturns = struct {
-		result1 *v1beta1.ServiceInstanceList
+		result1 *v1.ServiceInstanceList
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeSvcatClient) RetrieveInstancesReturnsOnCall(i int, result1 *v1beta1.ServiceInstanceList, result2 error) {
+func (fake *FakeSvcatClient) RetrieveInstancesReturnsOnCall(i int, result1 *v1.ServiceInstanceList, result2 error) {
 	fake.retrieveInstancesMutex.Lock()
 	defer fake.retrieveInstancesMutex.Unlock()
 	fake.RetrieveInstancesStub = nil
 	if fake.retrieveInstancesReturnsOnCall == nil {
 		fake.retrieveInstancesReturnsOnCall = make(map[int]struct {
-			result1 *v1beta1.ServiceInstanceList
+			result1 *v1.ServiceInstanceList
 			result2 error
 		})
 	}
 	fake.retrieveInstancesReturnsOnCall[i] = struct {
-		result1 *v1beta1.ServiceInstanceList
+		result1 *v1.ServiceInstanceList
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeSvcatClient) RetrieveInstancesByPlan(arg1 servicecatalog.Plan) ([]v1beta1.ServiceInstance, error) {
+func (fake *FakeSvcatClient) RetrieveInstancesByPlan(arg1 servicecatalog.Plan) ([]v1.ServiceInstance, error) {
 	fake.retrieveInstancesByPlanMutex.Lock()
 	ret, specificReturn := fake.retrieveInstancesByPlanReturnsOnCall[len(fake.retrieveInstancesByPlanArgsForCall)]
 	fake.retrieveInstancesByPlanArgsForCall = append(fake.retrieveInstancesByPlanArgsForCall, struct {
@@ -2750,7 +2750,7 @@ func (fake *FakeSvcatClient) RetrieveInstancesByPlanCallCount() int {
 	return len(fake.retrieveInstancesByPlanArgsForCall)
 }
 
-func (fake *FakeSvcatClient) RetrieveInstancesByPlanCalls(stub func(servicecatalog.Plan) ([]v1beta1.ServiceInstance, error)) {
+func (fake *FakeSvcatClient) RetrieveInstancesByPlanCalls(stub func(servicecatalog.Plan) ([]v1.ServiceInstance, error)) {
 	fake.retrieveInstancesByPlanMutex.Lock()
 	defer fake.retrieveInstancesByPlanMutex.Unlock()
 	fake.RetrieveInstancesByPlanStub = stub
@@ -2763,28 +2763,28 @@ func (fake *FakeSvcatClient) RetrieveInstancesByPlanArgsForCall(i int) serviceca
 	return argsForCall.arg1
 }
 
-func (fake *FakeSvcatClient) RetrieveInstancesByPlanReturns(result1 []v1beta1.ServiceInstance, result2 error) {
+func (fake *FakeSvcatClient) RetrieveInstancesByPlanReturns(result1 []v1.ServiceInstance, result2 error) {
 	fake.retrieveInstancesByPlanMutex.Lock()
 	defer fake.retrieveInstancesByPlanMutex.Unlock()
 	fake.RetrieveInstancesByPlanStub = nil
 	fake.retrieveInstancesByPlanReturns = struct {
-		result1 []v1beta1.ServiceInstance
+		result1 []v1.ServiceInstance
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeSvcatClient) RetrieveInstancesByPlanReturnsOnCall(i int, result1 []v1beta1.ServiceInstance, result2 error) {
+func (fake *FakeSvcatClient) RetrieveInstancesByPlanReturnsOnCall(i int, result1 []v1.ServiceInstance, result2 error) {
 	fake.retrieveInstancesByPlanMutex.Lock()
 	defer fake.retrieveInstancesByPlanMutex.Unlock()
 	fake.RetrieveInstancesByPlanStub = nil
 	if fake.retrieveInstancesByPlanReturnsOnCall == nil {
 		fake.retrieveInstancesByPlanReturnsOnCall = make(map[int]struct {
-			result1 []v1beta1.ServiceInstance
+			result1 []v1.ServiceInstance
 			result2 error
 		})
 	}
 	fake.retrieveInstancesByPlanReturnsOnCall[i] = struct {
-		result1 []v1beta1.ServiceInstance
+		result1 []v1.ServiceInstance
 		result2 error
 	}{result1, result2}
 }
@@ -3111,11 +3111,11 @@ func (fake *FakeSvcatClient) RetrievePlansReturnsOnCall(i int, result1 []service
 	}{result1, result2}
 }
 
-func (fake *FakeSvcatClient) RetrieveSecretByBinding(arg1 *v1beta1.ServiceBinding) (*v1.Secret, error) {
+func (fake *FakeSvcatClient) RetrieveSecretByBinding(arg1 *v1.ServiceBinding) (*v1.Secret, error) {
 	fake.retrieveSecretByBindingMutex.Lock()
 	ret, specificReturn := fake.retrieveSecretByBindingReturnsOnCall[len(fake.retrieveSecretByBindingArgsForCall)]
 	fake.retrieveSecretByBindingArgsForCall = append(fake.retrieveSecretByBindingArgsForCall, struct {
-		arg1 *v1beta1.ServiceBinding
+		arg1 *v1.ServiceBinding
 	}{arg1})
 	fake.recordInvocation("RetrieveSecretByBinding", []interface{}{arg1})
 	fake.retrieveSecretByBindingMutex.Unlock()
@@ -3135,13 +3135,13 @@ func (fake *FakeSvcatClient) RetrieveSecretByBindingCallCount() int {
 	return len(fake.retrieveSecretByBindingArgsForCall)
 }
 
-func (fake *FakeSvcatClient) RetrieveSecretByBindingCalls(stub func(*v1beta1.ServiceBinding) (*v1.Secret, error)) {
+func (fake *FakeSvcatClient) RetrieveSecretByBindingCalls(stub func(*v1.ServiceBinding) (*v1.Secret, error)) {
 	fake.retrieveSecretByBindingMutex.Lock()
 	defer fake.retrieveSecretByBindingMutex.Unlock()
 	fake.RetrieveSecretByBindingStub = stub
 }
 
-func (fake *FakeSvcatClient) RetrieveSecretByBindingArgsForCall(i int) *v1beta1.ServiceBinding {
+func (fake *FakeSvcatClient) RetrieveSecretByBindingArgsForCall(i int) *v1.ServiceBinding {
 	fake.retrieveSecretByBindingMutex.RLock()
 	defer fake.retrieveSecretByBindingMutex.RUnlock()
 	argsForCall := fake.retrieveSecretByBindingArgsForCall[i]
@@ -3417,7 +3417,7 @@ func (fake *FakeSvcatClient) UnbindReturnsOnCall(i int, result1 []types.Namespac
 	}{result1, result2}
 }
 
-func (fake *FakeSvcatClient) WaitForBinding(arg1 string, arg2 string, arg3 time.Duration, arg4 *time.Duration) (*v1beta1.ServiceBinding, error) {
+func (fake *FakeSvcatClient) WaitForBinding(arg1 string, arg2 string, arg3 time.Duration, arg4 *time.Duration) (*v1.ServiceBinding, error) {
 	fake.waitForBindingMutex.Lock()
 	ret, specificReturn := fake.waitForBindingReturnsOnCall[len(fake.waitForBindingArgsForCall)]
 	fake.waitForBindingArgsForCall = append(fake.waitForBindingArgsForCall, struct {
@@ -3444,7 +3444,7 @@ func (fake *FakeSvcatClient) WaitForBindingCallCount() int {
 	return len(fake.waitForBindingArgsForCall)
 }
 
-func (fake *FakeSvcatClient) WaitForBindingCalls(stub func(string, string, time.Duration, *time.Duration) (*v1beta1.ServiceBinding, error)) {
+func (fake *FakeSvcatClient) WaitForBindingCalls(stub func(string, string, time.Duration, *time.Duration) (*v1.ServiceBinding, error)) {
 	fake.waitForBindingMutex.Lock()
 	defer fake.waitForBindingMutex.Unlock()
 	fake.WaitForBindingStub = stub
@@ -3457,28 +3457,28 @@ func (fake *FakeSvcatClient) WaitForBindingArgsForCall(i int) (string, string, t
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
 }
 
-func (fake *FakeSvcatClient) WaitForBindingReturns(result1 *v1beta1.ServiceBinding, result2 error) {
+func (fake *FakeSvcatClient) WaitForBindingReturns(result1 *v1.ServiceBinding, result2 error) {
 	fake.waitForBindingMutex.Lock()
 	defer fake.waitForBindingMutex.Unlock()
 	fake.WaitForBindingStub = nil
 	fake.waitForBindingReturns = struct {
-		result1 *v1beta1.ServiceBinding
+		result1 *v1.ServiceBinding
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeSvcatClient) WaitForBindingReturnsOnCall(i int, result1 *v1beta1.ServiceBinding, result2 error) {
+func (fake *FakeSvcatClient) WaitForBindingReturnsOnCall(i int, result1 *v1.ServiceBinding, result2 error) {
 	fake.waitForBindingMutex.Lock()
 	defer fake.waitForBindingMutex.Unlock()
 	fake.WaitForBindingStub = nil
 	if fake.waitForBindingReturnsOnCall == nil {
 		fake.waitForBindingReturnsOnCall = make(map[int]struct {
-			result1 *v1beta1.ServiceBinding
+			result1 *v1.ServiceBinding
 			result2 error
 		})
 	}
 	fake.waitForBindingReturnsOnCall[i] = struct {
-		result1 *v1beta1.ServiceBinding
+		result1 *v1.ServiceBinding
 		result2 error
 	}{result1, result2}
 }
@@ -3549,7 +3549,7 @@ func (fake *FakeSvcatClient) WaitForBrokerReturnsOnCall(i int, result1 serviceca
 	}{result1, result2}
 }
 
-func (fake *FakeSvcatClient) WaitForInstance(arg1 string, arg2 string, arg3 time.Duration, arg4 *time.Duration) (*v1beta1.ServiceInstance, error) {
+func (fake *FakeSvcatClient) WaitForInstance(arg1 string, arg2 string, arg3 time.Duration, arg4 *time.Duration) (*v1.ServiceInstance, error) {
 	fake.waitForInstanceMutex.Lock()
 	ret, specificReturn := fake.waitForInstanceReturnsOnCall[len(fake.waitForInstanceArgsForCall)]
 	fake.waitForInstanceArgsForCall = append(fake.waitForInstanceArgsForCall, struct {
@@ -3576,7 +3576,7 @@ func (fake *FakeSvcatClient) WaitForInstanceCallCount() int {
 	return len(fake.waitForInstanceArgsForCall)
 }
 
-func (fake *FakeSvcatClient) WaitForInstanceCalls(stub func(string, string, time.Duration, *time.Duration) (*v1beta1.ServiceInstance, error)) {
+func (fake *FakeSvcatClient) WaitForInstanceCalls(stub func(string, string, time.Duration, *time.Duration) (*v1.ServiceInstance, error)) {
 	fake.waitForInstanceMutex.Lock()
 	defer fake.waitForInstanceMutex.Unlock()
 	fake.WaitForInstanceStub = stub
@@ -3589,33 +3589,33 @@ func (fake *FakeSvcatClient) WaitForInstanceArgsForCall(i int) (string, string, 
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
 }
 
-func (fake *FakeSvcatClient) WaitForInstanceReturns(result1 *v1beta1.ServiceInstance, result2 error) {
+func (fake *FakeSvcatClient) WaitForInstanceReturns(result1 *v1.ServiceInstance, result2 error) {
 	fake.waitForInstanceMutex.Lock()
 	defer fake.waitForInstanceMutex.Unlock()
 	fake.WaitForInstanceStub = nil
 	fake.waitForInstanceReturns = struct {
-		result1 *v1beta1.ServiceInstance
+		result1 *v1.ServiceInstance
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeSvcatClient) WaitForInstanceReturnsOnCall(i int, result1 *v1beta1.ServiceInstance, result2 error) {
+func (fake *FakeSvcatClient) WaitForInstanceReturnsOnCall(i int, result1 *v1.ServiceInstance, result2 error) {
 	fake.waitForInstanceMutex.Lock()
 	defer fake.waitForInstanceMutex.Unlock()
 	fake.WaitForInstanceStub = nil
 	if fake.waitForInstanceReturnsOnCall == nil {
 		fake.waitForInstanceReturnsOnCall = make(map[int]struct {
-			result1 *v1beta1.ServiceInstance
+			result1 *v1.ServiceInstance
 			result2 error
 		})
 	}
 	fake.waitForInstanceReturnsOnCall[i] = struct {
-		result1 *v1beta1.ServiceInstance
+		result1 *v1.ServiceInstance
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeSvcatClient) WaitForInstanceToNotExist(arg1 string, arg2 string, arg3 time.Duration, arg4 *time.Duration) (*v1beta1.ServiceInstance, error) {
+func (fake *FakeSvcatClient) WaitForInstanceToNotExist(arg1 string, arg2 string, arg3 time.Duration, arg4 *time.Duration) (*v1.ServiceInstance, error) {
 	fake.waitForInstanceToNotExistMutex.Lock()
 	ret, specificReturn := fake.waitForInstanceToNotExistReturnsOnCall[len(fake.waitForInstanceToNotExistArgsForCall)]
 	fake.waitForInstanceToNotExistArgsForCall = append(fake.waitForInstanceToNotExistArgsForCall, struct {
@@ -3642,7 +3642,7 @@ func (fake *FakeSvcatClient) WaitForInstanceToNotExistCallCount() int {
 	return len(fake.waitForInstanceToNotExistArgsForCall)
 }
 
-func (fake *FakeSvcatClient) WaitForInstanceToNotExistCalls(stub func(string, string, time.Duration, *time.Duration) (*v1beta1.ServiceInstance, error)) {
+func (fake *FakeSvcatClient) WaitForInstanceToNotExistCalls(stub func(string, string, time.Duration, *time.Duration) (*v1.ServiceInstance, error)) {
 	fake.waitForInstanceToNotExistMutex.Lock()
 	defer fake.waitForInstanceToNotExistMutex.Unlock()
 	fake.WaitForInstanceToNotExistStub = stub
@@ -3655,28 +3655,28 @@ func (fake *FakeSvcatClient) WaitForInstanceToNotExistArgsForCall(i int) (string
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
 }
 
-func (fake *FakeSvcatClient) WaitForInstanceToNotExistReturns(result1 *v1beta1.ServiceInstance, result2 error) {
+func (fake *FakeSvcatClient) WaitForInstanceToNotExistReturns(result1 *v1.ServiceInstance, result2 error) {
 	fake.waitForInstanceToNotExistMutex.Lock()
 	defer fake.waitForInstanceToNotExistMutex.Unlock()
 	fake.WaitForInstanceToNotExistStub = nil
 	fake.waitForInstanceToNotExistReturns = struct {
-		result1 *v1beta1.ServiceInstance
+		result1 *v1.ServiceInstance
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeSvcatClient) WaitForInstanceToNotExistReturnsOnCall(i int, result1 *v1beta1.ServiceInstance, result2 error) {
+func (fake *FakeSvcatClient) WaitForInstanceToNotExistReturnsOnCall(i int, result1 *v1.ServiceInstance, result2 error) {
 	fake.waitForInstanceToNotExistMutex.Lock()
 	defer fake.waitForInstanceToNotExistMutex.Unlock()
 	fake.WaitForInstanceToNotExistStub = nil
 	if fake.waitForInstanceToNotExistReturnsOnCall == nil {
 		fake.waitForInstanceToNotExistReturnsOnCall = make(map[int]struct {
-			result1 *v1beta1.ServiceInstance
+			result1 *v1.ServiceInstance
 			result2 error
 		})
 	}
 	fake.waitForInstanceToNotExistReturnsOnCall[i] = struct {
-		result1 *v1beta1.ServiceInstance
+		result1 *v1.ServiceInstance
 		result2 error
 	}{result1, result2}
 }

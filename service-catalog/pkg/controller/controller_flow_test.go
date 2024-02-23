@@ -22,7 +22,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	scfeatures "github.com/kubernetes-sigs/service-catalog/pkg/features"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -82,11 +82,11 @@ func TestOriginatingIdentity(t *testing.T) {
 	assert.NoError(t, ct.WaitForReadyBinding())
 	// Unbinding
 	require.NoError(t, ct.Unbind())
-	assert.NoError(t, ct.WaitForUnbindStatus(v1beta1.ServiceBindingUnbindStatusSucceeded))
+	assert.NoError(t, ct.WaitForUnbindStatus(v1.ServiceBindingUnbindStatusSucceeded))
 	// Deprovisioning
 	assert.NoError(t, ct.DeleteBinding())
 	assert.NoError(t, ct.Deprovision())
-	assert.NoError(t, ct.WaitForDeprovisionStatus(v1beta1.ServiceInstanceDeprovisionStatusSucceeded))
+	assert.NoError(t, ct.WaitForDeprovisionStatus(v1.ServiceInstanceDeprovisionStatusSucceeded))
 
 	// THEN
 	ct.AssertOSBRequestsUsername(t)
@@ -160,7 +160,7 @@ func TestBasicFlow(t *testing.T) {
 			require.NoError(t, ct.Unbind())
 
 			// THEN
-			assert.NoError(t, ct.WaitForUnbindStatus(v1beta1.ServiceBindingUnbindStatusSucceeded))
+			assert.NoError(t, ct.WaitForUnbindStatus(v1.ServiceBindingUnbindStatusSucceeded))
 			assert.NotZero(t, ct.NumberOfOSBUnbindingCalls())
 
 			// Deprovisioning
@@ -173,7 +173,7 @@ func TestBasicFlow(t *testing.T) {
 			assert.NoError(t, ct.Deprovision())
 
 			// THEN
-			assert.NoError(t, ct.WaitForDeprovisionStatus(v1beta1.ServiceInstanceDeprovisionStatusSucceeded))
+			assert.NoError(t, ct.WaitForDeprovisionStatus(v1.ServiceInstanceDeprovisionStatusSucceeded))
 			assert.NotZero(t, ct.NumberOfOSBDeprovisionCalls())
 		})
 	}

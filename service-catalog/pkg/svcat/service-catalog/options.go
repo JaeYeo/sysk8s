@@ -17,7 +17,7 @@ limitations under the License.
 package servicecatalog
 
 import (
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -34,7 +34,7 @@ type RegisterOptions struct {
 	ClassRestrictions []string
 	Namespace         string
 	PlanRestrictions  []string
-	RelistBehavior    v1beta1.ServiceBrokerRelistBehavior
+	RelistBehavior    v1.ServiceBrokerRelistBehavior
 	RelistDuration    *metav1.Duration
 	SkipTLS           bool
 }

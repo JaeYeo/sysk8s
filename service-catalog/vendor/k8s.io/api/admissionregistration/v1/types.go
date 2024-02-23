@@ -200,14 +200,14 @@ type ValidatingWebhook struct {
 	// Allowed values are "Exact" or "Equivalent".
 	//
 	// - Exact: match a request only if it exactly matches a specified rule.
-	// For example, if deployments can be modified via apps/v1, apps/v1beta1, and extensions/v1beta1,
+	// For example, if deployments can be modified via apps/v1, apps/v1, and extensions/v1,
 	// but "rules" only included `apiGroups:["apps"], apiVersions:["v1"], resources: ["deployments"]`,
-	// a request to apps/v1beta1 or extensions/v1beta1 would not be sent to the webhook.
+	// a request to apps/v1 or extensions/v1 would not be sent to the webhook.
 	//
 	// - Equivalent: match a request if modifies a resource listed in rules, even via another API group or version.
-	// For example, if deployments can be modified via apps/v1, apps/v1beta1, and extensions/v1beta1,
+	// For example, if deployments can be modified via apps/v1, apps/v1, and extensions/v1,
 	// and "rules" only included `apiGroups:["apps"], apiVersions:["v1"], resources: ["deployments"]`,
-	// a request to apps/v1beta1 or extensions/v1beta1 would be converted to apps/v1 and sent to the webhook.
+	// a request to apps/v1 or extensions/v1 would be converted to apps/v1 and sent to the webhook.
 	//
 	// Defaults to "Equivalent"
 	// +optional
@@ -274,7 +274,7 @@ type ValidatingWebhook struct {
 	ObjectSelector *metav1.LabelSelector `json:"objectSelector,omitempty" protobuf:"bytes,10,opt,name=objectSelector"`
 
 	// SideEffects states whether this webhook has side effects.
-	// Acceptable values are: None, NoneOnDryRun (webhooks created via v1beta1 may also specify Some or Unknown).
+	// Acceptable values are: None, NoneOnDryRun (webhooks created via v1 may also specify Some or Unknown).
 	// Webhooks with side effects MUST implement a reconciliation system, since a request may be
 	// rejected by a future step in the admission change and the side effects therefore need to be undone.
 	// Requests with the dryRun attribute will be auto-rejected if they match a webhook with
@@ -329,14 +329,14 @@ type MutatingWebhook struct {
 	// Allowed values are "Exact" or "Equivalent".
 	//
 	// - Exact: match a request only if it exactly matches a specified rule.
-	// For example, if deployments can be modified via apps/v1, apps/v1beta1, and extensions/v1beta1,
+	// For example, if deployments can be modified via apps/v1, apps/v1, and extensions/v1,
 	// but "rules" only included `apiGroups:["apps"], apiVersions:["v1"], resources: ["deployments"]`,
-	// a request to apps/v1beta1 or extensions/v1beta1 would not be sent to the webhook.
+	// a request to apps/v1 or extensions/v1 would not be sent to the webhook.
 	//
 	// - Equivalent: match a request if modifies a resource listed in rules, even via another API group or version.
-	// For example, if deployments can be modified via apps/v1, apps/v1beta1, and extensions/v1beta1,
+	// For example, if deployments can be modified via apps/v1, apps/v1, and extensions/v1,
 	// and "rules" only included `apiGroups:["apps"], apiVersions:["v1"], resources: ["deployments"]`,
-	// a request to apps/v1beta1 or extensions/v1beta1 would be converted to apps/v1 and sent to the webhook.
+	// a request to apps/v1 or extensions/v1 would be converted to apps/v1 and sent to the webhook.
 	//
 	// Defaults to "Equivalent"
 	// +optional
@@ -403,7 +403,7 @@ type MutatingWebhook struct {
 	ObjectSelector *metav1.LabelSelector `json:"objectSelector,omitempty" protobuf:"bytes,11,opt,name=objectSelector"`
 
 	// SideEffects states whether this webhook has side effects.
-	// Acceptable values are: None, NoneOnDryRun (webhooks created via v1beta1 may also specify Some or Unknown).
+	// Acceptable values are: None, NoneOnDryRun (webhooks created via v1 may also specify Some or Unknown).
 	// Webhooks with side effects MUST implement a reconciliation system, since a request may be
 	// rejected by a future step in the admission change and the side effects therefore need to be undone.
 	// Requests with the dryRun attribute will be auto-rejected if they match a webhook with

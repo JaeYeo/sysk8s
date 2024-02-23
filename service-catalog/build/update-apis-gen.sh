@@ -29,7 +29,7 @@ SC_PKG='github.com/kubernetes-sigs/service-catalog'
 ${BINDIR}/deepcopy-gen "$@" \
 	 --v 1 --logtostderr \
 	 --go-header-file "contrib/hack/boilerplate.go.txt" \
-	 --input-dirs "${SC_PKG}/pkg/apis/servicecatalog/v1beta1" \
+	 --input-dirs "${SC_PKG}/pkg/apis/servicecatalog/v1" \
 	 --bounding-dirs "github.com/kubernetes-sigs/service-catalog" \
 	 --output-file-base zz_generated.deepcopy
 
@@ -77,7 +77,7 @@ done
 ${BINDIR}/openapi-gen "$@" \
 	--v 3 --logtostderr \
 	--go-header-file "contrib/hack/boilerplate.go.txt" \
-	--input-dirs "${SC_PKG}/pkg/apis/servicecatalog/v1beta1,k8s.io/api/core/v1,k8s.io/apimachinery/pkg/api/resource,k8s.io/apimachinery/pkg/apis/meta/v1,k8s.io/apimachinery/pkg/version,k8s.io/apimachinery/pkg/runtime" \
+	--input-dirs "${SC_PKG}/pkg/apis/servicecatalog/v1,k8s.io/api/core/v1,k8s.io/apimachinery/pkg/api/resource,k8s.io/apimachinery/pkg/apis/meta/v1,k8s.io/apimachinery/pkg/version,k8s.io/apimachinery/pkg/runtime" \
 	--input-dirs "${SC_PKG}/pkg/apis/settings/v1alpha1" \
 	--output-package "${SC_PKG}/pkg/openapi" \
 	--report-filename "${REPORT_FILENAME}" || true

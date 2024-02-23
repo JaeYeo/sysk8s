@@ -20,8 +20,8 @@ import (
 
 	"github.com/Masterminds/semver"
 	"github.com/go-logr/logr"
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
-	rafter "github.com/kyma-project/rafter/pkg/apis/rafter/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
+	rafter "github.com/kyma-project/rafter/pkg/apis/rafter/v1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"helm.sh/helm/v3/pkg/chart"
@@ -437,7 +437,7 @@ func getTestSuite(t *testing.T, objects ...runtime.Object) *testSuite {
 	sch, err := v1alpha1.SchemeBuilder.Build()
 	require.NoError(t, err)
 	require.NoError(t, apis.AddToScheme(sch))
-	require.NoError(t, v1beta1.AddToScheme(sch))
+	require.NoError(t, v1.AddToScheme(sch))
 	require.NoError(t, v1.AddToScheme(sch))
 
 	sFact, err := storage.NewFactory(storage.NewConfigListAllMemory())

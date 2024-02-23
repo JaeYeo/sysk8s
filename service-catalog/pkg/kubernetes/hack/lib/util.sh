@@ -310,7 +310,7 @@ kube::util::analytics-link() {
 
 # Takes a group/version and returns the path to its location on disk, sans
 # "pkg". E.g.:
-# * default behavior: extensions/v1beta1 -> apis/extensions/v1beta1
+# * default behavior: extensions/v1 -> apis/extensions/v1
 # * default behavior for only a group: experimental -> apis/experimental
 # * Special handling for empty group: v1 -> api/v1, unversioned -> api/unversioned
 # * Special handling for groups suffixed with ".k8s.io": foo.k8s.io/v1 -> apis/foo/v1
@@ -345,8 +345,8 @@ kube::util::group-version-to-pkg-path() {
     __internal)
       echo "pkg/api"
       ;;
-    federation/v1beta1)
-      echo "federation/apis/federation/v1beta1"
+    federation/v1)
+      echo "federation/apis/federation/v1"
       ;;
     meta/v1)
       echo "vendor/k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -376,7 +376,7 @@ kube::util::group-version-to-pkg-path() {
 }
 
 # Takes a group/version and returns the swagger-spec file name.
-# default behavior: extensions/v1beta1 -> extensions_v1beta1
+# default behavior: extensions/v1 -> extensions_v1
 # special case for v1: v1 -> v1
 kube::util::gv-to-swagger-name() {
   local group_version="$1"
@@ -1174,7 +1174,7 @@ kube::util::analytics-link() {
 
 # Takes a group/version and returns the path to its location on disk, sans
 # "pkg". E.g.:
-# * default behavior: extensions/v1beta1 -> apis/extensions/v1beta1
+# * default behavior: extensions/v1 -> apis/extensions/v1
 # * default behavior for only a group: experimental -> apis/experimental
 # * Special handling for empty group: v1 -> api/v1, unversioned -> api/unversioned
 # * Special handling for groups suffixed with ".k8s.io": foo.k8s.io/v1 -> apis/foo/v1
@@ -1209,8 +1209,8 @@ kube::util::group-version-to-pkg-path() {
     __internal)
       echo "pkg/api"
       ;;
-    federation/v1beta1)
-      echo "federation/apis/federation/v1beta1"
+    federation/v1)
+      echo "federation/apis/federation/v1"
       ;;
     meta/v1)
       echo "vendor/k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -1240,7 +1240,7 @@ kube::util::group-version-to-pkg-path() {
 }
 
 # Takes a group/version and returns the swagger-spec file name.
-# default behavior: extensions/v1beta1 -> extensions_v1beta1
+# default behavior: extensions/v1 -> extensions_v1
 # special case for v1: v1 -> v1
 kube::util::gv-to-swagger-name() {
   local group_version="$1"

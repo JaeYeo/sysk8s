@@ -62,7 +62,7 @@ func RunCommand(opt *Options) error {
 	if err != nil {
 		return fmt.Errorf("failed to create Kubernetes client: %s", err)
 	}
-	scInterface := scClient.ServicecatalogV1beta1()
+	scInterface := scClient.Servicecatalogv1()
 
 	svc := migration.NewMigrationService(scInterface, opt.StoragePath, opt.ReleaseNamespace, opt.ApiserverName, opt.WebhookServiceName, opt.WebhookServicePort, k8sCli)
 	scalingSvc := migration.NewScalingService(opt.ReleaseNamespace, opt.ControllerManagerName, k8sCli.AppsV1())

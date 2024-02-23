@@ -14,10 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// Package v1beta1 contains definition of kms-plugin's gRPC service.
-package v1beta1
+// Package v1 contains definition of kms-plugin's gRPC service.
+package v1
 
 // IsVersionCheckMethod determines whether the supplied method is a version check against kms-plugin.
 func IsVersionCheckMethod(method string) bool {
-	return method == "/v1beta1.KeyManagementService/Version"
+	return method == "/v1.KeyManagementService/Version"
 }

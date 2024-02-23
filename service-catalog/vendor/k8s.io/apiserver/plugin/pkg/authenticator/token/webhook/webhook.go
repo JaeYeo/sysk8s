@@ -24,7 +24,7 @@ import (
 	"time"
 
 	authenticationv1 "k8s.io/api/authentication/v1"
-	authenticationv1beta1 "k8s.io/api/authentication/v1beta1"
+	authenticationv1 "k8s.io/api/authentication/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -172,8 +172,8 @@ func tokenReviewInterfaceFromKubeconfig(kubeConfigFile string, version string, c
 		}
 		return &tokenReviewV1Client{gw}, nil
 
-	case authenticationv1beta1.SchemeGroupVersion.Version:
-		groupVersions := []schema.GroupVersion{authenticationv1beta1.SchemeGroupVersion}
+	case authenticationv1.SchemeGroupVersion.Version:
+		groupVersions := []schema.GroupVersion{authenticationv1.SchemeGroupVersion}
 		if err := localScheme.SetVersionPriority(groupVersions...); err != nil {
 			return nil, err
 		}
@@ -181,14 +181,14 @@ func tokenReviewInterfaceFromKubeconfig(kubeConfigFile string, version string, c
 		if err != nil {
 			return nil, err
 		}
-		return &tokenReviewV1beta1Client{gw}, nil
+		return &tokenReviewv1Client{gw}, nil
 
 	default:
 		return nil, fmt.Errorf(
 			"unsupported authentication webhook version %q, supported versions are %q, %q",
 			version,
 			authenticationv1.SchemeGroupVersion.Version,
-			authenticationv1beta1.SchemeGroupVersion.Version,
+			authenticationv1.SchemeGroupVersion.Version,
 		)
 	}
 
@@ -204,38 +204,38 @@ func (t *tokenReviewV1Client) Create(ctx context.Context, review *authentication
 	return result, err
 }
 
-type tokenReviewV1beta1Client struct {
+type tokenReviewv1Client struct {
 	w *webhook.GenericWebhook
 }
 
-func (t *tokenReviewV1beta1Client) Create(ctx context.Context, review *authenticationv1.TokenReview, _ metav1.CreateOptions) (*authenticationv1.TokenReview, error) {
-	v1beta1Review := &authenticationv1beta1.TokenReview{Spec: v1SpecToV1beta1Spec(&review.Spec)}
-	v1beta1Result := &authenticationv1beta1.TokenReview{}
-	err := t.w.RestClient.Post().Body(v1beta1Review).Do(ctx).Into(v1beta1Result)
+func (t *tokenReviewv1Client) Create(ctx context.Context, review *authenticationv1.TokenReview, _ metav1.CreateOptions) (*authenticationv1.TokenReview, error) {
+	v1Review := &authenticationv1.TokenReview{Spec: v1SpecTov1Spec(&review.Spec)}
+	v1Result := &authenticationv1.TokenReview{}
+	err := t.w.RestClient.Post().Body(v1Review).Do(ctx).Into(v1Result)
 	if err != nil {
 		return nil, err
 	}
-	review.Status = v1beta1StatusToV1Status(&v1beta1Result.Status)
+	review.Status = v1StatusToV1Status(&v1Result.Status)
 	return review, nil
 }
 
-func v1SpecToV1beta1Spec(in *authenticationv1.TokenReviewSpec) authenticationv1beta1.TokenReviewSpec {
-	return authenticationv1beta1.TokenReviewSpec{
+func v1SpecTov1Spec(in *authenticationv1.TokenReviewSpec) authenticationv1.TokenReviewSpec {
+	return authenticationv1.TokenReviewSpec{
 		Token:     in.Token,
 		Audiences: in.Audiences,
 	}
 }
 
-func v1beta1StatusToV1Status(in *authenticationv1beta1.TokenReviewStatus) authenticationv1.TokenReviewStatus {
+func v1StatusToV1Status(in *authenticationv1.TokenReviewStatus) authenticationv1.TokenReviewStatus {
 	return authenticationv1.TokenReviewStatus{
 		Authenticated: in.Authenticated,
-		User:          v1beta1UserToV1User(in.User),
+		User:          v1UserToV1User(in.User),
 		Audiences:     in.Audiences,
 		Error:         in.Error,
 	}
 }
 
-func v1beta1UserToV1User(u authenticationv1beta1.UserInfo) authenticationv1.UserInfo {
+func v1UserToV1User(u authenticationv1.UserInfo) authenticationv1.UserInfo {
 	var extra map[string]authenticationv1.ExtraValue
 	if u.Extra != nil {
 		extra = make(map[string]authenticationv1.ExtraValue, len(u.Extra))

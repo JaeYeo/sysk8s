@@ -24,8 +24,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"k8s.io/api/admission/v1beta1"
-	admissionv1beta1 "k8s.io/api/admission/v1beta1"
+	"k8s.io/api/admission/v1"
+	admissionv1 "k8s.io/api/admission/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -35,7 +35,7 @@ var admissionScheme = runtime.NewScheme()
 var admissionCodecs = serializer.NewCodecFactory(admissionScheme)
 
 func init() {
-	utilruntime.Must(admissionv1beta1.AddToScheme(admissionScheme))
+	utilruntime.Must(admissionv1.AddToScheme(admissionScheme))
 }
 
 var _ http.Handler = &Webhook{}
@@ -71,7 +71,7 @@ func (wh *Webhook) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	req := Request{}
-	ar := v1beta1.AdmissionReview{
+	ar := v1.AdmissionReview{
 		// avoid an extra copy
 		Request: &req.AdmissionRequest,
 	}
@@ -90,7 +90,7 @@ func (wh *Webhook) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (wh *Webhook) writeResponse(w io.Writer, response Response) {
 	encoder := json.NewEncoder(w)
-	responseAdmissionReview := v1beta1.AdmissionReview{
+	responseAdmissionReview := v1.AdmissionReview{
 		Response: &response.AdmissionResponse,
 	}
 	err := encoder.Encode(responseAdmissionReview)

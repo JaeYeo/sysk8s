@@ -26,7 +26,7 @@ Catalog restrictions are specified in `ClusterServiceBroker` or `ServiceBroker`
  resources. A sample YAML might look like:
 
 ```yaml
-apiVersion: servicecatalog.k8s.io/v1beta1
+apiVersion: servicecatalog.k8s.io/v1
 kind: ClusterServiceBroker
 metadata:
   name: sample-broker
@@ -108,7 +108,7 @@ This example creates a Service Class restriction on spec.externalName using the
  The YAML for this would look like:
 
 ```yaml
-apiVersion: servicecatalog.k8s.io/v1beta1
+apiVersion: servicecatalog.k8s.io/v1
 kind: ClusterServiceBroker
 metadata:
   name: sample-broker
@@ -131,7 +131,7 @@ spec:
  above.
 
 ```yaml
-apiVersion: servicecatalog.k8s.io/v1beta1
+apiVersion: servicecatalog.k8s.io/v1
 kind: ClusterServiceBroker
 metadata:
   name: sample-broker
@@ -154,7 +154,7 @@ to restrict service plans to only those free plans with an externalName of
 `Demo`, the YAML would look like:
 
 ```yaml
-apiVersion: servicecatalog.k8s.io/v1beta1
+apiVersion: servicecatalog.k8s.io/v1
 kind: ClusterServiceBroker
 metadata:
   name: sample-broker
@@ -178,7 +178,7 @@ allow all free plans with the externalName `Demo`, and not a specific service
  named `AABBB-CCDD-EEGG-HIJK`, you would create a YAML like:
 
 ```yaml
-apiVersion: servicecatalog.k8s.io/v1beta1
+apiVersion: servicecatalog.k8s.io/v1
 kind: ClusterServiceBroker
 metadata:
   name: sample-broker

@@ -8,7 +8,7 @@ import (
 
 	"context"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
@@ -71,9 +71,9 @@ func (f *Facade) Create() error {
 }
 
 // createServiceBroker returns just created or existing ServiceBroker
-func (f *Facade) createServiceBroker(svcURL string) (*v1beta1.ServiceBroker, error) {
+func (f *Facade) createServiceBroker(svcURL string) (*v1.ServiceBroker, error) {
 	url := fmt.Sprintf("%s/ns/%s", svcURL, f.namespace)
-	broker := &v1beta1.ServiceBroker{
+	broker := &v1.ServiceBroker{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      NamespacedBrokerName,
 			Namespace: f.namespace,
@@ -81,8 +81,8 @@ func (f *Facade) createServiceBroker(svcURL string) (*v1beta1.ServiceBroker, err
 				BrokerLabelKey: BrokerLabelValue,
 			},
 		},
-		Spec: v1beta1.ServiceBrokerSpec{
-			CommonServiceBrokerSpec: v1beta1.CommonServiceBrokerSpec{
+		Spec: v1.ServiceBrokerSpec{
+			CommonServiceBrokerSpec: v1.CommonServiceBrokerSpec{
 				URL:            url,
 				RelistRequests: 1,
 			},
@@ -92,7 +92,7 @@ func (f *Facade) createServiceBroker(svcURL string) (*v1beta1.ServiceBroker, err
 	err := f.client.Create(context.Background(), broker)
 	if k8serrors.IsAlreadyExists(err) {
 		f.log.Infof("ServiceBroker for namespace [%s] already exist. Attempt to get resource.", f.namespace)
-		result := &v1beta1.ServiceBroker{}
+		result := &v1.ServiceBroker{}
 		err := f.client.Get(context.Background(), types.NamespacedName{Namespace: f.namespace, Name: NamespacedBrokerName}, result)
 		return result, err
 	}
@@ -102,7 +102,7 @@ func (f *Facade) createServiceBroker(svcURL string) (*v1beta1.ServiceBroker, err
 
 // Delete removes ServiceBroker. Errors don't stop execution of method. NotFound errors are ignored.
 func (f *Facade) Delete() error {
-	sb := &v1beta1.ServiceBroker{
+	sb := &v1.ServiceBroker{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      NamespacedBrokerName,
 			Namespace: f.namespace,
@@ -122,7 +122,7 @@ func (f *Facade) Delete() error {
 
 // Exist check if ServiceBroker exists.
 func (f *Facade) Exist() (bool, error) {
-	err := f.client.Get(context.Background(), types.NamespacedName{Namespace: f.namespace, Name: NamespacedBrokerName}, &v1beta1.ServiceBroker{})
+	err := f.client.Get(context.Background(), types.NamespacedName{Namespace: f.namespace, Name: NamespacedBrokerName}, &v1.ServiceBroker{})
 	switch {
 	case k8serrors.IsNotFound(err):
 		return false, nil

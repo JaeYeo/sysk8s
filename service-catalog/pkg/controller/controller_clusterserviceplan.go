@@ -25,7 +25,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/klog"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/util"
 )
 
@@ -45,7 +45,7 @@ func (c *controller) clusterServicePlanUpdate(oldObj, newObj interface{}) {
 }
 
 func (c *controller) clusterServicePlanDelete(obj interface{}) {
-	clusterServicePlan, ok := obj.(*v1beta1.ClusterServicePlan)
+	clusterServicePlan, ok := obj.(*v1.ClusterServicePlan)
 	if clusterServicePlan == nil || !ok {
 		return
 	}
@@ -72,7 +72,7 @@ func (c *controller) reconcileClusterServicePlanKey(key string) error {
 	return c.reconcileClusterServicePlan(plan)
 }
 
-func (c *controller) reconcileClusterServicePlan(clusterServicePlan *v1beta1.ClusterServicePlan) error {
+func (c *controller) reconcileClusterServicePlan(clusterServicePlan *v1.ClusterServicePlan) error {
 	klog.Infof("ClusterServicePlan %q (ExternalName: %q): processing", clusterServicePlan.Name, clusterServicePlan.Spec.ExternalName)
 
 	if !clusterServicePlan.Status.RemovedFromBrokerCatalog {
@@ -95,9 +95,9 @@ func (c *controller) reconcileClusterServicePlan(clusterServicePlan *v1beta1.Clu
 	return c.serviceCatalogClient.ClusterServicePlans().Delete(context.Background(), clusterServicePlan.Name, metav1.DeleteOptions{})
 }
 
-func (c *controller) findServiceInstancesOnClusterServicePlan(clusterServicePlan *v1beta1.ClusterServicePlan) (*v1beta1.ServiceInstanceList, error) {
+func (c *controller) findServiceInstancesOnClusterServicePlan(clusterServicePlan *v1.ClusterServicePlan) (*v1.ServiceInstanceList, error) {
 	labelSelector := labels.SelectorFromSet(labels.Set{
-		v1beta1.GroupName + "/" + v1beta1.FilterSpecClusterServicePlanRefName: util.GenerateSHA(clusterServicePlan.Name),
+		v1.GroupName + "/" + v1.FilterSpecClusterServicePlanRefName: util.GenerateSHA(clusterServicePlan.Name),
 	}).String()
 
 	listOpts := metav1.ListOptions{

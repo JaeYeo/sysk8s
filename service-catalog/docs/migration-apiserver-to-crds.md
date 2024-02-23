@@ -122,7 +122,7 @@ To achieve that, the migration tool creates `ValidatingWebhookConfiguration` at 
 to intercept and reject all attempts to mutate Service Catalog resources. Because of the limitation of the Aggregated API Server used in the previous version of Service Catalog, this webhook call fails with the following message:
 ```bash
 failed calling webhook "validating.reject-changes-to-sc-crds.servicecatalog.k8s.io": 
-webhook does not accept v1beta1 AdmissionReviewRequest
+webhook does not accept v1 AdmissionReviewRequest
 ```
 This error message is presented in case of a modification or creation attempt of any Service Catalog resource during the backup process, and it means that the write protection works as expected.
 

@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/kyma-project/helm-broker/internal"
-	"github.com/kyma-project/rafter/pkg/apis/rafter/v1beta1"
+	"github.com/kyma-project/rafter/pkg/apis/rafter/v1"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	apiErrors "k8s.io/apimachinery/pkg/api/errors"
@@ -36,7 +36,7 @@ func NewClusterProvider(dynamicClient client.Client, log logrus.FieldLogger) *Cl
 // EnsureAssetGroup creates ClusterAssetGroup for a given addon or updates it in case it already exists
 func (d *ClusterProvider) EnsureAssetGroup(addon *internal.Addon) error {
 	addon.Docs[0].Template.Sources = defaultDocsSourcesURLs(addon)
-	cdt := &v1beta1.ClusterAssetGroup{
+	cdt := &v1.ClusterAssetGroup{
 		ObjectMeta: v1.ObjectMeta{
 			Name: string(addon.ID),
 			Labels: map[string]string{
@@ -44,7 +44,7 @@ func (d *ClusterProvider) EnsureAssetGroup(addon *internal.Addon) error {
 				hbLabelKey:     "true",
 			},
 		},
-		Spec: v1beta1.ClusterAssetGroupSpec{CommonAssetGroupSpec: addon.Docs[0].Template},
+		Spec: v1.ClusterAssetGroupSpec{CommonAssetGroupSpec: addon.Docs[0].Template},
 	}
 	d.log.Infof("- ensuring ClusterAssetGroup %s", addon.ID)
 
@@ -67,7 +67,7 @@ func (d *ClusterProvider) EnsureAssetGroup(addon *internal.Addon) error {
 
 // EnsureAssetGroupRemoved removes ClusterAssetGroup for a given addon
 func (d *ClusterProvider) EnsureAssetGroupRemoved(id string) error {
-	cdt := &v1beta1.ClusterAssetGroup{
+	cdt := &v1.ClusterAssetGroup{
 		ObjectMeta: v1.ObjectMeta{
 			Name: id,
 		},
@@ -85,7 +85,7 @@ func (d *ClusterProvider) EnsureAssetGroupRemoved(id string) error {
 }
 
 func (d *ClusterProvider) updateClusterAssetGroup(addon *internal.Addon) error {
-	cdt := &v1beta1.ClusterAssetGroup{}
+	cdt := &v1.ClusterAssetGroup{}
 	return retry.RetryOnConflict(retry.DefaultBackoff, func() error {
 		if err := d.dynamicClient.Get(context.Background(), types.NamespacedName{Name: string(addon.ID)}, cdt); err != nil {
 			return errors.Wrapf(err, "while getting ClusterAssetGroup %s", addon.ID)
@@ -93,7 +93,7 @@ func (d *ClusterProvider) updateClusterAssetGroup(addon *internal.Addon) error {
 		if reflect.DeepEqual(cdt.Spec.CommonAssetGroupSpec, addon.Docs[0].Template) {
 			return nil
 		}
-		cdt.Spec = v1beta1.ClusterAssetGroupSpec{CommonAssetGroupSpec: addon.Docs[0].Template}
+		cdt.Spec = v1.ClusterAssetGroupSpec{CommonAssetGroupSpec: addon.Docs[0].Template}
 
 		if err := d.dynamicClient.Update(context.Background(), cdt); err != nil {
 			return err

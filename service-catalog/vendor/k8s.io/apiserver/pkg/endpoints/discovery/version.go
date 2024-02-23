@@ -39,7 +39,7 @@ func (f APIResourceListerFunc) ListAPIResources() []metav1.APIResource {
 }
 
 // APIVersionHandler creates a webservice serving the supported resources for the version
-// E.g., such a web service will be registered at /apis/extensions/v1beta1.
+// E.g., such a web service will be registered at /apis/extensions/v1.
 type APIVersionHandler struct {
 	serializer runtime.NegotiatedSerializer
 

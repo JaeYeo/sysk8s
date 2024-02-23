@@ -17,13 +17,13 @@ limitations under the License.
 package fake
 
 import (
-	v1beta1 "k8s.io/api/events/v1beta1"
+	v1 "k8s.io/api/events/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	core "k8s.io/client-go/testing"
 )
 
 // CreateWithEventNamespace creats a new event. Returns the copy of the event the server returns, or an error.
-func (c *FakeEvents) CreateWithEventNamespace(event *v1beta1.Event) (*v1beta1.Event, error) {
+func (c *FakeEvents) CreateWithEventNamespace(event *v1.Event) (*v1.Event, error) {
 	action := core.NewRootCreateAction(eventsResource, event)
 	if c.ns != "" {
 		action = core.NewCreateAction(eventsResource, c.ns, event)
@@ -33,11 +33,11 @@ func (c *FakeEvents) CreateWithEventNamespace(event *v1beta1.Event) (*v1beta1.Ev
 		return nil, err
 	}
 
-	return obj.(*v1beta1.Event), err
+	return obj.(*v1.Event), err
 }
 
 // UpdateWithEventNamespace replaces an existing event. Returns the copy of the event the server returns, or an error.
-func (c *FakeEvents) UpdateWithEventNamespace(event *v1beta1.Event) (*v1beta1.Event, error) {
+func (c *FakeEvents) UpdateWithEventNamespace(event *v1.Event) (*v1.Event, error) {
 	action := core.NewRootUpdateAction(eventsResource, event)
 	if c.ns != "" {
 		action = core.NewUpdateAction(eventsResource, c.ns, event)
@@ -47,11 +47,11 @@ func (c *FakeEvents) UpdateWithEventNamespace(event *v1beta1.Event) (*v1beta1.Ev
 		return nil, err
 	}
 
-	return obj.(*v1beta1.Event), err
+	return obj.(*v1.Event), err
 }
 
 // PatchWithEventNamespace patches an existing event. Returns the copy of the event the server returns, or an error.
-func (c *FakeEvents) PatchWithEventNamespace(event *v1beta1.Event, data []byte) (*v1beta1.Event, error) {
+func (c *FakeEvents) PatchWithEventNamespace(event *v1.Event, data []byte) (*v1.Event, error) {
 	pt := types.StrategicMergePatchType
 	action := core.NewRootPatchAction(eventsResource, event.Name, pt, data)
 	if c.ns != "" {
@@ -62,5 +62,5 @@ func (c *FakeEvents) PatchWithEventNamespace(event *v1beta1.Event, data []byte) 
 		return nil, err
 	}
 
-	return obj.(*v1beta1.Event), err
+	return obj.(*v1.Event), err
 }

@@ -25,10 +25,10 @@ import (
 	"net/http"
 	"testing"
 
-	sc "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	sc "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	admissionv1beta1 "k8s.io/api/admission/v1beta1"
+	admissionv1 "k8s.io/api/admission/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -49,13 +49,13 @@ func AssertHandlerReturnErrorIfReqObjIsMalformed(t *testing.T, handler TestDecod
 	require.NoError(t, err)
 
 	fixReq := admission.Request{
-		AdmissionRequest: admissionv1beta1.AdmissionRequest{
-			Operation: admissionv1beta1.Create,
+		AdmissionRequest: admissionv1.AdmissionRequest{
+			Operation: admissionv1.Create,
 			Name:      "test-name",
 			Namespace: "system",
 			Kind: metav1.GroupVersionKind{
 				Kind:    kind,
-				Version: "v1beta1",
+				Version: "v1",
 				Group:   "servicecatalog.k8s.io",
 			},
 			Object: runtime.RawExtension{Raw: []byte("{malformed: JSON,,")},
@@ -85,13 +85,13 @@ func AssertHandlerReturnErrorIfGVKMismatch(t *testing.T, handler TestDecoderHand
 	require.NoError(t, err)
 
 	fixReq := admission.Request{
-		AdmissionRequest: admissionv1beta1.AdmissionRequest{
-			Operation: admissionv1beta1.Create,
+		AdmissionRequest: admissionv1.AdmissionRequest{
+			Operation: admissionv1.Create,
 			Name:      "test-name",
 			Namespace: "system",
 			Kind: metav1.GroupVersionKind{
 				Kind:    "Incorrect" + kind,
-				Version: "v1beta1",
+				Version: "v1",
 				Group:   "servicecatalog.k8s.io",
 			},
 		},
@@ -99,7 +99,7 @@ func AssertHandlerReturnErrorIfGVKMismatch(t *testing.T, handler TestDecoderHand
 
 	expReqResult := &metav1.Status{
 		Code:    http.StatusBadRequest,
-		Message: fmt.Sprintf("type mismatch: want: servicecatalog.k8s.io/v1beta1, Kind=%s got: servicecatalog.k8s.io/v1beta1, Kind=Incorrect%s", kind, kind),
+		Message: fmt.Sprintf("type mismatch: want: servicecatalog.k8s.io/v1, Kind=%s got: servicecatalog.k8s.io/v1, Kind=Incorrect%s", kind, kind),
 	}
 
 	handler.InjectDecoder(decoder)

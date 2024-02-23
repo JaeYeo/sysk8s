@@ -23,15 +23,15 @@ import (
 	"testing"
 
 	osb "github.com/kubernetes-sigs/go-open-service-broker-client/v2"
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 )
 
 func TestBuildOriginatingIdentity(t *testing.T) {
-	userInfo := v1beta1.UserInfo{
+	userInfo := v1.UserInfo{
 		Username: "person@place.com",
 		UID:      "abcd-1234",
 		Groups:   []string{"stuff-dev", "main-eng"},
-		Extra:    map[string]v1beta1.ExtraValue{"foo": {"bar", "baz"}},
+		Extra:    map[string]v1.ExtraValue{"foo": {"bar", "baz"}},
 	}
 
 	e := osb.OriginatingIdentity{
@@ -49,7 +49,7 @@ func TestBuildOriginatingIdentity(t *testing.T) {
 		t.Fatalf("Unexpected Platform, %s", expectedGot(e.Platform, g.Platform))
 	}
 
-	var retUserInfo v1beta1.UserInfo
+	var retUserInfo v1.UserInfo
 	err = json.Unmarshal([]byte(g.Value), &retUserInfo)
 	if err != nil {
 		t.Fatalf("Unexpected Error, %+v", err)

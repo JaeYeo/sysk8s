@@ -48,7 +48,7 @@ import (
 	"k8s.io/client-go/tools/leaderelection/resourcelock"
 
 	"github.com/kubernetes-sigs/service-catalog/cmd/controller-manager/app/options"
-	servicecatalogv1beta1 "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	servicecatalogv1 "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	settingsv1alpha1 "github.com/kubernetes-sigs/service-catalog/pkg/apis/settings/v1alpha1"
 	servicecataloginformers "github.com/kubernetes-sigs/service-catalog/pkg/client/informers_generated/externalversions"
 	"github.com/kubernetes-sigs/service-catalog/pkg/controller"
@@ -196,7 +196,7 @@ func Run(controllerManagerOptions *options.ControllerManagerServer) error {
 		return err
 	}
 	// We also emit events for our own types
-	if err = servicecatalogv1beta1.AddToScheme(eventsScheme); err != nil {
+	if err = servicecatalogv1.AddToScheme(eventsScheme); err != nil {
 		return err
 	}
 	if err = settingsv1alpha1.AddToScheme(eventsScheme); err != nil {
@@ -309,13 +309,13 @@ func StartControllers(s *options.ControllerManagerServer,
 		serviceCatalogClientBuilder.ClientOrDie("shared-informers"),
 		s.ResyncInterval,
 	)
-	// All shared informers are v1beta1 API level
-	serviceCatalogSharedInformers := informerFactory.Servicecatalog().V1beta1()
+	// All shared informers are v1 API level
+	serviceCatalogSharedInformers := informerFactory.Servicecatalog().v1()
 
 	klog.V(5).Infof("Creating controller; broker relist interval: %v", s.ServiceBrokerRelistInterval)
 	serviceCatalogController, err := controller.NewController(
 		coreClient,
-		serviceCatalogClientBuilder.ClientOrDie(controllerManagerAgentName).ServicecatalogV1beta1(),
+		serviceCatalogClientBuilder.ClientOrDie(controllerManagerAgentName).Servicecatalogv1(),
 		serviceCatalogSharedInformers.ClusterServiceBrokers(),
 		serviceCatalogSharedInformers.ServiceBrokers(),
 		serviceCatalogSharedInformers.ClusterServiceClasses(),

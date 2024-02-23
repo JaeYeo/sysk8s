@@ -18,7 +18,7 @@ package servicecatalog_test
 
 import (
 	"fmt"
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/fake"
 	. "github.com/kubernetes-sigs/service-catalog/pkg/svcat/service-catalog"
 	"github.com/kubernetes-sigs/service-catalog/pkg/util"
@@ -35,66 +35,66 @@ var _ = Describe("Plan", func() {
 	var (
 		sdk          *SDK
 		svcCatClient *fake.Clientset
-		csc          *v1beta1.ClusterServiceClass
-		sc           *v1beta1.ServiceClass
-		csp          *v1beta1.ClusterServicePlan
-		csp2         *v1beta1.ClusterServicePlan
-		sp           *v1beta1.ServicePlan
-		sp2          *v1beta1.ServicePlan
+		csc          *v1.ClusterServiceClass
+		sc           *v1.ServiceClass
+		csp          *v1.ClusterServicePlan
+		csp2         *v1.ClusterServicePlan
+		sp           *v1.ServicePlan
+		sp2          *v1.ServicePlan
 	)
 
 	BeforeEach(func() {
-		csc = &v1beta1.ClusterServiceClass{
+		csc = &v1.ClusterServiceClass{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "someclass",
 				Labels: map[string]string{
-					v1beta1.GroupName + "/" + v1beta1.FilterSpecExternalName: util.GenerateSHA("someclass"),
+					v1.GroupName + "/" + v1.FilterSpecExternalName: util.GenerateSHA("someclass"),
 				},
 			},
 		}
-		csp = &v1beta1.ClusterServicePlan{
+		csp = &v1.ClusterServicePlan{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "foobar",
 				Labels: map[string]string{
-					v1beta1.GroupName + "/" + v1beta1.FilterSpecExternalName: util.GenerateSHA("foobar"),
+					v1.GroupName + "/" + v1.FilterSpecExternalName: util.GenerateSHA("foobar"),
 				},
 			},
 		}
-		csp2 = &v1beta1.ClusterServicePlan{
+		csp2 = &v1.ClusterServicePlan{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "clusterscopedplan",
 				Labels: map[string]string{
-					v1beta1.GroupName + "/" + v1beta1.FilterSpecExternalName:               util.GenerateSHA("clusterscopedplan"),
-					v1beta1.GroupName + "/" + v1beta1.FilterSpecClusterServiceClassRefName: util.GenerateSHA(csc.Name),
+					v1.GroupName + "/" + v1.FilterSpecExternalName:               util.GenerateSHA("clusterscopedplan"),
+					v1.GroupName + "/" + v1.FilterSpecClusterServiceClassRefName: util.GenerateSHA(csc.Name),
 				},
 			},
-			Spec: v1beta1.ClusterServicePlanSpec{
-				ClusterServiceClassRef: v1beta1.ClusterObjectReference{Name: csc.Name},
+			Spec: v1.ClusterServicePlanSpec{
+				ClusterServiceClassRef: v1.ClusterObjectReference{Name: csc.Name},
 			},
 		}
-		sc = &v1beta1.ServiceClass{
+		sc = &v1.ServiceClass{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "somenamespacedclass",
 				Namespace: "default",
 				Labels: map[string]string{
-					v1beta1.GroupName + "/" + v1beta1.FilterSpecExternalName: util.GenerateSHA("somenamespacedclass"),
+					v1.GroupName + "/" + v1.FilterSpecExternalName: util.GenerateSHA("somenamespacedclass"),
 				},
 			},
 		}
-		sp = &v1beta1.ServicePlan{
+		sp = &v1.ServicePlan{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "foobar",
 				Namespace: sc.Namespace,
 				Labels: map[string]string{
-					v1beta1.GroupName + "/" + v1beta1.FilterSpecExternalName:        util.GenerateSHA("foobar"),
-					v1beta1.GroupName + "/" + v1beta1.FilterSpecServiceClassRefName: util.GenerateSHA(sc.Name),
+					v1.GroupName + "/" + v1.FilterSpecExternalName:        util.GenerateSHA("foobar"),
+					v1.GroupName + "/" + v1.FilterSpecServiceClassRefName: util.GenerateSHA(sc.Name),
 				},
 			},
-			Spec: v1beta1.ServicePlanSpec{
-				ServiceClassRef: v1beta1.LocalObjectReference{Name: sc.Name},
+			Spec: v1.ServicePlanSpec{
+				ServiceClassRef: v1.LocalObjectReference{Name: sc.Name},
 			},
 		}
-		sp2 = &v1beta1.ServicePlan{ObjectMeta: metav1.ObjectMeta{Name: "namespacescopedplan", Namespace: "ns2"}}
+		sp2 = &v1.ServicePlan{ObjectMeta: metav1.ObjectMeta{Name: "namespacescopedplan", Namespace: "ns2"}}
 		svcCatClient = fake.NewSimpleClientset(csc, csp, csp2, sc, sp, sp2)
 		sdk = &SDK{
 			ServiceCatalogClient: svcCatClient,
@@ -102,7 +102,7 @@ var _ = Describe("Plan", func() {
 	})
 
 	Describe("RetrivePlans", func() {
-		It("Calls the generated v1beta1 List method", func() {
+		It("Calls the generated v1 List method", func() {
 			plans, err := sdk.RetrievePlans("", ScopeOptions{Scope: AllScope})
 
 			Expect(err).NotTo(HaveOccurred())
@@ -150,7 +150,7 @@ var _ = Describe("Plan", func() {
 		})
 	})
 	Describe("RetrievePlanByName", func() {
-		It("Calls the generated v1beta1 List method with the passed in plan name for cluster-scoped plans", func() {
+		It("Calls the generated v1 List method with the passed in plan name for cluster-scoped plans", func() {
 			planName := csp.Name
 			singleClient := fake.NewSimpleClientset(csp)
 			sdk.ServiceCatalogClient = singleClient
@@ -168,7 +168,7 @@ var _ = Describe("Plan", func() {
 			Expect(requirements).ShouldNot(BeEmpty())
 			Expect(requirements[0].String()).To(Equal("servicecatalog.k8s.io/spec.externalName=" + util.GenerateSHA("foobar")))
 		})
-		It("Calls the generated v1beta1 List method with the passed in plan name for namespace-scoped plans", func() {
+		It("Calls the generated v1 List method with the passed in plan name for namespace-scoped plans", func() {
 			planName := sp.Name
 			singleClient := fake.NewSimpleClientset(sp)
 			sdk.ServiceCatalogClient = singleClient
@@ -211,7 +211,7 @@ var _ = Describe("Plan", func() {
 		})
 	})
 	Describe("RetrievePlanByClassAndName", func() {
-		It("Calls the generated v1beta1 List method with the passed in class and plan name for cluster-scoped plans", func() {
+		It("Calls the generated v1 List method with the passed in class and plan name for cluster-scoped plans", func() {
 			className := csc.Name
 			planName := csp2.Name
 			singleClient := fake.NewSimpleClientset(csc, csp2)
@@ -249,7 +249,7 @@ var _ = Describe("Plan", func() {
 		})
 	})
 	Describe("RetrievePlanByClassIDAndName", func() {
-		It("Calls the generated v1beta1 List method with the passed in class kube name and plan external name for cluster-scoped plans", func() {
+		It("Calls the generated v1 List method with the passed in class kube name and plan external name for cluster-scoped plans", func() {
 			classKubeName := csc.Name
 			planName := csp2.Name
 			singleClient := fake.NewSimpleClientset(csc, csp2)
@@ -263,24 +263,24 @@ var _ = Describe("Plan", func() {
 			Expect(plan.GetNamespace()).To(Equal(""))
 			actions := singleClient.Actions()
 			Expect(len(actions)).To(Equal(2))
-			labelRequirement, err := labels.NewRequirement(v1beta1.GroupName+"/"+v1beta1.FilterSpecClusterServiceClassRefName, "=", []string{util.GenerateSHA(classKubeName)})
+			labelRequirement, err := labels.NewRequirement(v1.GroupName+"/"+v1.FilterSpecClusterServiceClassRefName, "=", []string{util.GenerateSHA(classKubeName)})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(actions[0].Matches("list", "clusterserviceplans")).To(BeTrue())
 			Expect(actions[0].(testing.ListAction).GetListRestrictions().Labels).To(ContainElement(*labelRequirement))
 			Expect(actions[1].Matches("list", "serviceplans")).To(BeTrue())
 			Expect(actions[1].(testing.ListAction).GetListRestrictions().Labels).To(ContainElement(*labelRequirement))
 		})
-		It("Calls the generated v1beta1 List method with the passed in class kube name and plan external name for namespace-scoped plans", func() {
+		It("Calls the generated v1 List method with the passed in class kube name and plan external name for namespace-scoped plans", func() {
 			classKubeName := sc.Name
 			planName := sp.Name
 			returnPlanCalled := 0
 			singleClient := fake.NewSimpleClientset(sc)
 			singleClient.PrependReactor("list", "serviceplans", func(action testing.Action) (bool, runtime.Object, error) {
 				if returnPlanCalled > 0 {
-					return true, &v1beta1.ServicePlanList{Items: []v1beta1.ServicePlan{*sp}}, nil
+					return true, &v1.ServicePlanList{Items: []v1.ServicePlan{*sp}}, nil
 				}
 				returnPlanCalled++
-				return true, &v1beta1.ServicePlanList{Items: []v1beta1.ServicePlan{}}, nil
+				return true, &v1.ServicePlanList{Items: []v1.ServicePlan{}}, nil
 			})
 			sdk.ServiceCatalogClient = singleClient
 
@@ -292,13 +292,13 @@ var _ = Describe("Plan", func() {
 			Expect(plan.GetNamespace()).To(Equal(sp.Namespace))
 			actions := singleClient.Actions()
 			Expect(len(actions)).To(Equal(4))
-			labelRequirement, err := labels.NewRequirement(v1beta1.GroupName+"/"+v1beta1.FilterSpecClusterServiceClassRefName, "=", []string{util.GenerateSHA(classKubeName)})
+			labelRequirement, err := labels.NewRequirement(v1.GroupName+"/"+v1.FilterSpecClusterServiceClassRefName, "=", []string{util.GenerateSHA(classKubeName)})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(actions[0].Matches("list", "clusterserviceplans")).To(BeTrue())
 			Expect(actions[0].(testing.ListAction).GetListRestrictions().Labels).To(ContainElement(*labelRequirement))
 			Expect(actions[1].Matches("list", "serviceplans")).To(BeTrue())
 			Expect(actions[1].(testing.ListAction).GetListRestrictions().Labels).To(ContainElement(*labelRequirement))
-			namespacedLabelRequirement, err := labels.NewRequirement(v1beta1.GroupName+"/"+v1beta1.FilterSpecServiceClassRefName, "=", []string{util.GenerateSHA(classKubeName)})
+			namespacedLabelRequirement, err := labels.NewRequirement(v1.GroupName+"/"+v1.FilterSpecServiceClassRefName, "=", []string{util.GenerateSHA(classKubeName)})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(actions[2].Matches("list", "clusterserviceplans")).To(BeTrue())
 			Expect(actions[2].(testing.ListAction).GetListRestrictions().Labels).To(ContainElement(*namespacedLabelRequirement))
@@ -315,7 +315,7 @@ var _ = Describe("Plan", func() {
 			spCalled := 0
 			badClient.PrependReactor("list", "clusterserviceplans", func(action testing.Action) (bool, runtime.Object, error) {
 				if cspCalled > 0 {
-					return true, &v1beta1.ClusterServicePlanList{Items: []v1beta1.ClusterServicePlan{}}, nil
+					return true, &v1.ClusterServicePlanList{Items: []v1.ClusterServicePlan{}}, nil
 				}
 				cspCalled++
 				return true, nil, fmt.Errorf(clusterErrorMessage)
@@ -325,7 +325,7 @@ var _ = Describe("Plan", func() {
 					return true, nil, fmt.Errorf(namespacedErrorMessage)
 				}
 				spCalled++
-				return true, &v1beta1.ServicePlanList{Items: []v1beta1.ServicePlan{}}, nil
+				return true, &v1.ServicePlanList{Items: []v1.ServicePlan{}}, nil
 			})
 			sdk.ServiceCatalogClient = badClient
 
@@ -337,11 +337,11 @@ var _ = Describe("Plan", func() {
 			Expect(err.Error()).Should(ContainSubstring(namespacedErrorMessage))
 			actions := badClient.Actions()
 			Expect(len(actions)).To(Equal(3))
-			labelRequirement, err := labels.NewRequirement(v1beta1.GroupName+"/"+v1beta1.FilterSpecClusterServiceClassRefName, "=", []string{util.GenerateSHA(classKubeName)})
+			labelRequirement, err := labels.NewRequirement(v1.GroupName+"/"+v1.FilterSpecClusterServiceClassRefName, "=", []string{util.GenerateSHA(classKubeName)})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(actions[0].Matches("list", "clusterserviceplans")).To(BeTrue())
 			Expect(actions[0].(testing.ListAction).GetListRestrictions().Labels).To(ContainElement(*labelRequirement))
-			labelNamespacedRequirement, err := labels.NewRequirement(v1beta1.GroupName+"/"+v1beta1.FilterSpecServiceClassRefName, "=", []string{util.GenerateSHA(classKubeName)})
+			labelNamespacedRequirement, err := labels.NewRequirement(v1.GroupName+"/"+v1.FilterSpecServiceClassRefName, "=", []string{util.GenerateSHA(classKubeName)})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(actions[1].Matches("list", "clusterserviceplans")).To(BeTrue())
 			Expect(actions[1].(testing.ListAction).GetListRestrictions().Labels).To(ContainElement(*labelNamespacedRequirement))
@@ -350,7 +350,7 @@ var _ = Describe("Plan", func() {
 		})
 	})
 	Describe("RetrievePlanByID", func() {
-		It("Calls the generated v1beta1 get method with the passed in Kubernetes name for cluster-scoped plans", func() {
+		It("Calls the generated v1 get method with the passed in Kubernetes name for cluster-scoped plans", func() {
 			planID := csp.Name
 			_, err := sdk.RetrievePlanByID(planID, ScopeOptions{Scope: ClusterScope})
 			Expect(err).NotTo(HaveOccurred())
@@ -359,7 +359,7 @@ var _ = Describe("Plan", func() {
 			Expect(actions[0].Matches("get", "clusterserviceplans")).To(BeTrue())
 			Expect(actions[0].(testing.GetActionImpl).Name).To(Equal(planID))
 		})
-		It("Calls the generated v1beta1 get method with the passed in Kubernetes name for cluster-scoped plans", func() {
+		It("Calls the generated v1 get method with the passed in Kubernetes name for cluster-scoped plans", func() {
 			planID := sp.Name
 			_, err := sdk.RetrievePlanByID(planID, ScopeOptions{Scope: NamespaceScope, Namespace: "default"})
 			Expect(err).NotTo(HaveOccurred())

@@ -32,9 +32,9 @@ import (
 
 	osb "github.com/kubernetes-sigs/go-open-service-broker-client/v2"
 	fakeosb "github.com/kubernetes-sigs/go-open-service-broker-client/v2/fake"
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	fakesc "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/fake"
-	scinterface "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/typed/servicecatalog/v1beta1"
+	scinterface "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/typed/servicecatalog/v1"
 	scinformers "github.com/kubernetes-sigs/service-catalog/pkg/client/informers_generated/externalversions"
 	"github.com/kubernetes-sigs/service-catalog/pkg/controller"
 	scfeatures "github.com/kubernetes-sigs/service-catalog/pkg/features"
@@ -83,7 +83,7 @@ const (
 // Every test case needs a new instance of the controllerTest.
 type controllerTest struct {
 	// resource clientsets and interfaces
-	scInterface      scinterface.ServicecatalogV1beta1Interface
+	scInterface      scinterface.Servicecatalogv1Interface
 	k8sClient        *fakek8s.Clientset
 	fakeOSBClient    *fakeosb.FakeClient
 	catalogReactions []fakeosb.CatalogReaction
@@ -108,13 +108,13 @@ func newControllerTest(t *testing.T) *controllerTest {
 
 	scClient := fakesc.NewSimpleClientset()
 	informerFactory := scinformers.NewSharedInformerFactory(scClient, 0)
-	serviceCatalogSharedInformers := informerFactory.Servicecatalog().V1beta1()
+	serviceCatalogSharedInformers := informerFactory.Servicecatalog().v1()
 
 	clusterServiceClassInformer := serviceCatalogSharedInformers.ClusterServiceClasses()
 	plansInformer := serviceCatalogSharedInformers.ClusterServicePlans()
 
 	testCase := &controllerTest{
-		scInterface:      scClient.ServicecatalogV1beta1(),
+		scInterface:      scClient.Servicecatalogv1(),
 		k8sClient:        k8sClient,
 		fakeOSBClient:    fakeOSBClient,
 		catalogReactions: []fakeosb.CatalogReaction{},
@@ -132,7 +132,7 @@ func newControllerTest(t *testing.T) *controllerTest {
 
 	testController, err := controller.NewController(
 		k8sClient,
-		scClient.ServicecatalogV1beta1(),
+		scClient.Servicecatalogv1(),
 		serviceCatalogSharedInformers.ClusterServiceBrokers(),
 		serviceCatalogSharedInformers.ServiceBrokers(),
 		clusterServiceClassInformer,
@@ -175,7 +175,7 @@ func newControllerTest(t *testing.T) *controllerTest {
 type serviceBindingHandler struct {
 	sync.Mutex
 
-	onUpdate func(old, new *v1beta1.ServiceBinding)
+	onUpdate func(old, new *v1.ServiceBinding)
 }
 
 // OnAdd handles ServiceBinding add action.
@@ -195,11 +195,11 @@ func (h *serviceBindingHandler) OnUpdate(old, obj interface{}) {
 	if h.onUpdate == nil {
 		return
 	}
-	newSb, ok := obj.(*v1beta1.ServiceBinding)
+	newSb, ok := obj.(*v1.ServiceBinding)
 	if !ok {
 		return
 	}
-	oldSb, ok := old.(*v1beta1.ServiceBinding)
+	oldSb, ok := old.(*v1.ServiceBinding)
 	if !ok {
 		return
 	}
@@ -208,7 +208,7 @@ func (h *serviceBindingHandler) OnUpdate(old, obj interface{}) {
 
 // SetServiceBindingOnChangeListener sets callback function which is called
 // when ServiceBinding was changed.
-func (ct *controllerTest) SetServiceBindingOnChangeListener(onUpdate func(old, new *v1beta1.ServiceBinding)) {
+func (ct *controllerTest) SetServiceBindingOnChangeListener(onUpdate func(old, new *v1.ServiceBinding)) {
 	ct.serviceBindingHandler.Lock()
 	defer ct.serviceBindingHandler.Unlock()
 	ct.serviceBindingHandler.onUpdate = onUpdate
@@ -437,15 +437,15 @@ func (ct *controllerTest) spyOSBClientFunc(target osb.CreateFunc) osb.CreateFunc
 }
 
 // fixClusterServiceBroker returns ClusterServiceBroker with filled in all required field
-func (ct *controllerTest) fixClusterServiceBroker() *v1beta1.ClusterServiceBroker {
-	return &v1beta1.ClusterServiceBroker{
+func (ct *controllerTest) fixClusterServiceBroker() *v1.ClusterServiceBroker {
+	return &v1.ClusterServiceBroker{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: testClusterServiceBrokerName,
 		},
-		Spec: v1beta1.ClusterServiceBrokerSpec{
-			CommonServiceBrokerSpec: v1beta1.CommonServiceBrokerSpec{
+		Spec: v1.ClusterServiceBrokerSpec{
+			CommonServiceBrokerSpec: v1.CommonServiceBrokerSpec{
 				URL:            "https://broker.example.com",
-				RelistBehavior: v1beta1.ServiceBrokerRelistBehaviorDuration,
+				RelistBehavior: v1.ServiceBrokerRelistBehaviorDuration,
 				RelistDuration: &metav1.Duration{Duration: 15 * time.Minute},
 			},
 		},
@@ -461,9 +461,9 @@ func (ct *controllerTest) CreateSimpleClusterServiceBroker() error {
 // CreateClusterServiceBrokerWithBasicAuth creates a ClusterServiceBroker with basic auth.
 func (ct *controllerTest) CreateClusterServiceBrokerWithBasicAuth() error {
 	csb := ct.fixClusterServiceBroker()
-	csb.Spec.AuthInfo = &v1beta1.ClusterServiceBrokerAuthInfo{
-		Basic: &v1beta1.ClusterBasicAuthConfig{
-			SecretRef: &v1beta1.ObjectReference{
+	csb.Spec.AuthInfo = &v1.ClusterServiceBrokerAuthInfo{
+		Basic: &v1.ClusterBasicAuthConfig{
+			SecretRef: &v1.ObjectReference{
 				Name:      authSecretName,
 				Namespace: testNamespace,
 			},
@@ -485,7 +485,7 @@ func (ct *controllerTest) AddServiceClassRestrictionsToBroker() error {
 	}
 
 	csb, err := ct.scInterface.ClusterServiceBrokers().Get(context.Background(), testClusterServiceBrokerName, metav1.GetOptions{})
-	csb.Spec.CatalogRestrictions = &v1beta1.CatalogRestrictions{
+	csb.Spec.CatalogRestrictions = &v1.CatalogRestrictions{
 		ServiceClass: restrictions,
 	}
 	csb.Generation = csb.Generation + 1
@@ -495,23 +495,23 @@ func (ct *controllerTest) AddServiceClassRestrictionsToBroker() error {
 
 // CreateServiceInstance creates a ServiceInstance which is used in testing scenarios.
 func (ct *controllerTest) CreateServiceInstance() error {
-	_, err := ct.scInterface.ServiceInstances(testNamespace).Create(context.Background(), &v1beta1.ServiceInstance{
+	_, err := ct.scInterface.ServiceInstances(testNamespace).Create(context.Background(), &v1.ServiceInstance{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: testServiceInstanceName,
 			// added by a Webhook, which is not tested here
-			Finalizers: []string{v1beta1.FinalizerServiceCatalog},
+			Finalizers: []string{v1.FinalizerServiceCatalog},
 		},
-		Spec: v1beta1.ServiceInstanceSpec{
-			PlanReference: v1beta1.PlanReference{
+		Spec: v1.ServiceInstanceSpec{
+			PlanReference: v1.PlanReference{
 				ClusterServiceClassExternalName: testClassExternalID,
 				ClusterServicePlanExternalName:  testPlanExternalID,
 			},
 			ExternalID: testExternalID,
 			// Plan and Class refs are added by a Webhook, which is not tested here
-			ClusterServicePlanRef: &v1beta1.ClusterObjectReference{
+			ClusterServicePlanRef: &v1.ClusterObjectReference{
 				Name: testPlanExternalID,
 			},
-			ClusterServiceClassRef: &v1beta1.ClusterObjectReference{
+			ClusterServiceClassRef: &v1.ClusterObjectReference{
 				Name: testClassExternalID,
 			},
 			UserInfo: fixtureUserInfo(),
@@ -553,16 +553,16 @@ func (ct *controllerTest) Deprovision() error {
 
 // CreateBinding creates a ServiceBinding which is used in testing scenarios.
 func (ct *controllerTest) CreateBinding() error {
-	_, err := ct.scInterface.ServiceBindings(testNamespace).Create(context.Background(), &v1beta1.ServiceBinding{
+	_, err := ct.scInterface.ServiceBindings(testNamespace).Create(context.Background(), &v1.ServiceBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace:   testNamespace,
 			Name:        testBindingName,
 			Generation:  1,
-			Finalizers:  []string{v1beta1.FinalizerServiceCatalog}, // set by the Webhook
+			Finalizers:  []string{v1.FinalizerServiceCatalog}, // set by the Webhook
 			Annotations: map[string]string{},
 		},
-		Spec: v1beta1.ServiceBindingSpec{
-			InstanceRef: v1beta1.LocalObjectReference{
+		Spec: v1.ServiceBindingSpec{
+			InstanceRef: v1.LocalObjectReference{
 				Name: testServiceInstanceName,
 			},
 			ExternalID: testServiceBindingGUID,
@@ -598,8 +598,8 @@ func (ct *controllerTest) CreateSecretWithBasicAuth(username, password string) e
 			Name:      authSecretName,
 		},
 		Data: map[string][]byte{
-			v1beta1.BasicAuthUsernameKey: []byte(username),
-			v1beta1.BasicAuthPasswordKey: []byte(password),
+			v1.BasicAuthUsernameKey: []byte(username),
+			v1.BasicAuthPasswordKey: []byte(password),
 		},
 	}, metav1.CreateOptions{})
 	return err
@@ -613,8 +613,8 @@ func (ct *controllerTest) UpdateSecretWithBasicAuth(username, password string) e
 			Name:      authSecretName,
 		},
 		Data: map[string][]byte{
-			v1beta1.BasicAuthUsernameKey: []byte(username),
-			v1beta1.BasicAuthPasswordKey: []byte(password),
+			v1.BasicAuthUsernameKey: []byte(username),
+			v1.BasicAuthPasswordKey: []byte(password),
 		},
 	}, metav1.UpdateOptions{})
 	return err
@@ -689,58 +689,58 @@ func (ct *controllerTest) WaitForServiceBindingToNotExists() error {
 
 // WaitForReadyBinding waits until the ServiceBinding is in Ready state
 func (ct *controllerTest) WaitForReadyBinding() error {
-	return ct.waitForBindingStatusCondition(v1beta1.ServiceBindingCondition{
-		Type:   v1beta1.ServiceBindingConditionReady,
-		Status: v1beta1.ConditionTrue,
+	return ct.waitForBindingStatusCondition(v1.ServiceBindingCondition{
+		Type:   v1.ServiceBindingConditionReady,
+		Status: v1.ConditionTrue,
 	})
 }
 
 // WaitForNotReadyBinding waits until the ServiceBinding is in NotReady state
 func (ct *controllerTest) WaitForNotReadyBinding() error {
-	return ct.waitForBindingStatusCondition(v1beta1.ServiceBindingCondition{
-		Type:   v1beta1.ServiceBindingConditionReady,
-		Status: v1beta1.ConditionFalse,
+	return ct.waitForBindingStatusCondition(v1.ServiceBindingCondition{
+		Type:   v1.ServiceBindingConditionReady,
+		Status: v1.ConditionFalse,
 	})
 }
 
 // WaitForUnbindFailed waits for the ServiceBinding to be marked as failed because of the unbind action
 func (ct *controllerTest) WaitForUnbindFailed() error {
-	return ct.waitForBindingStatusCondition(v1beta1.ServiceBindingCondition{
-		Type:   v1beta1.ServiceBindingConditionReady,
-		Status: v1beta1.ConditionUnknown,
+	return ct.waitForBindingStatusCondition(v1.ServiceBindingCondition{
+		Type:   v1.ServiceBindingConditionReady,
+		Status: v1.ConditionUnknown,
 		Reason: "UnbindCallFailed",
 	})
 }
 
 // WaitForNotReadyBinding waits until the ServiceBinding is in InProgress state
 func (ct *controllerTest) WaitForBindingInProgress() error {
-	return ct.waitForBindingStatusCondition(v1beta1.ServiceBindingCondition{
-		Type:   v1beta1.ServiceBindingConditionReady,
-		Status: v1beta1.ConditionFalse,
+	return ct.waitForBindingStatusCondition(v1.ServiceBindingCondition{
+		Type:   v1.ServiceBindingConditionReady,
+		Status: v1.ConditionFalse,
 		Reason: "Binding",
 	})
 }
 
 // WaitForNotReadyBinding waits until the ServiceBinding completes the orphan mitigation
 func (ct *controllerTest) WaitForBindingOrphanMitigationSuccessful() error {
-	return ct.waitForBindingStatusCondition(v1beta1.ServiceBindingCondition{
-		Type:   v1beta1.ServiceBindingConditionReady,
-		Status: v1beta1.ConditionFalse,
+	return ct.waitForBindingStatusCondition(v1.ServiceBindingCondition{
+		Type:   v1.ServiceBindingConditionReady,
+		Status: v1.ConditionFalse,
 		Reason: "OrphanMitigationSuccessful",
 	})
 }
 
 // WaitForBindingFailed waits unit the ServiceBinding is in Failed state
 func (ct *controllerTest) WaitForBindingFailed() error {
-	return ct.waitForBindingStatusCondition(v1beta1.ServiceBindingCondition{
-		Type:   v1beta1.ServiceBindingConditionFailed,
-		Status: v1beta1.ConditionTrue,
+	return ct.waitForBindingStatusCondition(v1.ServiceBindingCondition{
+		Type:   v1.ServiceBindingConditionFailed,
+		Status: v1.ConditionTrue,
 	})
 }
 
 // WaitForUnbindStatus waits unit the ServiceBinding will have the given status
-func (ct *controllerTest) WaitForUnbindStatus(status v1beta1.ServiceBindingUnbindStatus) error {
-	var lastBinding *v1beta1.ServiceBinding
+func (ct *controllerTest) WaitForUnbindStatus(status v1.ServiceBindingUnbindStatus) error {
+	var lastBinding *v1.ServiceBinding
 	err := wait.PollImmediate(pollingInterval, pollingTimeout, func() (bool, error) {
 		binding, err := ct.scInterface.ServiceBindings(testNamespace).Get(context.Background(), testBindingName, metav1.GetOptions{})
 		if err != nil {
@@ -761,8 +761,8 @@ func (ct *controllerTest) WaitForUnbindStatus(status v1beta1.ServiceBindingUnbin
 }
 
 // WaitForDeprovisionStatus waits unit the ServiceInstance will have the given status
-func (ct *controllerTest) WaitForDeprovisionStatus(status v1beta1.ServiceInstanceDeprovisionStatus) error {
-	var lastInstance *v1beta1.ServiceInstance
+func (ct *controllerTest) WaitForDeprovisionStatus(status v1.ServiceInstanceDeprovisionStatus) error {
+	var lastInstance *v1.ServiceInstance
 	err := wait.PollImmediate(pollingInterval, pollingTimeout, func() (bool, error) {
 		si, err := ct.scInterface.ServiceInstances(testNamespace).Get(context.Background(), testServiceInstanceName, metav1.GetOptions{})
 		if err != nil {
@@ -784,8 +784,8 @@ func (ct *controllerTest) WaitForDeprovisionStatus(status v1beta1.ServiceInstanc
 }
 
 // waitForBindingStatusCondition waits until ServiceBinding will have the given condition
-func (ct *controllerTest) waitForBindingStatusCondition(condition v1beta1.ServiceBindingCondition) error {
-	var lastBinding *v1beta1.ServiceBinding
+func (ct *controllerTest) waitForBindingStatusCondition(condition v1.ServiceBindingCondition) error {
+	var lastBinding *v1.ServiceBinding
 	err := wait.PollImmediate(pollingInterval, pollingTimeout, func() (bool, error) {
 		binding, err := ct.scInterface.ServiceBindings(testNamespace).Get(context.Background(), testBindingName, metav1.GetOptions{})
 		if err != nil {
@@ -810,7 +810,7 @@ func (ct *controllerTest) waitForBindingStatusCondition(condition v1beta1.Servic
 
 // WaitForServiceInstanceRemoved waits until the ServiceInstance will be removed
 func (ct *controllerTest) WaitForServiceInstanceRemoved() error {
-	var lastInstance *v1beta1.ServiceInstance
+	var lastInstance *v1.ServiceInstance
 	err := wait.PollImmediate(pollingInterval, pollingTimeout, func() (bool, error) {
 		instance, err := ct.scInterface.ServiceInstances(testNamespace).Get(context.Background(), testServiceInstanceName, metav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
@@ -827,24 +827,24 @@ func (ct *controllerTest) WaitForServiceInstanceRemoved() error {
 
 // WaitForReadyInstance waits until the ServiceInstance will be marked as ready
 func (ct *controllerTest) WaitForReadyInstance() error {
-	return ct.waitForInstanceCondition(v1beta1.ServiceInstanceCondition{
-		Type:   v1beta1.ServiceInstanceConditionReady,
-		Status: v1beta1.ConditionTrue,
+	return ct.waitForInstanceCondition(v1.ServiceInstanceCondition{
+		Type:   v1.ServiceInstanceConditionReady,
+		Status: v1.ConditionTrue,
 	})
 }
 
 // WaitForInstanceUpdating waits until the ServiceInstance will be in update state
 func (ct *controllerTest) WaitForInstanceUpdating() error {
-	return ct.waitForInstanceCondition(v1beta1.ServiceInstanceCondition{
-		Type:   v1beta1.ServiceInstanceConditionReady,
-		Status: v1beta1.ConditionFalse,
+	return ct.waitForInstanceCondition(v1.ServiceInstanceCondition{
+		Type:   v1.ServiceInstanceConditionReady,
+		Status: v1.ConditionFalse,
 		Reason: "UpdatingInstance",
 	})
 }
 
 // WaitForServiceInstanceRemoved waits until the ServiceInstance will in given condition
-func (ct *controllerTest) waitForInstanceCondition(condition v1beta1.ServiceInstanceCondition) error {
-	var lastInstance *v1beta1.ServiceInstance
+func (ct *controllerTest) waitForInstanceCondition(condition v1.ServiceInstanceCondition) error {
+	var lastInstance *v1.ServiceInstance
 	err := wait.PollImmediate(pollingInterval, pollingTimeout, func() (bool, error) {
 		instance, err := ct.scInterface.ServiceInstances(testNamespace).Get(context.Background(), testServiceInstanceName, metav1.GetOptions{})
 		if err != nil {
@@ -869,7 +869,7 @@ func (ct *controllerTest) waitForInstanceCondition(condition v1beta1.ServiceInst
 
 // WaitForAsyncProvisioningInProgress waits until the ServiceInstance will be in process of async provisioning
 func (ct *controllerTest) WaitForAsyncProvisioningInProgress() error {
-	var lastInstance *v1beta1.ServiceInstance
+	var lastInstance *v1.ServiceInstance
 	err := wait.PollImmediate(pollingInterval, pollingTimeout, func() (bool, error) {
 		instance, err := ct.scInterface.ServiceInstances(testNamespace).Get(context.Background(), testServiceInstanceName, metav1.GetOptions{})
 		if err != nil {
@@ -891,12 +891,12 @@ func (ct *controllerTest) WaitForAsyncProvisioningInProgress() error {
 
 // WaitForReadyBroker waits until the ServiceBroker will be in Ready state
 func (ct *controllerTest) WaitForReadyBroker() error {
-	condition := v1beta1.ServiceBrokerCondition{
-		Type:   v1beta1.ServiceBrokerConditionReady,
-		Status: v1beta1.ConditionTrue,
+	condition := v1.ServiceBrokerCondition{
+		Type:   v1.ServiceBrokerConditionReady,
+		Status: v1.ConditionTrue,
 	}
 
-	var lastBroker *v1beta1.ClusterServiceBroker
+	var lastBroker *v1.ClusterServiceBroker
 	err := wait.PollImmediate(pollingInterval, pollingTimeout, func() (bool, error) {
 		broker, err := ct.scInterface.ClusterServiceBrokers().Get(context.Background(), testClusterServiceBrokerName, metav1.GetOptions{})
 		if err != nil {
@@ -1051,8 +1051,8 @@ func (ct *controllerTest) SetupEmptyPlanListForOSBClient() {
 
 // WaitForInstanceCondition waits until ServiceInstance `status.conditions` field value is equal to condition in parameters
 // returns error if the time limit has been reached
-func (ct *controllerTest) WaitForInstanceCondition(condition v1beta1.ServiceInstanceCondition) error {
-	var lastInstance *v1beta1.ServiceInstance
+func (ct *controllerTest) WaitForInstanceCondition(condition v1.ServiceInstanceCondition) error {
+	var lastInstance *v1.ServiceInstance
 	err := wait.PollImmediate(pollingInterval, pollingTimeout, func() (bool, error) {
 		instance, err := ct.scInterface.ServiceInstances(testNamespace).Get(context.Background(), testServiceInstanceName, metav1.GetOptions{})
 		if err != nil {
@@ -1100,10 +1100,10 @@ func (ct *controllerTest) WaitForServiceInstanceProcessedGeneration(generation i
 	return err
 }
 
-func isServiceInstanceConditionTrue(instance *v1beta1.ServiceInstance) bool {
+func isServiceInstanceConditionTrue(instance *v1.ServiceInstance) bool {
 	for _, cond := range instance.Status.Conditions {
-		if cond.Type == v1beta1.ServiceInstanceConditionReady || cond.Type == v1beta1.ServiceInstanceConditionFailed {
-			return cond.Status == v1beta1.ConditionTrue
+		if cond.Type == v1.ServiceInstanceConditionReady || cond.Type == v1.ServiceInstanceConditionFailed {
+			return cond.Status == v1.ConditionTrue
 		}
 	}
 
@@ -1111,7 +1111,7 @@ func isServiceInstanceConditionTrue(instance *v1beta1.ServiceInstance) bool {
 }
 
 // AssertServiceInstanceHasNoCondition makes sure ServiceInstance is in not specific condition
-func (ct *controllerTest) AssertServiceInstanceHasNoCondition(t *testing.T, cond v1beta1.ServiceInstanceCondition) {
+func (ct *controllerTest) AssertServiceInstanceHasNoCondition(t *testing.T, cond v1.ServiceInstanceCondition) {
 	instance, err := ct.scInterface.ServiceInstances(testNamespace).Get(context.Background(), testServiceInstanceName, metav1.GetOptions{})
 	if err != nil {
 		t.Fatalf("error getting Instance: %v", err)
@@ -1142,13 +1142,13 @@ func (ct *controllerTest) AssertServiceInstanceOrphanMitigationStatus(t *testing
 
 // CreateClusterServiceClass creates ClusterServiceClass with default parameters
 func (ct *controllerTest) CreateClusterServiceClass() error {
-	serviceClass := &v1beta1.ClusterServiceClass{
+	serviceClass := &v1.ClusterServiceClass{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: testClassExternalID,
 		},
-		Spec: v1beta1.ClusterServiceClassSpec{
+		Spec: v1.ClusterServiceClassSpec{
 			ClusterServiceBrokerName: testClusterServiceBrokerName,
-			CommonServiceClassSpec: v1beta1.CommonServiceClassSpec{
+			CommonServiceClassSpec: v1.CommonServiceClassSpec{
 				ExternalID:   testClassExternalID,
 				ExternalName: testClusterServiceClassName,
 				Description:  "a test service",
@@ -1165,11 +1165,11 @@ func (ct *controllerTest) CreateClusterServiceClass() error {
 
 // CreateClusterServicePlan creates CreateClusterServicePlan with default parameters
 func (ct *controllerTest) CreateClusterServicePlan() error {
-	servicePlan := &v1beta1.ClusterServicePlan{
+	servicePlan := &v1.ClusterServicePlan{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: testPlanExternalID,
 		},
-		Spec: v1beta1.ClusterServicePlanSpec{
+		Spec: v1.ClusterServicePlanSpec{
 			ClusterServiceBrokerName: testClusterServicePlanName,
 		},
 	}
@@ -1188,7 +1188,7 @@ func (ct *controllerTest) UpdateServiceInstanceExternalPlanName(planID string) (
 	}
 
 	instance.Spec.ClusterServicePlanExternalName = planID
-	instance.Spec.ClusterServicePlanRef = &v1beta1.ClusterObjectReference{
+	instance.Spec.ClusterServicePlanRef = &v1.ClusterObjectReference{
 		Name: planID,
 	}
 
@@ -1211,7 +1211,7 @@ func (ct *controllerTest) UpdateServiceInstanceInternalPlanName(planName string)
 	}
 
 	instance.Spec.ClusterServicePlanName = planName
-	instance.Spec.ClusterServicePlanRef = &v1beta1.ClusterObjectReference{
+	instance.Spec.ClusterServicePlanRef = &v1.ClusterObjectReference{
 		Name: testOtherPlanExternalID,
 	}
 
@@ -1229,7 +1229,7 @@ func (ct *controllerTest) UpdateServiceInstanceInternalPlanName(planName string)
 // by adding reference to Secret. If parameters are empty method creates ServiceInstance without parameters
 func (ct *controllerTest) CreateServiceInstanceWithCustomParameters(withParam, paramFromSecret bool) error {
 	var params map[string]interface{}
-	var paramsFrom []v1beta1.ParametersFromSource
+	var paramsFrom []v1.ParametersFromSource
 
 	if withParam {
 		params = map[string]interface{}{
@@ -1238,9 +1238,9 @@ func (ct *controllerTest) CreateServiceInstanceWithCustomParameters(withParam, p
 	}
 
 	if paramFromSecret {
-		paramsFrom = []v1beta1.ParametersFromSource{
+		paramsFrom = []v1.ParametersFromSource{
 			{
-				SecretKeyRef: &v1beta1.SecretKeyReference{
+				SecretKeyRef: &v1.SecretKeyReference{
 					Name: secretNameWithParameters,
 					Key:  secretKeyWithParameters,
 				},
@@ -1266,26 +1266,26 @@ func (ct *controllerTest) CreateServiceInstanceWithCustomParameters(withParam, p
 // Secret reference
 func (ct *controllerTest) CreateServiceInstanceWithParameters(
 	params map[string]interface{},
-	paramsFrom []v1beta1.ParametersFromSource) (*v1beta1.ServiceInstance, error) {
+	paramsFrom []v1.ParametersFromSource) (*v1.ServiceInstance, error) {
 	rawParams, err := convertParametersIntoRawExtension(params)
 	if err != nil {
 		return nil, err
 	}
 
-	instance := &v1beta1.ServiceInstance{
+	instance := &v1.ServiceInstance{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:       testServiceInstanceName,
-			Finalizers: []string{v1beta1.FinalizerServiceCatalog},
+			Finalizers: []string{v1.FinalizerServiceCatalog},
 		},
-		Spec: v1beta1.ServiceInstanceSpec{
-			PlanReference: v1beta1.PlanReference{
+		Spec: v1.ServiceInstanceSpec{
+			PlanReference: v1.PlanReference{
 				ClusterServiceClassExternalName: testClusterServiceClassName,
 				ClusterServicePlanExternalName:  testClusterServicePlanName,
 			},
-			ClusterServicePlanRef: &v1beta1.ClusterObjectReference{
+			ClusterServicePlanRef: &v1.ClusterObjectReference{
 				Name: testPlanExternalID,
 			},
-			ClusterServiceClassRef: &v1beta1.ClusterObjectReference{
+			ClusterServiceClassRef: &v1.ClusterObjectReference{
 				Name: testClassExternalID,
 			},
 			ExternalID:     testExternalID,
@@ -1324,9 +1324,9 @@ func (ct *controllerTest) UpdateCustomServiceInstanceParameters(
 	}
 
 	if updateFromSecret {
-		instance.Spec.ParametersFrom = []v1beta1.ParametersFromSource{
+		instance.Spec.ParametersFrom = []v1.ParametersFromSource{
 			{
-				SecretKeyRef: &v1beta1.SecretKeyReference{
+				SecretKeyRef: &v1.SecretKeyReference{
 					Name: otherSecretNameWithParameters,
 					Key:  otherSecretKeyWithParameters,
 				},
@@ -1370,20 +1370,20 @@ func (ct *controllerTest) CreateServiceInstanceWithInvalidParameters() error {
 	}
 	rawParams.Raw[0] = 0x21
 
-	instance := &v1beta1.ServiceInstance{
+	instance := &v1.ServiceInstance{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:       testServiceInstanceName,
-			Finalizers: []string{v1beta1.FinalizerServiceCatalog},
+			Finalizers: []string{v1.FinalizerServiceCatalog},
 		},
-		Spec: v1beta1.ServiceInstanceSpec{
-			PlanReference: v1beta1.PlanReference{
+		Spec: v1.ServiceInstanceSpec{
+			PlanReference: v1.PlanReference{
 				ClusterServiceClassExternalName: testClusterServiceClassName,
 				ClusterServicePlanExternalName:  testClusterServicePlanName,
 			},
-			ClusterServicePlanRef: &v1beta1.ClusterObjectReference{
+			ClusterServicePlanRef: &v1.ClusterObjectReference{
 				Name: testPlanExternalID,
 			},
-			ClusterServiceClassRef: &v1beta1.ClusterObjectReference{
+			ClusterServiceClassRef: &v1.ClusterObjectReference{
 				Name: testClassExternalID,
 			},
 			ExternalID:     testExternalID,
@@ -1700,23 +1700,23 @@ func (ct *controllerTest) AssertLastBindRequest(t *testing.T, expectedParams map
 
 // CreateServiceInstance creates a ServiceInstance which is used in testing scenarios.
 func (ct *controllerTest) CreateServiceInstanceWithNonbindablePlan() error {
-	_, err := ct.scInterface.ServiceInstances(testNamespace).Create(context.Background(), &v1beta1.ServiceInstance{
+	_, err := ct.scInterface.ServiceInstances(testNamespace).Create(context.Background(), &v1.ServiceInstance{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: testServiceInstanceName,
 			// added by a Webhook, which is not tested here
-			Finalizers: []string{v1beta1.FinalizerServiceCatalog},
+			Finalizers: []string{v1.FinalizerServiceCatalog},
 		},
-		Spec: v1beta1.ServiceInstanceSpec{
-			PlanReference: v1beta1.PlanReference{
+		Spec: v1.ServiceInstanceSpec{
+			PlanReference: v1.PlanReference{
 				ClusterServiceClassExternalName: testClassExternalID,
 				ClusterServicePlanExternalName:  testNonbindablePlanExternalID,
 			},
 			ExternalID: testExternalID,
 			// Plan and Class refs are added by a Webhook, which is not tested here
-			ClusterServicePlanRef: &v1beta1.ClusterObjectReference{
+			ClusterServicePlanRef: &v1.ClusterObjectReference{
 				Name: testNonbindablePlanExternalID,
 			},
-			ClusterServiceClassRef: &v1beta1.ClusterObjectReference{
+			ClusterServiceClassRef: &v1.ClusterObjectReference{
 				Name: testClassExternalID,
 			},
 		},
@@ -1735,7 +1735,7 @@ func (ct *controllerTest) SetOSBProvisionReactionWithHTTPError(code int) {
 	}
 }
 
-func (ct *controllerTest) CreateBindingWithParams(params map[string]interface{}, paramsFrom []v1beta1.ParametersFromSource) error {
+func (ct *controllerTest) CreateBindingWithParams(params map[string]interface{}, paramsFrom []v1.ParametersFromSource) error {
 	var parameters *runtime.RawExtension
 	if params != nil {
 		marshaledParams, err := json.Marshal(params)
@@ -1744,16 +1744,16 @@ func (ct *controllerTest) CreateBindingWithParams(params map[string]interface{},
 		}
 		parameters = &runtime.RawExtension{Raw: marshaledParams}
 	}
-	_, err := ct.scInterface.ServiceBindings(testNamespace).Create(context.Background(), &v1beta1.ServiceBinding{
+	_, err := ct.scInterface.ServiceBindings(testNamespace).Create(context.Background(), &v1.ServiceBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace:   testNamespace,
 			Name:        testBindingName,
 			Generation:  1,
-			Finalizers:  []string{v1beta1.FinalizerServiceCatalog}, // set by the Webhook
+			Finalizers:  []string{v1.FinalizerServiceCatalog}, // set by the Webhook
 			Annotations: map[string]string{},
 		},
-		Spec: v1beta1.ServiceBindingSpec{
-			InstanceRef: v1beta1.LocalObjectReference{
+		Spec: v1.ServiceBindingSpec{
+			InstanceRef: v1.LocalObjectReference{
 				Name: testServiceInstanceName,
 			},
 			ExternalID:     testServiceBindingGUID,
@@ -1772,17 +1772,17 @@ func (ct *controllerTest) AssertBindingData(t *testing.T, expectedData map[strin
 	assert.Equal(t, expectedData, s.Data)
 }
 
-func (ct *controllerTest) CreateBindingWithTransforms(transforms []v1beta1.SecretTransform) error {
-	_, err := ct.scInterface.ServiceBindings(testNamespace).Create(context.Background(), &v1beta1.ServiceBinding{
+func (ct *controllerTest) CreateBindingWithTransforms(transforms []v1.SecretTransform) error {
+	_, err := ct.scInterface.ServiceBindings(testNamespace).Create(context.Background(), &v1.ServiceBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace:   testNamespace,
 			Name:        testBindingName,
 			Generation:  1,
-			Finalizers:  []string{v1beta1.FinalizerServiceCatalog}, // set by the Webhook
+			Finalizers:  []string{v1.FinalizerServiceCatalog}, // set by the Webhook
 			Annotations: map[string]string{},
 		},
-		Spec: v1beta1.ServiceBindingSpec{
-			InstanceRef: v1beta1.LocalObjectReference{
+		Spec: v1.ServiceBindingSpec{
+			InstanceRef: v1.LocalObjectReference{
 				Name: testServiceInstanceName,
 			},
 			ExternalID:       testServiceBindingGUID,
@@ -1879,8 +1879,8 @@ func fixtureBindCredentials() map[string]interface{} {
 	}
 }
 
-func fixtureUserInfo() *v1beta1.UserInfo {
-	return &v1beta1.UserInfo{
+func fixtureUserInfo() *v1.UserInfo {
+	return &v1.UserInfo{
 		Username: testUsername,
 	}
 }

@@ -20,7 +20,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/olekukonko/tablewriter"
 )
 
@@ -30,14 +30,14 @@ func Test_appendInstanceDashboardURL(t *testing.T) {
 
 	tests := []struct {
 		name           string
-		status         v1beta1.ServiceInstanceStatus
+		status         v1.ServiceInstanceStatus
 		table          *tablewriter.Table
 		expectedString string
 	}{
-		{"dashboardURLOK", v1beta1.ServiceInstanceStatus{
+		{"dashboardURLOK", v1.ServiceInstanceStatus{
 			DashboardURL: &dashboardURL,
 		}, table, "DashboardURL:   grafana.example.com"},
-		{"dashboardURLEmpty", v1beta1.ServiceInstanceStatus{}, table, ""},
+		{"dashboardURLEmpty", v1.ServiceInstanceStatus{}, table, ""},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

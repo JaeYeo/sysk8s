@@ -21,7 +21,7 @@ package fake
 import (
 	"context"
 
-	v1beta1 "k8s.io/api/batch/v1beta1"
+	v1 "k8s.io/api/batch/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
@@ -32,29 +32,29 @@ import (
 
 // FakeCronJobs implements CronJobInterface
 type FakeCronJobs struct {
-	Fake *FakeBatchV1beta1
+	Fake *FakeBatchv1
 	ns   string
 }
 
-var cronjobsResource = schema.GroupVersionResource{Group: "batch", Version: "v1beta1", Resource: "cronjobs"}
+var cronjobsResource = schema.GroupVersionResource{Group: "batch", Version: "v1", Resource: "cronjobs"}
 
-var cronjobsKind = schema.GroupVersionKind{Group: "batch", Version: "v1beta1", Kind: "CronJob"}
+var cronjobsKind = schema.GroupVersionKind{Group: "batch", Version: "v1", Kind: "CronJob"}
 
 // Get takes name of the cronJob, and returns the corresponding cronJob object, and an error if there is any.
-func (c *FakeCronJobs) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1beta1.CronJob, err error) {
+func (c *FakeCronJobs) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1.CronJob, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(cronjobsResource, c.ns, name), &v1beta1.CronJob{})
+		Invokes(testing.NewGetAction(cronjobsResource, c.ns, name), &v1.CronJob{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta1.CronJob), err
+	return obj.(*v1.CronJob), err
 }
 
 // List takes label and field selectors, and returns the list of CronJobs that match those selectors.
-func (c *FakeCronJobs) List(ctx context.Context, opts v1.ListOptions) (result *v1beta1.CronJobList, err error) {
+func (c *FakeCronJobs) List(ctx context.Context, opts v1.ListOptions) (result *v1.CronJobList, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewListAction(cronjobsResource, cronjobsKind, c.ns, opts), &v1beta1.CronJobList{})
+		Invokes(testing.NewListAction(cronjobsResource, cronjobsKind, c.ns, opts), &v1.CronJobList{})
 
 	if obj == nil {
 		return nil, err
@@ -64,8 +64,8 @@ func (c *FakeCronJobs) List(ctx context.Context, opts v1.ListOptions) (result *v
 	if label == nil {
 		label = labels.Everything()
 	}
-	list := &v1beta1.CronJobList{ListMeta: obj.(*v1beta1.CronJobList).ListMeta}
-	for _, item := range obj.(*v1beta1.CronJobList).Items {
+	list := &v1.CronJobList{ListMeta: obj.(*v1.CronJobList).ListMeta}
+	for _, item := range obj.(*v1.CronJobList).Items {
 		if label.Matches(labels.Set(item.Labels)) {
 			list.Items = append(list.Items, item)
 		}
@@ -81,43 +81,43 @@ func (c *FakeCronJobs) Watch(ctx context.Context, opts v1.ListOptions) (watch.In
 }
 
 // Create takes the representation of a cronJob and creates it.  Returns the server's representation of the cronJob, and an error, if there is any.
-func (c *FakeCronJobs) Create(ctx context.Context, cronJob *v1beta1.CronJob, opts v1.CreateOptions) (result *v1beta1.CronJob, err error) {
+func (c *FakeCronJobs) Create(ctx context.Context, cronJob *v1.CronJob, opts v1.CreateOptions) (result *v1.CronJob, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(cronjobsResource, c.ns, cronJob), &v1beta1.CronJob{})
+		Invokes(testing.NewCreateAction(cronjobsResource, c.ns, cronJob), &v1.CronJob{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta1.CronJob), err
+	return obj.(*v1.CronJob), err
 }
 
 // Update takes the representation of a cronJob and updates it. Returns the server's representation of the cronJob, and an error, if there is any.
-func (c *FakeCronJobs) Update(ctx context.Context, cronJob *v1beta1.CronJob, opts v1.UpdateOptions) (result *v1beta1.CronJob, err error) {
+func (c *FakeCronJobs) Update(ctx context.Context, cronJob *v1.CronJob, opts v1.UpdateOptions) (result *v1.CronJob, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(cronjobsResource, c.ns, cronJob), &v1beta1.CronJob{})
+		Invokes(testing.NewUpdateAction(cronjobsResource, c.ns, cronJob), &v1.CronJob{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta1.CronJob), err
+	return obj.(*v1.CronJob), err
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeCronJobs) UpdateStatus(ctx context.Context, cronJob *v1beta1.CronJob, opts v1.UpdateOptions) (*v1beta1.CronJob, error) {
+func (c *FakeCronJobs) UpdateStatus(ctx context.Context, cronJob *v1.CronJob, opts v1.UpdateOptions) (*v1.CronJob, error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateSubresourceAction(cronjobsResource, "status", c.ns, cronJob), &v1beta1.CronJob{})
+		Invokes(testing.NewUpdateSubresourceAction(cronjobsResource, "status", c.ns, cronJob), &v1.CronJob{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta1.CronJob), err
+	return obj.(*v1.CronJob), err
 }
 
 // Delete takes name of the cronJob and deletes it. Returns an error if one occurs.
 func (c *FakeCronJobs) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(cronjobsResource, c.ns, name), &v1beta1.CronJob{})
+		Invokes(testing.NewDeleteAction(cronjobsResource, c.ns, name), &v1.CronJob{})
 
 	return err
 }
@@ -126,17 +126,17 @@ func (c *FakeCronJobs) Delete(ctx context.Context, name string, opts v1.DeleteOp
 func (c *FakeCronJobs) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
 	action := testing.NewDeleteCollectionAction(cronjobsResource, c.ns, listOpts)
 
-	_, err := c.Fake.Invokes(action, &v1beta1.CronJobList{})
+	_, err := c.Fake.Invokes(action, &v1.CronJobList{})
 	return err
 }
 
 // Patch applies the patch and returns the patched cronJob.
-func (c *FakeCronJobs) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta1.CronJob, err error) {
+func (c *FakeCronJobs) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1.CronJob, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(cronjobsResource, c.ns, name, pt, data, subresources...), &v1beta1.CronJob{})
+		Invokes(testing.NewPatchSubresourceAction(cronjobsResource, c.ns, name, pt, data, subresources...), &v1.CronJob{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta1.CronJob), err
+	return obj.(*v1.CronJob), err
 }

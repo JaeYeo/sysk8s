@@ -3,7 +3,7 @@ package instance
 import (
 	"context"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kyma-project/helm-broker/internal/controller/broker"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -24,7 +24,7 @@ func New(c client.Client, clusterBrokerName string) *Facade {
 
 // AnyServiceInstanceExistsForNamespacedServiceBroker checks whether there is at least one service instance created with helm broker service class.
 func (f *Facade) AnyServiceInstanceExistsForNamespacedServiceBroker(namespace string) (bool, error) {
-	instanceList := &v1beta1.ServiceInstanceList{}
+	instanceList := &v1.ServiceInstanceList{}
 	err := f.client.List(context.TODO(), instanceList, client.InNamespace(namespace))
 	if err != nil {
 		return false, err
@@ -33,7 +33,7 @@ func (f *Facade) AnyServiceInstanceExistsForNamespacedServiceBroker(namespace st
 		return false, nil
 	}
 
-	classList := &v1beta1.ServiceClassList{}
+	classList := &v1.ServiceClassList{}
 	err = f.client.List(context.TODO(), classList, client.InNamespace(namespace))
 	if err != nil {
 		return false, err
@@ -60,7 +60,7 @@ func (f *Facade) AnyServiceInstanceExistsForNamespacedServiceBroker(namespace st
 
 // AnyServiceInstanceExistsForClusterServiceBroker checks whether there is at least one service instance created with helm broker cluster service class.
 func (f *Facade) AnyServiceInstanceExistsForClusterServiceBroker() (bool, error) {
-	instanceList := &v1beta1.ServiceInstanceList{}
+	instanceList := &v1.ServiceInstanceList{}
 	err := f.client.List(context.TODO(), instanceList)
 	if err != nil {
 		return false, err
@@ -69,7 +69,7 @@ func (f *Facade) AnyServiceInstanceExistsForClusterServiceBroker() (bool, error)
 		return false, nil
 	}
 
-	classList := &v1beta1.ClusterServiceClassList{}
+	classList := &v1.ClusterServiceClassList{}
 	err = f.client.List(context.TODO(), classList)
 	if err != nil {
 		return false, err

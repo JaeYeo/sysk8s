@@ -50,7 +50,7 @@ All of the webhook logic is covered by the unit tests. The API server tests were
 Mutating and validating admission webhooks are registered in the chart's file **webhook-register.yaml**. For example, the registration of the Service Instances looks as follows:
 
 ```yaml
-apiVersion: admissionregistration.k8s.io/v1beta1
+apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
   name: {{ template "fullname" . }}-webhook
@@ -67,12 +67,12 @@ webhooks:
   rules:
   - operations: [ "CREATE", "UPDATE" ]
     apiGroups: ["servicecatalog.k8s.io"]
-    apiVersions: ["v1beta1"]
+    apiVersions: ["v1"]
     resources: ["serviceinstances"]
 
 ---
 
-apiVersion: admissionregistration.k8s.io/v1beta1
+apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
 metadata:
   name: {{ template "fullname" . }}-validating-webhook
@@ -89,7 +89,7 @@ webhooks:
   rules:
   - operations: [ "CREATE", "UPDATE" ]
     apiGroups: ["servicecatalog.k8s.io"]
-    apiVersions: ["v1beta1"]
+    apiVersions: ["v1"]
     resources: ["serviceinstances"]
 ```
 

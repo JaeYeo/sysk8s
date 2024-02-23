@@ -18,7 +18,7 @@ package controller
 
 import (
 	"context"
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/util"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/klog"
@@ -45,7 +45,7 @@ func (c *controller) servicePlanUpdate(oldObj, newObj interface{}) {
 }
 
 func (c *controller) servicePlanDelete(obj interface{}) {
-	servicePlan, ok := obj.(*v1beta1.ServicePlan)
+	servicePlan, ok := obj.(*v1.ServicePlan)
 	if servicePlan == nil || !ok {
 		return
 	}
@@ -76,7 +76,7 @@ func (c *controller) reconcileServicePlanKey(key string) error {
 	return c.reconcileServicePlan(plan)
 }
 
-func (c *controller) reconcileServicePlan(servicePlan *v1beta1.ServicePlan) error {
+func (c *controller) reconcileServicePlan(servicePlan *v1.ServicePlan) error {
 	pcb := pretty.NewContextBuilder(pretty.ServicePlan, servicePlan.Namespace, servicePlan.Name, "")
 	klog.Infof("ServicePlan %q (ExternalName: %q): processing", servicePlan.Name, servicePlan.Spec.ExternalName)
 
@@ -100,9 +100,9 @@ func (c *controller) reconcileServicePlan(servicePlan *v1beta1.ServicePlan) erro
 	return c.serviceCatalogClient.ServicePlans(servicePlan.Namespace).Delete(context.Background(), servicePlan.Name, metav1.DeleteOptions{})
 }
 
-func (c *controller) findServiceInstancesOnServicePlan(servicePlan *v1beta1.ServicePlan) (*v1beta1.ServiceInstanceList, error) {
+func (c *controller) findServiceInstancesOnServicePlan(servicePlan *v1.ServicePlan) (*v1.ServiceInstanceList, error) {
 	labelSelector := labels.SelectorFromSet(labels.Set{
-		v1beta1.GroupName + "/" + v1beta1.FilterSpecServicePlanRefName: util.GenerateSHA(servicePlan.Name),
+		v1.GroupName + "/" + v1.FilterSpecServicePlanRefName: util.GenerateSHA(servicePlan.Name),
 	}).String()
 
 	listOpts := metav1.ListOptions{

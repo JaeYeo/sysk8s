@@ -25,7 +25,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/klog"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/util"
 )
 
@@ -45,7 +45,7 @@ func (c *controller) clusterServiceClassUpdate(oldObj, newObj interface{}) {
 }
 
 func (c *controller) clusterServiceClassDelete(obj interface{}) {
-	serviceClass, ok := obj.(*v1beta1.ClusterServiceClass)
+	serviceClass, ok := obj.(*v1.ClusterServiceClass)
 	if serviceClass == nil || !ok {
 		return
 	}
@@ -71,7 +71,7 @@ func (c *controller) reconcileClusterServiceClassKey(key string) error {
 	return c.reconcileClusterServiceClass(class)
 }
 
-func (c *controller) reconcileClusterServiceClass(serviceClass *v1beta1.ClusterServiceClass) error {
+func (c *controller) reconcileClusterServiceClass(serviceClass *v1.ClusterServiceClass) error {
 	klog.Infof("ClusterServiceClass %q (ExternalName: %q): processing", serviceClass.Name, serviceClass.Spec.ExternalName)
 
 	if !serviceClass.Status.RemovedFromBrokerCatalog {
@@ -94,9 +94,9 @@ func (c *controller) reconcileClusterServiceClass(serviceClass *v1beta1.ClusterS
 	return c.serviceCatalogClient.ClusterServiceClasses().Delete(context.Background(), serviceClass.Name, metav1.DeleteOptions{})
 }
 
-func (c *controller) findServiceInstancesOnClusterServiceClass(serviceClass *v1beta1.ClusterServiceClass) (*v1beta1.ServiceInstanceList, error) {
+func (c *controller) findServiceInstancesOnClusterServiceClass(serviceClass *v1.ClusterServiceClass) (*v1.ServiceInstanceList, error) {
 	labelSelector := labels.SelectorFromSet(labels.Set{
-		v1beta1.GroupName + "/" + v1beta1.FilterSpecClusterServiceClassRefName: util.GenerateSHA(serviceClass.Name),
+		v1.GroupName + "/" + v1.FilterSpecClusterServiceClassRefName: util.GenerateSHA(serviceClass.Name),
 	}).String()
 
 	listOpts := metav1.ListOptions{

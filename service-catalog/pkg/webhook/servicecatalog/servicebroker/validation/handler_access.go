@@ -19,7 +19,7 @@ package validation
 import (
 	"context"
 	"fmt"
-	sc "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	sc "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/webhookutil"
 	authenticationapi "k8s.io/api/authentication/v1"
 	authorizationapi "k8s.io/api/authorization/v1"

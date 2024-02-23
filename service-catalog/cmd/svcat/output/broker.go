@@ -19,7 +19,7 @@ package output
 import (
 	"io"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/svcat/service-catalog"
 )
 
@@ -30,19 +30,19 @@ func getBrokerScope(broker servicecatalog.Broker) string {
 	return servicecatalog.ClusterScope
 }
 
-func getBrokerStatusCondition(status v1beta1.CommonServiceBrokerStatus) v1beta1.ServiceBrokerCondition {
+func getBrokerStatusCondition(status v1.CommonServiceBrokerStatus) v1.ServiceBrokerCondition {
 	if len(status.Conditions) > 0 {
 		return status.Conditions[len(status.Conditions)-1]
 	}
-	return v1beta1.ServiceBrokerCondition{}
+	return v1.ServiceBrokerCondition{}
 }
 
-func getBrokerStatusShort(status v1beta1.CommonServiceBrokerStatus) string {
+func getBrokerStatusShort(status v1.CommonServiceBrokerStatus) string {
 	lastCond := getBrokerStatusCondition(status)
 	return formatStatusShort(string(lastCond.Type), lastCond.Status, lastCond.Reason)
 }
 
-func getBrokerStatusFull(status v1beta1.CommonServiceBrokerStatus) string {
+func getBrokerStatusFull(status v1.CommonServiceBrokerStatus) string {
 	lastCond := getBrokerStatusCondition(status)
 	return formatStatusFull(string(lastCond.Type), lastCond.Status, lastCond.Reason, lastCond.Message, lastCond.LastTransitionTime)
 }

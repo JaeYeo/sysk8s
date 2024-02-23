@@ -17,31 +17,32 @@ ctrl:
   tmpDirSizeLimit: 1Gi
   resources:
     limits:
-      memory: 960Mi
-      cpu: 1000m
+      memory: 96Mi
+      cpu: 100m
     requests:
-      memory: 320Mi
-      cpu: 800m
+      memory: 32Mi
+      cpu: 80m
   internalPort: 8080
   statusPort: 8081
   # enable/disable docs topics support for helm controller
   documentationEnabled: false
   uploadServiceURL: "not-needed-if-APP_DOCUMENTATION_ENABLED-set-to-false"
+  debugEnabled: true
 
 broker:
   resources:
     limits:
-      memory: 760Mi
-      cpu: 600m
+      memory: 76Mi
+      cpu: 60m
     requests:
-      memory: 320Mi
-      cpu: 300m
+      memory: 32Mi
+      cpu: 30m
   internalPort: 8070
   statusPort: 8071
   metricsPort: 8072
 
 webhook:
-  image: "eu.gcr.io/kyma-project/helm-broker-webhook:PR-190"
+  image: "eu.gcr.io/kyma-project/helm-broker-webhook:PR-200"
   imagePullPolicy: IfNotPresent
   securityContext: {runAsUser: 1001}
   strategy:
@@ -61,11 +62,11 @@ webhook:
   # Ref: http://kubernetes.io/docs/user-guide/compute-resources/
   resources:
     requests:
-      cpu: 1000m
-      memory: 200Mi
+      cpu: 100m
+      memory: 20Mi
     limits:
-      cpu: 1000m
-      memory: 300Mi
+      cpu: 100m
+      memory: 30Mi
 
 defaultAddonsURL: "https://github.com/kyma-project/addons/releases/download/0.15.0/index.yaml"
 
@@ -80,9 +81,9 @@ global:
   # paths to docker images
   helm_broker:
     dir: /pr/
-    version: PR-190
+    version: PR-200
   helm_controller:
     dir: /pr/
-    version: PR-190
+    version: PR-200
   # etcd port uses by helm broker
   etcdClientPort: 2379

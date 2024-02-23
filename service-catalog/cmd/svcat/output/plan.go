@@ -22,11 +22,11 @@ import (
 	"sort"
 	"strconv"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/svcat/service-catalog"
 )
 
-func getPlanStatusShort(status v1beta1.ClusterServicePlanStatus) string {
+func getPlanStatusShort(status v1.ClusterServicePlanStatus) string {
 	if status.RemovedFromBrokerCatalog {
 		return statusDeprecated
 	}
@@ -125,7 +125,7 @@ func WriteAssociatedPlans(w io.Writer, plans []servicecatalog.Plan) {
 }
 
 // WriteParentPlan prints identifying information for a parent class.
-func WriteParentPlan(w io.Writer, plan *v1beta1.ClusterServicePlan) {
+func WriteParentPlan(w io.Writer, plan *v1.ClusterServicePlan) {
 	fmt.Fprintln(w, "\nPlan:")
 	t := NewDetailsTable(w)
 	t.AppendBulk([][]string{

@@ -163,8 +163,8 @@ To deploy to Kubernetes, see the
 
     * `pkg/client/*_generated`
     * `pkg/apis/servicecatalog/zz_*`
-    * `pkg/apis/servicecatalog/v1beta1/zz_*`
-    * `pkg/apis/servicecatalog/v1beta1/types.generated.go`
+    * `pkg/apis/servicecatalog/v1/zz_*`
+    * `pkg/apis/servicecatalog/v1/types.generated.go`
     * `pkg/openapi/openapi_generated.go`
 
 * Running `make clean` or `make clean-generated` will roll back (via

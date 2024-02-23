@@ -19,22 +19,22 @@ limitations under the License.
 package fake
 
 import (
-	v1beta1 "k8s.io/client-go/kubernetes/typed/batch/v1beta1"
+	v1 "k8s.io/client-go/kubernetes/typed/batch/v1"
 	rest "k8s.io/client-go/rest"
 	testing "k8s.io/client-go/testing"
 )
 
-type FakeBatchV1beta1 struct {
+type FakeBatchv1 struct {
 	*testing.Fake
 }
 
-func (c *FakeBatchV1beta1) CronJobs(namespace string) v1beta1.CronJobInterface {
+func (c *FakeBatchv1) CronJobs(namespace string) v1.CronJobInterface {
 	return &FakeCronJobs{c, namespace}
 }
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
-func (c *FakeBatchV1beta1) RESTClient() rest.Interface {
+func (c *FakeBatchv1) RESTClient() rest.Interface {
 	var ret *rest.RESTClient
 	return ret
 }

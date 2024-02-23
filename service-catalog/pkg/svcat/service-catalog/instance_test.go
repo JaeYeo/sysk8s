@@ -22,7 +22,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/fake"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -40,22 +40,22 @@ var _ = Describe("Instances", func() {
 	var (
 		sdk          *SDK
 		svcCatClient *fake.Clientset
-		si           *v1beta1.ServiceInstance
-		si2          *v1beta1.ServiceInstance
+		si           *v1.ServiceInstance
+		si2          *v1.ServiceInstance
 	)
 
 	BeforeEach(func() {
-		si = &v1beta1.ServiceInstance{ObjectMeta: metav1.ObjectMeta{Name: "foobar", Namespace: "foobar_namespace"}}
+		si = &v1.ServiceInstance{ObjectMeta: metav1.ObjectMeta{Name: "foobar", Namespace: "foobar_namespace"}}
 		si.Status.Conditions = append(si.Status.Conditions,
-			v1beta1.ServiceInstanceCondition{
-				Type:   v1beta1.ServiceInstanceConditionReady,
-				Status: v1beta1.ConditionTrue,
+			v1.ServiceInstanceCondition{
+				Type:   v1.ServiceInstanceConditionReady,
+				Status: v1.ConditionTrue,
 			})
-		si2 = &v1beta1.ServiceInstance{ObjectMeta: metav1.ObjectMeta{Name: "barbaz", Namespace: "foobar_namespace"}}
+		si2 = &v1.ServiceInstance{ObjectMeta: metav1.ObjectMeta{Name: "barbaz", Namespace: "foobar_namespace"}}
 		si2.Status.Conditions = append(si2.Status.Conditions,
-			v1beta1.ServiceInstanceCondition{
-				Type:   v1beta1.ServiceInstanceConditionFailed,
-				Status: v1beta1.ConditionTrue,
+			v1.ServiceInstanceCondition{
+				Type:   v1.ServiceInstanceConditionFailed,
+				Status: v1.ConditionTrue,
 			})
 		svcCatClient = fake.NewSimpleClientset(si, si2)
 		sdk = &SDK{
@@ -83,7 +83,7 @@ var _ = Describe("Instances", func() {
 		})
 	})
 	Describe("RetrieveInstancees", func() {
-		It("Calls the generated v1beta1 List method with the specified namespace", func() {
+		It("Calls the generated v1 List method with the specified namespace", func() {
 			namespace := si.Namespace
 
 			instances, err := sdk.RetrieveInstances(namespace, "", "")
@@ -111,7 +111,7 @@ var _ = Describe("Instances", func() {
 		})
 	})
 	Describe("RetrieveInstance", func() {
-		It("Calls the generated v1beta1 Get method with the passed in instance", func() {
+		It("Calls the generated v1 Get method with the passed in instance", func() {
 			instanceName := si.Name
 			namespace := si.Namespace
 
@@ -137,10 +137,10 @@ var _ = Describe("Instances", func() {
 		})
 	})
 	Describe("RetrieveInstanceByBinding", func() {
-		It("Calls the generated v1beta1 Get method with the binding's namespace and the binding's instance's name", func() {
+		It("Calls the generated v1 Get method with the binding's namespace and the binding's instance's name", func() {
 			instanceName := si.Name
 			namespace := si.Namespace
-			sb := &v1beta1.ServiceBinding{ObjectMeta: metav1.ObjectMeta{Name: "banana_binding", Namespace: namespace}}
+			sb := &v1.ServiceBinding{ObjectMeta: metav1.ObjectMeta{Name: "banana_binding", Namespace: namespace}}
 			sb.Spec.InstanceRef.Name = instanceName
 			instance, err := sdk.RetrieveInstanceByBinding(sb)
 
@@ -155,7 +155,7 @@ var _ = Describe("Instances", func() {
 		It("Bubbles up errors", func() {
 			namespace := si.Namespace
 			instanceName := "not_real_instance"
-			sb := &v1beta1.ServiceBinding{ObjectMeta: metav1.ObjectMeta{Name: "banana_binding", Namespace: namespace}}
+			sb := &v1.ServiceBinding{ObjectMeta: metav1.ObjectMeta{Name: "banana_binding", Namespace: namespace}}
 			sb.Spec.InstanceRef.Name = instanceName
 			badClient := &fake.Clientset{}
 			errorMessage := "no instance found"
@@ -174,20 +174,20 @@ var _ = Describe("Instances", func() {
 		})
 	})
 	Describe("RetrieveInstancesByPlan", func() {
-		It("Calls the generated v1beta1 List method with a ListOption containing the passed in plan", func() {
-			plan := &v1beta1.ClusterServicePlan{
+		It("Calls the generated v1 List method with a ListOption containing the passed in plan", func() {
+			plan := &v1.ClusterServicePlan{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: "foobar_plan",
 				},
-				Spec: v1beta1.ClusterServicePlanSpec{},
+				Spec: v1.ClusterServicePlanSpec{},
 			}
-			si = &v1beta1.ServiceInstance{
+			si = &v1.ServiceInstance{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "foobar",
 					Namespace: "foobar_namespace",
 				},
-				Spec: v1beta1.ServiceInstanceSpec{
-					ClusterServicePlanRef: &v1beta1.ClusterObjectReference{
+				Spec: v1.ServiceInstanceSpec{
+					ClusterServicePlanRef: &v1.ClusterObjectReference{
 						Name: plan.Name,
 					},
 				},
@@ -208,11 +208,11 @@ var _ = Describe("Instances", func() {
 		It("Bubbles up errors", func() {
 			badClient := fake.NewSimpleClientset()
 			errorMessage := "no instances found"
-			plan := &v1beta1.ClusterServicePlan{
+			plan := &v1.ClusterServicePlan{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: "foobar_plan",
 				},
-				Spec: v1beta1.ClusterServicePlanSpec{},
+				Spec: v1.ClusterServicePlanSpec{},
 			}
 			badClient.PrependReactor("list", "serviceinstances", func(action testing.Action) (bool, runtime.Object, error) {
 				return true, nil, fmt.Errorf(errorMessage)
@@ -283,7 +283,7 @@ var _ = Describe("Instances", func() {
 			update, ok := updateAction.(testing.UpdateActionImpl)
 			Expect(ok).To(BeTrue())
 			Expect(update.Namespace).To(Equal(namespace))
-			obj, ok := update.Object.(*v1beta1.ServiceInstance)
+			obj, ok := update.Object.(*v1.ServiceInstance)
 			Expect(ok).To(BeTrue())
 			Expect(obj.Name).To(Equal(instanceName))
 			// obj.Spec.UpdateRequests is an int64, so compare it to an int64
@@ -291,32 +291,32 @@ var _ = Describe("Instances", func() {
 		})
 	})
 	Describe("InstanceParentHierarchy", func() {
-		It("calls the v1beta1 generated Get function repeatedly to build the heirarchy of the passed in service isntance", func() {
-			broker := &v1beta1.ClusterServiceBroker{ObjectMeta: metav1.ObjectMeta{Name: "foobar_broker"}}
-			class := &v1beta1.ClusterServiceClass{
+		It("calls the v1 generated Get function repeatedly to build the heirarchy of the passed in service isntance", func() {
+			broker := &v1.ClusterServiceBroker{ObjectMeta: metav1.ObjectMeta{Name: "foobar_broker"}}
+			class := &v1.ClusterServiceClass{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: "foobar_class",
 				},
-				Spec: v1beta1.ClusterServiceClassSpec{
+				Spec: v1.ClusterServiceClassSpec{
 					ClusterServiceBrokerName: broker.Name,
 				},
 			}
-			plan := &v1beta1.ClusterServicePlan{
+			plan := &v1.ClusterServicePlan{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: "foobar_plan",
 				},
-				Spec: v1beta1.ClusterServicePlanSpec{},
+				Spec: v1.ClusterServicePlanSpec{},
 			}
-			si = &v1beta1.ServiceInstance{
+			si = &v1.ServiceInstance{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "foobar",
 					Namespace: "foobar_namespace",
 				},
-				Spec: v1beta1.ServiceInstanceSpec{
-					ClusterServicePlanRef: &v1beta1.ClusterObjectReference{
+				Spec: v1.ServiceInstanceSpec{
+					ClusterServicePlanRef: &v1.ClusterObjectReference{
 						Name: plan.Name,
 					},
-					ClusterServiceClassRef: &v1beta1.ClusterObjectReference{
+					ClusterServiceClassRef: &v1.ClusterObjectReference{
 						Name: class.Name,
 					},
 				},
@@ -334,7 +334,7 @@ var _ = Describe("Instances", func() {
 					Verb: "get",
 					Resource: schema.GroupVersionResource{
 						Group:    "servicecatalog.k8s.io",
-						Version:  "v1beta1",
+						Version:  "v1",
 						Resource: "clusterserviceclasses",
 					},
 				},
@@ -345,7 +345,7 @@ var _ = Describe("Instances", func() {
 					Verb: "get",
 					Resource: schema.GroupVersionResource{
 						Group:    "servicecatalog.k8s.io",
-						Version:  "v1beta1",
+						Version:  "v1",
 						Resource: "clusterserviceplans",
 					},
 				},
@@ -356,7 +356,7 @@ var _ = Describe("Instances", func() {
 					Verb: "get",
 					Resource: schema.GroupVersionResource{
 						Group:    "servicecatalog.k8s.io",
-						Version:  "v1beta1",
+						Version:  "v1",
 						Resource: "clusterservicebrokers",
 					},
 				},
@@ -367,16 +367,16 @@ var _ = Describe("Instances", func() {
 			Expect(actions).Should(ContainElement(getBroker))
 		})
 		It("Bubbles up errors", func() {
-			si = &v1beta1.ServiceInstance{
+			si = &v1.ServiceInstance{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "foobar",
 					Namespace: "foobar_namespace",
 				},
-				Spec: v1beta1.ServiceInstanceSpec{
-					ClusterServicePlanRef: &v1beta1.ClusterObjectReference{
+				Spec: v1.ServiceInstanceSpec{
+					ClusterServicePlanRef: &v1.ClusterObjectReference{
 						Name: "not_real_plan",
 					},
-					ClusterServiceClassRef: &v1beta1.ClusterObjectReference{
+					ClusterServiceClassRef: &v1.ClusterObjectReference{
 						Name: "not_real_class",
 					},
 				},
@@ -401,27 +401,27 @@ var _ = Describe("Instances", func() {
 	})
 	Describe("InstanceToServiceClassAndPlan", func() {
 		It("Calls the generated v1beta methods with the names of the class and plan from the passed in instance", func() {
-			class := &v1beta1.ClusterServiceClass{
+			class := &v1.ClusterServiceClass{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: "foobar_class",
 				},
 			}
-			plan := &v1beta1.ClusterServicePlan{
+			plan := &v1.ClusterServicePlan{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: "foobar_plan",
 				},
-				Spec: v1beta1.ClusterServicePlanSpec{},
+				Spec: v1.ClusterServicePlanSpec{},
 			}
-			si = &v1beta1.ServiceInstance{
+			si = &v1.ServiceInstance{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "foobar",
 					Namespace: "foobar_namespace",
 				},
-				Spec: v1beta1.ServiceInstanceSpec{
-					ClusterServicePlanRef: &v1beta1.ClusterObjectReference{
+				Spec: v1.ServiceInstanceSpec{
+					ClusterServicePlanRef: &v1.ClusterObjectReference{
 						Name: plan.Name,
 					},
-					ClusterServiceClassRef: &v1beta1.ClusterObjectReference{
+					ClusterServiceClassRef: &v1.ClusterObjectReference{
 						Name: class.Name,
 					},
 				},
@@ -439,7 +439,7 @@ var _ = Describe("Instances", func() {
 					Verb: "get",
 					Resource: schema.GroupVersionResource{
 						Group:    "servicecatalog.k8s.io",
-						Version:  "v1beta1",
+						Version:  "v1",
 						Resource: "clusterserviceclasses",
 					},
 				},
@@ -450,7 +450,7 @@ var _ = Describe("Instances", func() {
 					Verb: "get",
 					Resource: schema.GroupVersionResource{
 						Group:    "servicecatalog.k8s.io",
-						Version:  "v1beta1",
+						Version:  "v1",
 						Resource: "clusterserviceplans",
 					},
 				},
@@ -460,16 +460,16 @@ var _ = Describe("Instances", func() {
 			Expect(actions).Should(ContainElement(getPlan))
 		})
 		It("Bubbles up errors", func() {
-			si = &v1beta1.ServiceInstance{
+			si = &v1.ServiceInstance{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "foobar",
 					Namespace: "foobar_namespace",
 				},
-				Spec: v1beta1.ServiceInstanceSpec{
-					ClusterServicePlanRef: &v1beta1.ClusterObjectReference{
+				Spec: v1.ServiceInstanceSpec{
+					ClusterServicePlanRef: &v1.ClusterObjectReference{
 						Name: "not_real_plan",
 					},
-					ClusterServiceClassRef: &v1beta1.ClusterObjectReference{
+					ClusterServiceClassRef: &v1.ClusterObjectReference{
 						Name: "not_real_class",
 					},
 				},
@@ -492,7 +492,7 @@ var _ = Describe("Instances", func() {
 		})
 	})
 	Describe("Provision", func() {
-		It("Calls the v1beta1 Create method with the passed in arguments", func() {
+		It("Calls the v1 Create method with the passed in arguments", func() {
 			namespace := "cherry_namespace"
 			instanceName := "cherry"
 			externalID := "cherry-external-id"
@@ -521,20 +521,20 @@ var _ = Describe("Instances", func() {
 
 			actions := svcCatClient.Actions()
 			Expect(actions[0].Matches("create", "serviceinstances")).To(BeTrue())
-			objectFromRequest := actions[0].(testing.CreateActionImpl).Object.(*v1beta1.ServiceInstance)
+			objectFromRequest := actions[0].(testing.CreateActionImpl).Object.(*v1.ServiceInstance)
 			Expect(objectFromRequest.ObjectMeta.Name).To(Equal(instanceName))
 			Expect(objectFromRequest.ObjectMeta.Namespace).To(Equal(namespace))
 			Expect(objectFromRequest.Spec.PlanReference.ClusterServiceClassName).To(Equal(classKubeName))
 			Expect(objectFromRequest.Spec.PlanReference.ClusterServicePlanName).To(Equal(planKubeName))
 			Expect(objectFromRequest.Spec.Parameters.Raw).To(Equal([]byte("{\"foo\":\"bar\"}")))
-			param := v1beta1.ParametersFromSource{
-				SecretKeyRef: &v1beta1.SecretKeyReference{
+			param := v1.ParametersFromSource{
+				SecretKeyRef: &v1.SecretKeyReference{
 					Name: "username",
 					Key:  "admin",
 				},
 			}
-			param2 := v1beta1.ParametersFromSource{
-				SecretKeyRef: &v1beta1.SecretKeyReference{
+			param2 := v1.ParametersFromSource{
+				SecretKeyRef: &v1.SecretKeyReference{
 					Name: "password",
 					Key:  "abc123",
 				},
@@ -572,7 +572,7 @@ var _ = Describe("Instances", func() {
 		})
 	})
 	Describe("Deprovision", func() {
-		It("Calls the v1beta1 Delete method with the passed in service instance name", func() {
+		It("Calls the v1 Delete method with the passed in service instance name", func() {
 			err := sdk.Deprovision(si.Namespace, si.Name)
 			Expect(err).NotTo(HaveOccurred())
 			actions := svcCatClient.Actions()
@@ -599,17 +599,17 @@ var _ = Describe("Instances", func() {
 		var (
 			counter          int
 			interval         time.Duration
-			notReady         v1beta1.ServiceInstanceCondition
-			notReadyInstance *v1beta1.ServiceInstance
+			notReady         v1.ServiceInstanceCondition
+			notReadyInstance *v1.ServiceInstance
 			timeout          time.Duration
 			waitClient       *fake.Clientset
 		)
 		BeforeEach(func() {
 			counter = 0
 			interval = 100 * time.Millisecond
-			notReady = v1beta1.ServiceInstanceCondition{Type: v1beta1.ServiceInstanceConditionReady, Status: v1beta1.ConditionFalse}
-			notReadyInstance = &v1beta1.ServiceInstance{ObjectMeta: metav1.ObjectMeta{Name: si.Name}}
-			notReadyInstance.Status.Conditions = []v1beta1.ServiceInstanceCondition{notReady}
+			notReady = v1.ServiceInstanceCondition{Type: v1.ServiceInstanceConditionReady, Status: v1.ConditionFalse}
+			notReadyInstance = &v1.ServiceInstance{ObjectMeta: metav1.ObjectMeta{Name: si.Name}}
+			notReadyInstance.Status.Conditions = []v1.ServiceInstanceCondition{notReady}
 			timeout = 1 * time.Second
 			waitClient = fake.NewSimpleClientset()
 			waitClient.PrependReactor("get", "serviceinstances", func(action testing.Action) (bool, runtime.Object, error) {
@@ -618,7 +618,7 @@ var _ = Describe("Instances", func() {
 			})
 			sdk.ServiceCatalogClient = waitClient
 		})
-		It("Calls the v1beta1 get instance method with the passed in name until it reaches a ready state", func() {
+		It("Calls the v1 get instance method with the passed in name until it reaches a ready state", func() {
 			waitClient.PrependReactor("get", "serviceinstances", func(action testing.Action) (bool, runtime.Object, error) {
 				if counter > 5 {
 					return true, si, nil
@@ -638,9 +638,9 @@ var _ = Describe("Instances", func() {
 			}
 		})
 		It("Waits until the instance is Failed", func() {
-			failedInstance := &v1beta1.ServiceInstance{ObjectMeta: metav1.ObjectMeta{Name: si.Name}}
-			failed := v1beta1.ServiceInstanceCondition{Type: v1beta1.ServiceInstanceConditionFailed, Status: v1beta1.ConditionTrue}
-			failedInstance.Status.Conditions = []v1beta1.ServiceInstanceCondition{failed}
+			failedInstance := &v1.ServiceInstance{ObjectMeta: metav1.ObjectMeta{Name: si.Name}}
+			failed := v1.ServiceInstanceCondition{Type: v1.ServiceInstanceConditionFailed, Status: v1.ConditionTrue}
+			failedInstance.Status.Conditions = []v1.ServiceInstanceCondition{failed}
 			waitClient.PrependReactor("get", "serviceinstances", func(action testing.Action) (bool, runtime.Object, error) {
 				if counter > 5 {
 					return true, failedInstance, nil
@@ -698,10 +698,10 @@ var _ = Describe("Instances", func() {
 			})
 			sdk.ServiceCatalogClient = waitClient
 		})
-		It("Calls the v1beta1 get instance method with the passed in service instance name until the instance no longer exists", func() {
+		It("Calls the v1 get instance method with the passed in service instance name until the instance no longer exists", func() {
 			waitClient.PrependReactor("get", "serviceinstances", func(action testing.Action) (bool, runtime.Object, error) {
 				if counter > 5 {
-					return true, nil, apierrors.NewNotFound(v1beta1.Resource("serviceinstance"), "instance not found")
+					return true, nil, apierrors.NewNotFound(v1.Resource("serviceinstance"), "instance not found")
 				}
 				return false, nil, nil
 			})
@@ -750,7 +750,7 @@ var _ = Describe("Instances", func() {
 	})
 
 	Describe("RemoveFinalizerForInstance", func() {
-		It("Calls the generated v1beta1 put method with the passed in instance", func() {
+		It("Calls the generated v1 put method with the passed in instance", func() {
 			err := sdk.RemoveFinalizerForInstance(si.Namespace, si.Name)
 			Expect(err).NotTo(HaveOccurred())
 
@@ -760,8 +760,8 @@ var _ = Describe("Instances", func() {
 			Expect(actions[0].(testing.GetActionImpl).Name).To(Equal(si.Name))
 			Expect(actions[0].(testing.GetActionImpl).Namespace).To(Equal(si.Namespace))
 			Expect(actions[1].Matches("update", "serviceinstances")).To(BeTrue())
-			Expect(actions[1].(testing.UpdateActionImpl).Object.(*v1beta1.ServiceInstance).ObjectMeta.Name).To(Equal(si.Name))
-			Expect(actions[1].(testing.UpdateActionImpl).Object.(*v1beta1.ServiceInstance).ObjectMeta.Namespace).To(Equal(si.Namespace))
+			Expect(actions[1].(testing.UpdateActionImpl).Object.(*v1.ServiceInstance).ObjectMeta.Name).To(Equal(si.Name))
+			Expect(actions[1].(testing.UpdateActionImpl).Object.(*v1.ServiceInstance).ObjectMeta.Namespace).To(Equal(si.Namespace))
 		})
 		It("Bubbles up errors", func() {
 			errorMessage := "instance not found"

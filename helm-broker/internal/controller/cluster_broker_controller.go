@@ -3,7 +3,7 @@ package controller
 import (
 	"context"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kyma-project/helm-broker/pkg/apis/addons/v1alpha1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
@@ -43,7 +43,7 @@ func (sbc *ClusterBrokerController) Start(mgr manager.Manager) error {
 	}
 
 	// Watch for changes to ServiceInstance, ClusterAddonsConfiguration, ClusterServiceBroker
-	err = c.Watch(&source.Kind{Type: &v1beta1.ServiceInstance{}}, eventHandler, createDeletePredicate)
+	err = c.Watch(&source.Kind{Type: &v1.ServiceInstance{}}, eventHandler, createDeletePredicate)
 	if err != nil {
 		return err
 	}
@@ -53,7 +53,7 @@ func (sbc *ClusterBrokerController) Start(mgr manager.Manager) error {
 		return err
 	}
 
-	err = c.Watch(&source.Kind{Type: &v1beta1.ClusterServiceBroker{}}, eventHandler, predicate.Funcs{
+	err = c.Watch(&source.Kind{Type: &v1.ClusterServiceBroker{}}, eventHandler, predicate.Funcs{
 		// filter out all other ClusterServiceBroker, only "helm-broker" is interesting for us
 		CreateFunc: func(e event.CreateEvent) bool { return e.Meta.GetName() == sbc.clusterBrokerName },
 		DeleteFunc: func(e event.DeleteEvent) bool { return e.Meta.GetName() == sbc.clusterBrokerName },

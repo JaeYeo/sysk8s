@@ -34,7 +34,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	metav1beta1 "k8s.io/apimachinery/pkg/apis/meta/v1beta1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/admission"
@@ -105,7 +105,7 @@ func (scope *RequestScope) AllowsMediaTypeTransform(mimeType, mimeSubType string
 	}
 
 	// TODO: this is temporary, replace with an abstraction calculated at endpoint installation time
-	if gvk.GroupVersion() == metav1beta1.SchemeGroupVersion || gvk.GroupVersion() == metav1.SchemeGroupVersion {
+	if gvk.GroupVersion() == metav1.SchemeGroupVersion || gvk.GroupVersion() == metav1.SchemeGroupVersion {
 		switch gvk.Kind {
 		case "Table":
 			return scope.TableConvertor != nil &&

@@ -23,7 +23,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	scfeatures "github.com/kubernetes-sigs/service-catalog/pkg/features"
 	"github.com/kubernetes-sigs/service-catalog/pkg/util"
 	"github.com/kubernetes-sigs/service-catalog/test/fake"
@@ -61,29 +61,29 @@ func TestReconcileServiceBrokerUpdatesBrokerClient(t *testing.T) {
 
 }
 
-func getServiceBrokerReactor(broker *v1beta1.ServiceBroker) (string, string, clientgotesting.ReactionFunc) {
+func getServiceBrokerReactor(broker *v1.ServiceBroker) (string, string, clientgotesting.ReactionFunc) {
 	return "get", "servicebrokers", func(action clientgotesting.Action) (bool, runtime.Object, error) {
 		return true, broker, nil
 	}
 }
 
-func listServiceClassesReactor(classes []v1beta1.ServiceClass) (string, string, clientgotesting.ReactionFunc) {
+func listServiceClassesReactor(classes []v1.ServiceClass) (string, string, clientgotesting.ReactionFunc) {
 	return "list", "serviceclasses", func(action clientgotesting.Action) (bool, runtime.Object, error) {
-		return true, &v1beta1.ServiceClassList{
+		return true, &v1.ServiceClassList{
 			Items: classes,
 		}, nil
 	}
 }
 
-func listServicePlansReactor(plans []v1beta1.ServicePlan) (string, string, clientgotesting.ReactionFunc) {
+func listServicePlansReactor(plans []v1.ServicePlan) (string, string, clientgotesting.ReactionFunc) {
 	return "list", "serviceplans", func(action clientgotesting.Action) (bool, runtime.Object, error) {
-		return true, &v1beta1.ServicePlanList{
+		return true, &v1.ServicePlanList{
 			Items: plans,
 		}, nil
 	}
 }
 
-func reconcileServiceBroker(t *testing.T, testController *controller, broker *v1beta1.ServiceBroker) error {
+func reconcileServiceBroker(t *testing.T, testController *controller, broker *v1.ServiceBroker) error {
 	clone := broker.DeepCopy()
 	err := testController.reconcileServiceBroker(broker)
 	if !reflect.DeepEqual(broker, clone) {
@@ -97,7 +97,7 @@ func reconcileServiceBroker(t *testing.T, testController *controller, broker *v1
 func TestReconcileServiceBrokerDelete(t *testing.T) {
 	cases := []struct {
 		name     string
-		authInfo *v1beta1.ServiceBrokerAuthInfo
+		authInfo *v1.ServiceBrokerAuthInfo
 		secret   *corev1.Secret
 	}{
 		{
@@ -129,7 +129,7 @@ func TestReconcileServiceBrokerDelete(t *testing.T) {
 
 			broker := getTestServiceBrokerWithAuth(tc.authInfo)
 			broker.DeletionTimestamp = &metav1.Time{}
-			broker.Finalizers = []string{v1beta1.FinalizerServiceCatalog}
+			broker.Finalizers = []string{v1.FinalizerServiceCatalog}
 
 			updateBrokerClientCalled := false
 			testController.brokerClientManager = NewBrokerClientManager(func(_ *osb.ClientConfiguration) (osb.Client, error) {
@@ -138,8 +138,8 @@ func TestReconcileServiceBrokerDelete(t *testing.T) {
 			})
 
 			fakeCatalogClient.AddReactor(getServiceBrokerReactor(broker))
-			fakeCatalogClient.AddReactor(listServiceClassesReactor([]v1beta1.ServiceClass{*testServiceClass}))
-			fakeCatalogClient.AddReactor(listServicePlansReactor([]v1beta1.ServicePlan{*testServicePlan}))
+			fakeCatalogClient.AddReactor(listServiceClassesReactor([]v1.ServiceClass{*testServiceClass}))
+			fakeCatalogClient.AddReactor(listServicePlansReactor([]v1.ServicePlan{*testServicePlan}))
 
 			// when
 			err := reconcileServiceBroker(t, testController, broker)
@@ -171,12 +171,12 @@ func TestReconcileServiceBrokerDelete(t *testing.T) {
 
 			listRestrictions := clientgotesting.ListRestrictions{
 				Labels: labels.SelectorFromSet(labels.Set{
-					v1beta1.GroupName + "/" + v1beta1.FilterSpecServiceBrokerName: util.GenerateSHA(broker.Name),
+					v1.GroupName + "/" + v1.FilterSpecServiceBrokerName: util.GenerateSHA(broker.Name),
 				}),
 				Fields: fields.Everything(),
 			}
-			assertList(t, catalogActions[0], &v1beta1.ServiceClass{}, listRestrictions)
-			assertList(t, catalogActions[1], &v1beta1.ServicePlan{}, listRestrictions)
+			assertList(t, catalogActions[0], &v1.ServiceClass{}, listRestrictions)
+			assertList(t, catalogActions[1], &v1.ServicePlan{}, listRestrictions)
 			assertDelete(t, catalogActions[2], testServicePlan)
 			assertDelete(t, catalogActions[3], testServiceClass)
 			updatedServiceBroker := assertUpdateStatus(t, catalogActions[4], broker)
@@ -200,7 +200,7 @@ func TestReconcileServiceBrokerDelete(t *testing.T) {
 }
 
 func TestReconcileServiceClassFromServiceBrokerCatalog(t *testing.T) {
-	updatedClass := func() *v1beta1.ServiceClass {
+	updatedClass := func() *v1.ServiceClass {
 		p := getTestServiceClass()
 		p.Spec.Description = "new-description"
 		p.Spec.ExternalName = "new-value"
@@ -211,9 +211,9 @@ func TestReconcileServiceClassFromServiceBrokerCatalog(t *testing.T) {
 
 	cases := []struct {
 		name                    string
-		newServiceClass         *v1beta1.ServiceClass
-		existingServiceClass    *v1beta1.ServiceClass
-		listerServiceClass      *v1beta1.ServiceClass
+		newServiceClass         *v1.ServiceClass
+		existingServiceClass    *v1.ServiceClass
+		listerServiceClass      *v1.ServiceClass
 		shouldError             bool
 		errText                 *string
 		catalogClientPrepFunc   func(*fake.Clientset)
@@ -232,7 +232,7 @@ func TestReconcileServiceClassFromServiceBrokerCatalog(t *testing.T) {
 			name:                 "exists, but for a different broker",
 			newServiceClass:      getTestServiceClass(),
 			existingServiceClass: getTestServiceClass(),
-			listerServiceClass: func() *v1beta1.ServiceClass {
+			listerServiceClass: func() *v1.ServiceClass {
 				p := getTestServiceClass()
 				p.Spec.ServiceBrokerName = "something-else"
 				return p
@@ -301,7 +301,7 @@ func TestReconcileServiceClassFromServiceBrokerCatalog(t *testing.T) {
 }
 
 func TestReconcileServicePlanFromServiceBrokerCatalog(t *testing.T) {
-	updatedPlan := func() *v1beta1.ServicePlan {
+	updatedPlan := func() *v1.ServicePlan {
 		p := getTestServicePlan()
 		p.Spec.Description = "new-description"
 		p.Spec.ExternalName = "new-value"
@@ -316,9 +316,9 @@ func TestReconcileServicePlanFromServiceBrokerCatalog(t *testing.T) {
 
 	cases := []struct {
 		name                    string
-		newServicePlan          *v1beta1.ServicePlan
-		existingServicePlan     *v1beta1.ServicePlan
-		listerServicePlan       *v1beta1.ServicePlan
+		newServicePlan          *v1.ServicePlan
+		existingServicePlan     *v1.ServicePlan
+		listerServicePlan       *v1.ServicePlan
 		shouldError             bool
 		errText                 *string
 		catalogClientPrepFunc   func(*fake.Clientset)
@@ -337,7 +337,7 @@ func TestReconcileServicePlanFromServiceBrokerCatalog(t *testing.T) {
 			name:                "exists, but for a different broker",
 			newServicePlan:      getTestServicePlan(),
 			existingServicePlan: getTestServicePlan(),
-			listerServicePlan: func() *v1beta1.ServicePlan {
+			listerServicePlan: func() *v1.ServicePlan {
 				p := getTestServicePlan()
 				p.Spec.ServiceBrokerName = "something-else"
 				return p
@@ -419,8 +419,8 @@ func TestReconcileServiceBrokerExistingServiceClassAndServicePlan(t *testing.T) 
 	sharedInformers.ServiceClasses().Informer().GetStore().Add(testServiceClass)
 
 	fakeCatalogClient.AddReactor("list", "serviceclasses", func(action clientgotesting.Action) (bool, runtime.Object, error) {
-		return true, &v1beta1.ServiceClassList{
-			Items: []v1beta1.ServiceClass{
+		return true, &v1.ServiceClassList{
+			Items: []v1.ServiceClass{
 				*testServiceClass,
 			},
 		}, nil
@@ -436,15 +436,15 @@ func TestReconcileServiceBrokerExistingServiceClassAndServicePlan(t *testing.T) 
 
 	listRestrictions := clientgotesting.ListRestrictions{
 		Labels: labels.SelectorFromSet(labels.Set{
-			v1beta1.GroupName + "/" + v1beta1.FilterSpecServiceBrokerName: util.GenerateSHA(testServiceBrokerName),
+			v1.GroupName + "/" + v1.FilterSpecServiceBrokerName: util.GenerateSHA(testServiceBrokerName),
 		}),
 		Fields: fields.Everything(),
 	}
 
 	actions := fakeCatalogClient.Actions()
 	assertNumberOfActions(t, actions, 6)
-	assertList(t, actions[0], &v1beta1.ServiceClass{}, listRestrictions)
-	assertList(t, actions[1], &v1beta1.ServicePlan{}, listRestrictions)
+	assertList(t, actions[0], &v1.ServiceClass{}, listRestrictions)
+	assertList(t, actions[1], &v1.ServicePlan{}, listRestrictions)
 	assertUpdate(t, actions[2], testServiceClass)
 	assertCreate(t, actions[3], testServicePlan)
 
@@ -455,9 +455,9 @@ func TestReconcileServiceBrokerExistingServiceClassAndServicePlan(t *testing.T) 
 	kubeActions := fakeKubeClient.Actions()
 	assertNumberOfActions(t, kubeActions, 0)
 
-	updateObject, ok := updatedServiceBroker.(*v1beta1.ServiceBroker)
+	updateObject, ok := updatedServiceBroker.(*v1.ServiceBroker)
 	if !ok {
-		t.Fatalf("couldn't convert to *v1beta1.ServiceBroker")
+		t.Fatalf("couldn't convert to *v1.ServiceBroker")
 	}
 
 	if updateObject.Status.LastConditionState != "Ready" {

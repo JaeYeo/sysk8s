@@ -14,10 +14,10 @@ User/ServiceAccount RBAC is used for provisioning a given [addon](https://github
   
 ## Suggested solution
 
-Service Catalog has the [OriginatingIdentity](https://github.com/kubernetes-sigs/service-catalog/blob/b6afbc9fec94e7b0d350f22e736d0484d181b351/pkg/features/features.go#L31-L37) feature enabled, which sets up the [UserInfo](https://github.com/kubernetes-sigs/service-catalog/blob/5068f67d9616bab9e21dae8a161578a034a0803a/pkg/apis/servicecatalog/v1beta1/types.go#L748-L754) field. This field is available for both ServiceInstances and ServiceBindings. It contains information about the user that last changed a given resource's **spec** entry. See the example:
+Service Catalog has the [OriginatingIdentity](https://github.com/kubernetes-sigs/service-catalog/blob/b6afbc9fec94e7b0d350f22e736d0484d181b351/pkg/features/features.go#L31-L37) feature enabled, which sets up the [UserInfo](https://github.com/kubernetes-sigs/service-catalog/blob/5068f67d9616bab9e21dae8a161578a034a0803a/pkg/apis/servicecatalog/v1/types.go#L748-L754) field. This field is available for both ServiceInstances and ServiceBindings. It contains information about the user that last changed a given resource's **spec** entry. See the example:
 
 ```yaml
-- apiVersion: servicecatalog.k8s.io/v1beta1
+- apiVersion: servicecatalog.k8s.io/v1
   kind: ServiceInstance
   metadata:
     name: redis

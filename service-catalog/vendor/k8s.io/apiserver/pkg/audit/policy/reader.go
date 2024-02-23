@@ -24,7 +24,7 @@ import (
 	auditinternal "k8s.io/apiserver/pkg/apis/audit"
 	auditv1 "k8s.io/apiserver/pkg/apis/audit/v1"
 	auditv1alpha1 "k8s.io/apiserver/pkg/apis/audit/v1alpha1"
-	auditv1beta1 "k8s.io/apiserver/pkg/apis/audit/v1beta1"
+	auditv1 "k8s.io/apiserver/pkg/apis/audit/v1"
 	"k8s.io/apiserver/pkg/apis/audit/validation"
 	"k8s.io/apiserver/pkg/audit"
 
@@ -33,7 +33,7 @@ import (
 
 var (
 	apiGroupVersions = []schema.GroupVersion{
-		auditv1beta1.SchemeGroupVersion,
+		auditv1.SchemeGroupVersion,
 		auditv1alpha1.SchemeGroupVersion,
 		auditv1.SchemeGroupVersion,
 	}

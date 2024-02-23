@@ -25,7 +25,7 @@ import (
 	"time"
 
 	"github.com/hashicorp/go-multierror"
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/pkg/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -34,7 +34,7 @@ import (
 )
 
 // RetrieveBindings lists all bindings in a namespace.
-func (sdk *SDK) RetrieveBindings(ns string) (*v1beta1.ServiceBindingList, error) {
+func (sdk *SDK) RetrieveBindings(ns string) (*v1.ServiceBindingList, error) {
 	bindings, err := sdk.ServiceCatalog().ServiceBindings(ns).List(context.Background(), v1.ListOptions{})
 	if err != nil {
 		return nil, errors.Wrapf(err, "unable to list bindings in %s", ns)
@@ -44,7 +44,7 @@ func (sdk *SDK) RetrieveBindings(ns string) (*v1beta1.ServiceBindingList, error)
 }
 
 // RetrieveBinding gets a binding by its name.
-func (sdk *SDK) RetrieveBinding(ns, name string) (*v1beta1.ServiceBinding, error) {
+func (sdk *SDK) RetrieveBinding(ns, name string) (*v1.ServiceBinding, error) {
 	binding, err := sdk.ServiceCatalog().ServiceBindings(ns).Get(context.Background(), name, v1.GetOptions{})
 	if err != nil {
 		return nil, errors.Wrapf(err, "unable to get binding '%s.%s'", ns, name)
@@ -53,15 +53,15 @@ func (sdk *SDK) RetrieveBinding(ns, name string) (*v1beta1.ServiceBinding, error
 }
 
 // RetrieveBindingsByInstance gets all child bindings for an instance.
-func (sdk *SDK) RetrieveBindingsByInstance(instance *v1beta1.ServiceInstance,
-) ([]v1beta1.ServiceBinding, error) {
+func (sdk *SDK) RetrieveBindingsByInstance(instance *v1.ServiceInstance,
+) ([]v1.ServiceBinding, error) {
 	// Not using a filtered list operation because it's not supported yet.
 	results, err := sdk.ServiceCatalog().ServiceBindings(instance.Namespace).List(context.Background(), v1.ListOptions{})
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to search bindings")
 	}
 
-	var bindings []v1beta1.ServiceBinding
+	var bindings []v1.ServiceBinding
 	for _, binding := range results.Items {
 		if binding.Spec.InstanceRef.Name == instance.Name {
 			bindings = append(bindings, binding)
@@ -73,7 +73,7 @@ func (sdk *SDK) RetrieveBindingsByInstance(instance *v1beta1.ServiceInstance,
 
 // Bind an instance to a secret.
 func (sdk *SDK) Bind(namespace, bindingName, externalID, instanceName, secretName string,
-	params interface{}, secrets map[string]string) (*v1beta1.ServiceBinding, error) {
+	params interface{}, secrets map[string]string) (*v1.ServiceBinding, error) {
 
 	// Manually defaulting the name of the binding
 	// I'm not doing the same for the secret since the API handles defaulting that value.
@@ -81,14 +81,14 @@ func (sdk *SDK) Bind(namespace, bindingName, externalID, instanceName, secretNam
 		bindingName = instanceName
 	}
 
-	request := &v1beta1.ServiceBinding{
+	request := &v1.ServiceBinding{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      bindingName,
 			Namespace: namespace,
 		},
-		Spec: v1beta1.ServiceBindingSpec{
+		Spec: v1.ServiceBindingSpec{
 			ExternalID: externalID,
-			InstanceRef: v1beta1.LocalObjectReference{
+			InstanceRef: v1.LocalObjectReference{
 				Name: instanceName,
 			},
 			SecretName:     secretName,
@@ -186,8 +186,8 @@ func joinErrors(groupMsg string, errors []error, sep string, a ...interface{}) s
 }
 
 // BindingParentHierarchy retrieves all ancestor resources of a binding.
-func (sdk *SDK) BindingParentHierarchy(binding *v1beta1.ServiceBinding,
-) (*v1beta1.ServiceInstance, *v1beta1.ClusterServiceClass, *v1beta1.ClusterServicePlan, *v1beta1.ClusterServiceBroker, error) {
+func (sdk *SDK) BindingParentHierarchy(binding *v1.ServiceBinding,
+) (*v1.ServiceInstance, *v1.ClusterServiceClass, *v1.ClusterServicePlan, *v1.ClusterServiceBroker, error) {
 	instance, err := sdk.RetrieveInstanceByBinding(binding)
 	if err != nil {
 		return nil, nil, nil, nil, err
@@ -208,15 +208,15 @@ func (sdk *SDK) BindingParentHierarchy(binding *v1beta1.ServiceBinding,
 
 // GetBindingStatusCondition returns the last condition on a binding status.
 // When no conditions exist, an empty condition is returned.
-func GetBindingStatusCondition(status v1beta1.ServiceBindingStatus) v1beta1.ServiceBindingCondition {
+func GetBindingStatusCondition(status v1.ServiceBindingStatus) v1.ServiceBindingCondition {
 	if len(status.Conditions) > 0 {
 		return status.Conditions[len(status.Conditions)-1]
 	}
-	return v1beta1.ServiceBindingCondition{}
+	return v1.ServiceBindingCondition{}
 }
 
 // WaitForBinding waits for the instance to complete the current operation (or fail).
-func (sdk *SDK) WaitForBinding(ns, name string, interval time.Duration, timeout *time.Duration) (binding *v1beta1.ServiceBinding, err error) {
+func (sdk *SDK) WaitForBinding(ns, name string, interval time.Duration, timeout *time.Duration) (binding *v1.ServiceBinding, err error) {
 	if timeout == nil {
 		notimeout := time.Duration(math.MaxInt64)
 		timeout = &notimeout
@@ -242,24 +242,24 @@ func (sdk *SDK) WaitForBinding(ns, name string, interval time.Duration, timeout 
 }
 
 // IsBindingReady returns true if the instance is in the Ready status.
-func (sdk *SDK) IsBindingReady(binding *v1beta1.ServiceBinding) bool {
-	return sdk.bindingHasStatus(binding, v1beta1.ServiceBindingConditionReady)
+func (sdk *SDK) IsBindingReady(binding *v1.ServiceBinding) bool {
+	return sdk.bindingHasStatus(binding, v1.ServiceBindingConditionReady)
 }
 
 // IsBindingFailed returns true if the instance is in the Failed status.
-func (sdk *SDK) IsBindingFailed(binding *v1beta1.ServiceBinding) bool {
-	return sdk.bindingHasStatus(binding, v1beta1.ServiceBindingConditionFailed)
+func (sdk *SDK) IsBindingFailed(binding *v1.ServiceBinding) bool {
+	return sdk.bindingHasStatus(binding, v1.ServiceBindingConditionFailed)
 }
 
 // BindingHasStatus returns if the instance is in the specified status.
-func (sdk *SDK) bindingHasStatus(binding *v1beta1.ServiceBinding, status v1beta1.ServiceBindingConditionType) bool {
+func (sdk *SDK) bindingHasStatus(binding *v1.ServiceBinding, status v1.ServiceBindingConditionType) bool {
 	if binding == nil {
 		return false
 	}
 
 	for _, cond := range binding.Status.Conditions {
 		if cond.Type == status &&
-			cond.Status == v1beta1.ConditionTrue {
+			cond.Status == v1.ConditionTrue {
 			return true
 		}
 	}
@@ -275,7 +275,7 @@ func (sdk *SDK) RemoveFinalizerForBinding(namespacedName types.NamespacedName) e
 		return err
 	}
 	finalizers := sets.NewString(binding.Finalizers...)
-	finalizers.Delete(v1beta1.FinalizerServiceCatalog)
+	finalizers.Delete(v1.FinalizerServiceCatalog)
 	binding.Finalizers = finalizers.List()
 	_, err = sdk.ServiceCatalog().ServiceBindings(binding.Namespace).Update(context.Background(), binding, v1.UpdateOptions{})
 	return err
@@ -320,7 +320,7 @@ func (sdk *SDK) RemoveFinalizerForBindings(bindings []types.NamespacedName) ([]t
 	return deleted, bindErr.ErrorOrNil()
 }
 
-// RemoveBindingFinalizerByInstance removes v1beta1.FinalizerServiceCatalog from all bindings for the specified instance.
+// RemoveBindingFinalizerByInstance removes v1.FinalizerServiceCatalog from all bindings for the specified instance.
 func (sdk *SDK) RemoveBindingFinalizerByInstance(ns, name string) ([]types.NamespacedName, error) {
 	instance, err := sdk.RetrieveInstance(ns, name)
 	if err != nil {

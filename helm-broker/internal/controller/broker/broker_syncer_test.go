@@ -3,7 +3,7 @@ package broker
 import (
 	"testing"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -20,7 +20,7 @@ func TestServiceBrokerSync_Success(t *testing.T) {
 	// given
 	destNs := fixDestNs()
 	serviceBroker := fixServiceBroker()
-	require.NoError(t, v1beta1.AddToScheme(scheme.Scheme))
+	require.NoError(t, v1.AddToScheme(scheme.Scheme))
 	cli := k8sigs.NewFakeClientWithScheme(scheme.Scheme, serviceBroker)
 	sbSyncer := NewBrokerSyncer(cli, spy.NewLogDummy())
 	sbSyncer.SetNamespace(destNs)
@@ -30,7 +30,7 @@ func TestServiceBrokerSync_Success(t *testing.T) {
 	require.NoError(t, err)
 
 	// then
-	sb := &v1beta1.ServiceBroker{}
+	sb := &v1.ServiceBroker{}
 	err = cli.Get(context.Background(), types.NamespacedName{Namespace: destNs, Name: serviceBroker.Name}, sb)
 	require.NoError(t, err)
 
@@ -40,7 +40,7 @@ func TestServiceBrokerSync_Success(t *testing.T) {
 
 func TestServiceBrokerSync_NotExistingBroker(t *testing.T) {
 	// given
-	require.NoError(t, v1beta1.AddToScheme(scheme.Scheme))
+	require.NoError(t, v1.AddToScheme(scheme.Scheme))
 	cli := k8sigs.NewFakeClientWithScheme(scheme.Scheme)
 	sbSyncer := NewBrokerSyncer(cli, spy.NewLogDummy())
 
@@ -51,8 +51,8 @@ func TestServiceBrokerSync_NotExistingBroker(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func fixServiceBroker() *v1beta1.ServiceBroker {
-	return &v1beta1.ServiceBroker{
+func fixServiceBroker() *v1.ServiceBroker {
+	return &v1.ServiceBroker{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      fixBrokerName(),
 			Namespace: fixDestNs(),

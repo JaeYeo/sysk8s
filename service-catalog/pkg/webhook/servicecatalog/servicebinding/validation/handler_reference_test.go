@@ -18,11 +18,11 @@ package validation_test
 
 import (
 	"context"
-	sc "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	sc "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/webhook/servicecatalog/servicebinding/validation"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	admissionv1beta1 "k8s.io/api/admission/v1beta1"
+	admissionv1 "k8s.io/api/admission/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -44,17 +44,17 @@ func TestSpecValidationHandlerServiceInstanceReferenceUpToDate(t *testing.T) {
 	require.NoError(t, err)
 
 	request := admission.Request{
-		AdmissionRequest: admissionv1beta1.AdmissionRequest{
+		AdmissionRequest: admissionv1.AdmissionRequest{
 			UID:       "1111-aaaa",
 			Name:      "test-binding",
 			Namespace: namespace,
 			Kind: metav1.GroupVersionKind{
 				Kind:    "ServiceBinding",
-				Version: "v1beta1",
+				Version: "v1",
 				Group:   "servicecatalog.k8s.io",
 			},
 			Object: runtime.RawExtension{Raw: []byte(`{
-  				"apiVersion": "servicecatalog.k8s.io/v1beta1",
+  				"apiVersion": "servicecatalog.k8s.io/v1",
   				"kind": "ServiceBinding",
   				"metadata": {
 				  "finalizers": ["kubernetes-incubator/service-catalog"],
@@ -79,10 +79,10 @@ func TestSpecValidationHandlerServiceInstanceReferenceUpToDate(t *testing.T) {
 	require.NoError(t, err)
 
 	tests := map[string]struct {
-		operation admissionv1beta1.Operation
+		operation admissionv1.Operation
 	}{
 		"Request for Create ServiceBinding should be allowed": {
-			admissionv1beta1.Create,
+			admissionv1.Create,
 		},
 	}
 
@@ -122,16 +122,16 @@ func TestSpecValidationHandlerServiceInstanceReferenceOutOfDate(t *testing.T) {
 	require.NoError(t, err)
 
 	request := admission.Request{
-		AdmissionRequest: admissionv1beta1.AdmissionRequest{
+		AdmissionRequest: admissionv1.AdmissionRequest{
 			UID:  "2222-bbbb",
 			Name: "test-binding",
 			Kind: metav1.GroupVersionKind{
 				Kind:    "ServiceBinding",
-				Version: "v1beta1",
+				Version: "v1",
 				Group:   "servicecatalog.k8s.io",
 			},
 			Object: runtime.RawExtension{Raw: []byte(`{
-  				"apiVersion": "servicecatalog.k8s.io/v1beta1",
+  				"apiVersion": "servicecatalog.k8s.io/v1",
   				"kind": "ServiceBinding",
   				"metadata": {
 				  "finalizers": ["kubernetes-incubator/service-catalog"],
@@ -157,10 +157,10 @@ func TestSpecValidationHandlerServiceInstanceReferenceOutOfDate(t *testing.T) {
 	require.NoError(t, err)
 
 	tests := map[string]struct {
-		operation admissionv1beta1.Operation
+		operation admissionv1.Operation
 	}{
 		"Request for Create ServiceBinding should be denied": {
-			admissionv1beta1.Create,
+			admissionv1.Create,
 		},
 	}
 

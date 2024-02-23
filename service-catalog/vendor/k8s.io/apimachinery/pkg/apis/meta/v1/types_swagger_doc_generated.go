@@ -54,7 +54,7 @@ var map_APIResource = map[string]string{
 	"singularName":       "singularName is the singular name of the resource.  This allows clients to handle plural and singular opaquely. The singularName is more correct for reporting status on a single item and both singular and plural are allowed from the kubectl CLI interface.",
 	"namespaced":         "namespaced indicates if a resource is namespaced or not.",
 	"group":              "group is the preferred group of the resource.  Empty implies the group of the containing resource list. For subresources, this may have a different value, for example: Scale\".",
-	"version":            "version is the preferred version of the resource.  Empty implies the version of the containing resource list For subresources, this may have a different value, for example: v1 (while inside a v1beta1 version of the core resource's group)\".",
+	"version":            "version is the preferred version of the resource.  Empty implies the version of the containing resource list For subresources, this may have a different value, for example: v1 (while inside a v1 version of the core resource's group)\".",
 	"kind":               "kind is the kind for the resource (e.g. 'Foo' is the kind for a resource 'foo')",
 	"verbs":              "verbs is a list of supported kube verbs (this includes get, list, watch, create, update, patch, delete, deletecollection, and proxy)",
 	"shortNames":         "shortNames is a list of suggested short names of the resource.",
@@ -389,7 +389,7 @@ func (TableColumnDefinition) SwaggerDoc() map[string]string {
 
 var map_TableOptions = map[string]string{
 	"":              "TableOptions are used when a Table is requested by the caller.",
-	"includeObject": "includeObject decides whether to include each object along with its columnar information. Specifying \"None\" will return no object, specifying \"Object\" will return the full object contents, and specifying \"Metadata\" (the default) will return the object's metadata in the PartialObjectMetadata kind in version v1beta1 of the meta.k8s.io API group.",
+	"includeObject": "includeObject decides whether to include each object along with its columnar information. Specifying \"None\" will return no object, specifying \"Object\" will return the full object contents, and specifying \"Metadata\" (the default) will return the object's metadata in the PartialObjectMetadata kind in version v1 of the meta.k8s.io API group.",
 }
 
 func (TableOptions) SwaggerDoc() map[string]string {

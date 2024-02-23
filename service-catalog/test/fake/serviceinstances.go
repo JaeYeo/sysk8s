@@ -23,22 +23,22 @@ import (
 	"k8s.io/apimachinery/pkg/util/rand"
 	watch "k8s.io/apimachinery/pkg/watch"
 
-	v1beta1 "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
-	v1beta1typed "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/typed/servicecatalog/v1beta1"
+	v1 "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
+	v1typed "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/typed/servicecatalog/v1"
 )
 
 // ServiceInstances is a wrapper around the generated fake ServiceInstances
 // that clones the ServiceInstance objects being passed to UpdateStatus. This is a
 // workaround until the generated fake clientset does its own copying.
 type ServiceInstances struct {
-	v1beta1typed.ServiceInstanceInterface
+	v1typed.ServiceInstanceInterface
 }
 
-func (c *ServiceInstances) Create(ctx context.Context, serviceInstance *v1beta1.ServiceInstance, opts v1.CreateOptions) (*v1beta1.ServiceInstance, error) {
+func (c *ServiceInstances) Create(ctx context.Context, serviceInstance *v1.ServiceInstance, opts v1.CreateOptions) (*v1.ServiceInstance, error) {
 	return c.ServiceInstanceInterface.Create(ctx, serviceInstance, opts)
 }
 
-func (c *ServiceInstances) Update(ctx context.Context, serviceInstance *v1beta1.ServiceInstance, opts v1.UpdateOptions) (*v1beta1.ServiceInstance, error) {
+func (c *ServiceInstances) Update(ctx context.Context, serviceInstance *v1.ServiceInstance, opts v1.UpdateOptions) (*v1.ServiceInstance, error) {
 	instanceCopy := serviceInstance.DeepCopy()
 	updatedInstance, err := c.ServiceInstanceInterface.Update(ctx, instanceCopy, opts)
 	if updatedInstance != nil {
@@ -47,7 +47,7 @@ func (c *ServiceInstances) Update(ctx context.Context, serviceInstance *v1beta1.
 	return updatedInstance, err
 }
 
-func (c *ServiceInstances) UpdateStatus(ctx context.Context, serviceInstance *v1beta1.ServiceInstance, opts v1.UpdateOptions) (*v1beta1.ServiceInstance, error) {
+func (c *ServiceInstances) UpdateStatus(ctx context.Context, serviceInstance *v1.ServiceInstance, opts v1.UpdateOptions) (*v1.ServiceInstance, error) {
 	instanceCopy := serviceInstance.DeepCopy()
 	updatedInstance, err := c.ServiceInstanceInterface.UpdateStatus(ctx, instanceCopy, opts)
 	if updatedInstance != nil {
@@ -64,11 +64,11 @@ func (c *ServiceInstances) DeleteCollection(ctx context.Context, opts v1.DeleteO
 	return c.ServiceInstanceInterface.DeleteCollection(ctx, opts, listOpts)
 }
 
-func (c *ServiceInstances) Get(ctx context.Context, name string, opts v1.GetOptions) (*v1beta1.ServiceInstance, error) {
+func (c *ServiceInstances) Get(ctx context.Context, name string, opts v1.GetOptions) (*v1.ServiceInstance, error) {
 	return c.ServiceInstanceInterface.Get(ctx, name, opts)
 }
 
-func (c *ServiceInstances) List(ctx context.Context, opts v1.ListOptions) (*v1beta1.ServiceInstanceList, error) {
+func (c *ServiceInstances) List(ctx context.Context, opts v1.ListOptions) (*v1.ServiceInstanceList, error) {
 	return c.ServiceInstanceInterface.List(ctx, opts)
 }
 
@@ -78,6 +78,6 @@ func (c *ServiceInstances) Watch(ctx context.Context, opts v1.ListOptions) (watc
 }
 
 // Patch applies the patch and returns the patched serviceInstance.
-func (c *ServiceInstances) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta1.ServiceInstance, err error) {
+func (c *ServiceInstances) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1.ServiceInstance, err error) {
 	return c.ServiceInstanceInterface.Patch(ctx, name, pt, data, opts, subresources...)
 }

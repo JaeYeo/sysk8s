@@ -19,14 +19,14 @@ limitations under the License.
 package events
 
 import (
-	v1beta1 "k8s.io/client-go/informers/events/v1beta1"
+	v1 "k8s.io/client-go/informers/events/v1"
 	internalinterfaces "k8s.io/client-go/informers/internalinterfaces"
 )
 
 // Interface provides access to each of this group's versions.
 type Interface interface {
-	// V1beta1 provides access to shared informers for resources in V1beta1.
-	V1beta1() v1beta1.Interface
+	// v1 provides access to shared informers for resources in v1.
+	v1() v1.Interface
 }
 
 type group struct {
@@ -40,7 +40,7 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &group{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// V1beta1 returns a new v1beta1.Interface.
-func (g *group) V1beta1() v1beta1.Interface {
-	return v1beta1.New(g.factory, g.namespace, g.tweakListOptions)
+// v1 returns a new v1.Interface.
+func (g *group) v1() v1.Interface {
+	return v1.New(g.factory, g.namespace, g.tweakListOptions)
 }

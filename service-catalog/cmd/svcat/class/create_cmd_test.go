@@ -21,7 +21,7 @@ import (
 
 	"github.com/kubernetes-sigs/service-catalog/cmd/svcat/command"
 	"github.com/kubernetes-sigs/service-catalog/cmd/svcat/test"
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/svcat"
 	servicecatalog "github.com/kubernetes-sigs/service-catalog/pkg/svcat/service-catalog"
 	servicecatalogfakes "github.com/kubernetes-sigs/service-catalog/pkg/svcat/service-catalog/service-catalogfakes"
@@ -71,9 +71,9 @@ var _ = Describe("Create Command", func() {
 			className := "newclass"
 			existingClassName := "existingclass"
 
-			classToReturn := &v1beta1.ClusterServiceClass{
-				Spec: v1beta1.ClusterServiceClassSpec{
-					CommonServiceClassSpec: v1beta1.CommonServiceClassSpec{
+			classToReturn := &v1.ClusterServiceClass{
+				Spec: v1.ClusterServiceClassSpec{
+					CommonServiceClassSpec: v1.CommonServiceClassSpec{
 						ExternalName: className,
 					},
 				},
@@ -107,12 +107,12 @@ var _ = Describe("Create Command", func() {
 			classNamespace := "default"
 			existingClassName := "existingclass"
 
-			classToReturn := &v1beta1.ServiceClass{
+			classToReturn := &v1.ServiceClass{
 				ObjectMeta: v1.ObjectMeta{
 					Namespace: classNamespace,
 				},
-				Spec: v1beta1.ServiceClassSpec{
-					CommonServiceClassSpec: v1beta1.CommonServiceClassSpec{
+				Spec: v1.ServiceClassSpec{
+					CommonServiceClassSpec: v1.CommonServiceClassSpec{
 						ExternalName: className,
 					},
 				},

@@ -17,11 +17,11 @@ limitations under the License.
 package webhookutil_test
 
 import (
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/webhookutil"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	corev1beta1 "k8s.io/api/apps/v1beta1"
+	corev1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"strings"
 	"testing"
@@ -33,10 +33,10 @@ func TestMatchKinds(t *testing.T) {
 		reqGVK := metav1.GroupVersionKind{
 			Kind:    "Deployment",
 			Group:   "apps",
-			Version: "v1beta1",
+			Version: "v1",
 		}
 
-		deployObject := &corev1beta1.Deployment{}
+		deployObject := &corev1.Deployment{}
 
 		// when
 		err := webhookutil.MatchKinds(deployObject, reqGVK)
@@ -50,28 +50,28 @@ func TestMatchKinds(t *testing.T) {
 		reqGVK := metav1.GroupVersionKind{
 			Kind:    "Pod",
 			Group:   "apps",
-			Version: "v1beta1",
+			Version: "v1",
 		}
 
-		deployObject := &corev1beta1.Deployment{}
+		deployObject := &corev1.Deployment{}
 
 		// when
 		err := webhookutil.MatchKinds(deployObject, reqGVK)
 
 		// then
-		assert.EqualError(t, err, "type mismatch: want: apps/v1beta1, Kind=Deployment got: apps/v1beta1, Kind=Pod")
+		assert.EqualError(t, err, "type mismatch: want: apps/v1, Kind=Deployment got: apps/v1, Kind=Pod")
 	})
 
 	t.Run("Should return error if GVK is not registered", func(t *testing.T) {
 		// given
 		reqGVK := metav1.GroupVersionKind{}
-		csbObject := &v1beta1.ClusterServiceBroker{}
+		csbObject := &v1.ClusterServiceBroker{}
 
 		// when
 		err := webhookutil.MatchKinds(csbObject, reqGVK)
 
 		// then
 		require.Error(t, err)
-		assert.True(t, strings.Contains(err.Error(), "no kind is registered for the type v1beta1.ClusterServiceBroker in scheme"))
+		assert.True(t, strings.Contains(err.Error(), "no kind is registered for the type v1.ClusterServiceBroker in scheme"))
 	})
 }

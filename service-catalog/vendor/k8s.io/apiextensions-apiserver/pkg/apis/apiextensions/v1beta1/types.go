@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package v1beta1
+package v1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -120,7 +120,7 @@ type CustomResourceConversion struct {
 	// are supported by API server, conversion will fail for the custom resource.
 	// If a persisted Webhook configuration specifies allowed versions and does not
 	// include any versions known to the API Server, calls to the webhook will fail.
-	// Defaults to `["v1beta1"]`.
+	// Defaults to `["v1"]`.
 	// +optional
 	ConversionReviewVersions []string `json:"conversionReviewVersions,omitempty" protobuf:"bytes,3,rep,name=conversionReviewVersions"`
 }

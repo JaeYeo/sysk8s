@@ -19,7 +19,7 @@ package servicecatalog_test
 import (
 	"fmt"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/fake"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -38,34 +38,34 @@ var _ = Describe("Secret", func() {
 		sdk            *SDK
 		k8sClient      *k8sfake.Clientset
 		svcCatClient   *fake.Clientset
-		readyBinding   *v1beta1.ServiceBinding
-		unreadyBinding *v1beta1.ServiceBinding
+		readyBinding   *v1.ServiceBinding
+		unreadyBinding *v1.ServiceBinding
 		boundSecret    *corev1.Secret
 	)
 
 	BeforeEach(func() {
-		readyBinding = &v1beta1.ServiceBinding{
+		readyBinding = &v1.ServiceBinding{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "foobar",
 				Namespace: "foobar_namespace"},
-			Spec: v1beta1.ServiceBindingSpec{
+			Spec: v1.ServiceBindingSpec{
 				SecretName: "mysecret",
 			},
-			Status: v1beta1.ServiceBindingStatus{
-				Conditions: []v1beta1.ServiceBindingCondition{
+			Status: v1.ServiceBindingStatus{
+				Conditions: []v1.ServiceBindingCondition{
 					{
-						Type:   v1beta1.ServiceBindingConditionReady,
-						Status: v1beta1.ConditionTrue,
+						Type:   v1.ServiceBindingConditionReady,
+						Status: v1.ConditionTrue,
 					},
 				},
 			},
 		}
-		unreadyBinding = &v1beta1.ServiceBinding{
+		unreadyBinding = &v1.ServiceBinding{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "barbaz",
 				Namespace: "foobar_namespace",
 			},
-			Spec: v1beta1.ServiceBindingSpec{
+			Spec: v1.ServiceBindingSpec{
 				SecretName: "missing-secret",
 			},
 		}

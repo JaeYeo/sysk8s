@@ -45,7 +45,7 @@ func NameSystems(pluralExceptions map[string]string) namer.NameSystems {
 			// these exceptions are used to deconflict the generated code
 			// you can put your fully qualified package like
 			// to generate a name that doesn't conflict with your group.
-			// "k8s.io/apis/events/v1beta1.Event": "EventResource"
+			// "k8s.io/apis/events/v1.Event": "EventResource"
 		},
 		KeyFunc: func(t *types.Type) string {
 			return t.Name.Package + "." + t.Name.Name
@@ -57,7 +57,7 @@ func NameSystems(pluralExceptions map[string]string) namer.NameSystems {
 			// these exceptions are used to deconflict the generated code
 			// you can put your fully qualified package like
 			// to generate a name that doesn't conflict with your group.
-			// "k8s.io/apis/events/v1beta1.Event": "eventResource"
+			// "k8s.io/apis/events/v1.Event": "eventResource"
 		},
 		KeyFunc: func(t *types.Type) string {
 			return t.Name.Package + "." + t.Name.Name
@@ -69,7 +69,7 @@ func NameSystems(pluralExceptions map[string]string) namer.NameSystems {
 			// these exceptions are used to deconflict the generated code
 			// you can put your fully qualified package like
 			// to generate a name that doesn't conflict with your group.
-			// "k8s.io/apis/events/v1beta1.Event": "EventResource"
+			// "k8s.io/apis/events/v1.Event": "EventResource"
 		},
 		KeyFunc: func(t *types.Type) string {
 			return t.Name.Package + "." + t.Name.Name
@@ -80,9 +80,9 @@ func NameSystems(pluralExceptions map[string]string) namer.NameSystems {
 		Exceptions: map[string]string{
 			// you can put your fully qualified package like
 			// to generate a name that doesn't conflict with your group.
-			// "k8s.io/apis/events/v1beta1.Event": "eventResource"
+			// "k8s.io/apis/events/v1.Event": "eventResource"
 			// these exceptions are used to deconflict the generated code
-			"k8s.io/apis/events/v1beta1.Event":        "eventResources",
+			"k8s.io/apis/events/v1.Event":        "eventResources",
 			"k8s.io/kubernetes/pkg/apis/events.Event": "eventResources",
 		},
 		KeyFunc: func(t *types.Type) string {

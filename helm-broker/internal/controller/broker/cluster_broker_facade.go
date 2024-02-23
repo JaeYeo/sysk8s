@@ -8,7 +8,7 @@ import (
 
 	"context"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
@@ -64,7 +64,7 @@ func (f *ClusterFacade) Create() error {
 
 // Delete removes ClusterServiceBroker. Errors don't stop execution of method. NotFound errors are ignored.
 func (f *ClusterFacade) Delete() error {
-	csb := &v1beta1.ClusterServiceBroker{
+	csb := &v1.ClusterServiceBroker{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: f.clusterBrokerName,
 		},
@@ -83,7 +83,7 @@ func (f *ClusterFacade) Delete() error {
 
 // Exist check if ClusterServiceBroker exists.
 func (f *ClusterFacade) Exist() (bool, error) {
-	err := f.client.Get(context.Background(), types.NamespacedName{Name: f.clusterBrokerName}, &v1beta1.ClusterServiceBroker{})
+	err := f.client.Get(context.Background(), types.NamespacedName{Name: f.clusterBrokerName}, &v1.ClusterServiceBroker{})
 	switch {
 	case k8serrors.IsNotFound(err):
 		return false, nil
@@ -95,14 +95,14 @@ func (f *ClusterFacade) Exist() (bool, error) {
 }
 
 // createServiceBroker returns just created or existing ClusterServiceBroker
-func (f *ClusterFacade) createClusterServiceBroker(svcURL string) (*v1beta1.ClusterServiceBroker, error) {
+func (f *ClusterFacade) createClusterServiceBroker(svcURL string) (*v1.ClusterServiceBroker, error) {
 	url := fmt.Sprintf("%s/cluster", svcURL)
-	broker := &v1beta1.ClusterServiceBroker{
+	broker := &v1.ClusterServiceBroker{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: f.clusterBrokerName,
 		},
-		Spec: v1beta1.ClusterServiceBrokerSpec{
-			CommonServiceBrokerSpec: v1beta1.CommonServiceBrokerSpec{
+		Spec: v1.ClusterServiceBrokerSpec{
+			CommonServiceBrokerSpec: v1.CommonServiceBrokerSpec{
 				URL:            url,
 				RelistRequests: 1,
 			},
@@ -112,7 +112,7 @@ func (f *ClusterFacade) createClusterServiceBroker(svcURL string) (*v1beta1.Clus
 	err := f.client.Create(context.Background(), broker)
 	if k8serrors.IsAlreadyExists(err) {
 		f.log.Infof("ClusterServiceBroker [%s] already exist. Attempt to get resource.", broker.Name)
-		createdBroker := &v1beta1.ClusterServiceBroker{}
+		createdBroker := &v1.ClusterServiceBroker{}
 		err = f.client.Get(context.Background(), types.NamespacedName{Name: f.clusterBrokerName}, createdBroker)
 		return createdBroker, err
 	}

@@ -20,14 +20,14 @@ import (
 	"context"
 	"testing"
 
-	sc "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	sc "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/util"
 	"github.com/kubernetes-sigs/service-catalog/pkg/webhook/servicecatalog/clusterserviceplan/mutation"
 	"github.com/kubernetes-sigs/service-catalog/pkg/webhookutil/tester"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gomodules.xyz/jsonpatch/v2"
-	admissionv1beta1 "k8s.io/api/admission/v1beta1"
+	admissionv1 "k8s.io/api/admission/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -42,7 +42,7 @@ func TestCreateUpdateHandlerHandleCreateSuccess(t *testing.T) {
 	}{
 		"Should copy spec fields to labels": {
 			givenRawObj: []byte(`{
-  				"apiVersion": "servicecatalog.k8s.io/v1beta1",
+  				"apiVersion": "servicecatalog.k8s.io/v1",
   				"kind": "ClusterServicePlan",
   				"metadata": {
   				  "name": "test-service-plan"
@@ -77,13 +77,13 @@ func TestCreateUpdateHandlerHandleCreateSuccess(t *testing.T) {
 			require.NoError(t, err)
 
 			fixReq := admission.Request{
-				AdmissionRequest: admissionv1beta1.AdmissionRequest{
-					Operation: admissionv1beta1.Create,
+				AdmissionRequest: admissionv1.AdmissionRequest{
+					Operation: admissionv1.Create,
 					Name:      "test-service-plan",
 					Namespace: "system",
 					Kind: metav1.GroupVersionKind{
 						Kind:    "ClusterServicePlan",
-						Version: "v1beta1",
+						Version: "v1",
 						Group:   "servicecatalog.k8s.io",
 					},
 					Object: runtime.RawExtension{Raw: tc.givenRawObj},
@@ -98,7 +98,7 @@ func TestCreateUpdateHandlerHandleCreateSuccess(t *testing.T) {
 			// then
 			assert.True(t, resp.Allowed)
 			require.NotNil(t, resp.PatchType)
-			assert.Equal(t, admissionv1beta1.PatchTypeJSONPatch, *resp.PatchType)
+			assert.Equal(t, admissionv1.PatchTypeJSONPatch, *resp.PatchType)
 
 			for _, expPatch := range tc.expPatches {
 				assert.Contains(t, resp.Patches, expPatch)
@@ -116,7 +116,7 @@ func TestCreateUpdateHandlerHandleUpdateSuccess(t *testing.T) {
 	}{
 		"Should reset broker name and class ref to old one and allow to change other fields": {
 			oldRawObject: []byte(`{
-  				"apiVersion": "servicecatalog.k8s.io/v1beta1",
+  				"apiVersion": "servicecatalog.k8s.io/v1",
   				"kind": "ClusterServicePlan",
   				"metadata": {
   				  "creationTimestamp": null,
@@ -139,7 +139,7 @@ func TestCreateUpdateHandlerHandleUpdateSuccess(t *testing.T) {
   				}
 			}`),
 			newRawObj: []byte(`{
-  				"apiVersion": "servicecatalog.k8s.io/v1beta1",
+  				"apiVersion": "servicecatalog.k8s.io/v1",
   				"kind": "ClusterServicePlan",
   				"metadata": {
   				  "creationTimestamp": null,
@@ -184,13 +184,13 @@ func TestCreateUpdateHandlerHandleUpdateSuccess(t *testing.T) {
 			require.NoError(t, err)
 
 			fixReq := admission.Request{
-				AdmissionRequest: admissionv1beta1.AdmissionRequest{
-					Operation: admissionv1beta1.Update,
+				AdmissionRequest: admissionv1.AdmissionRequest{
+					Operation: admissionv1.Update,
 					Name:      "test-plan",
 					Namespace: "system",
 					Kind: metav1.GroupVersionKind{
 						Kind:    "ClusterServicePlan",
-						Version: "v1beta1",
+						Version: "v1",
 						Group:   "servicecatalog.k8s.io",
 					},
 					OldObject: runtime.RawExtension{Raw: tc.oldRawObject},
@@ -207,7 +207,7 @@ func TestCreateUpdateHandlerHandleUpdateSuccess(t *testing.T) {
 			// then
 			assert.True(t, resp.Allowed)
 			require.NotNil(t, resp.PatchType)
-			assert.Equal(t, admissionv1beta1.PatchTypeJSONPatch, *resp.PatchType)
+			assert.Equal(t, admissionv1.PatchTypeJSONPatch, *resp.PatchType)
 
 			// filtering out status cause k8s api-server will discard this too
 			patches := tester.FilterOutStatusPatch(resp.Patches)

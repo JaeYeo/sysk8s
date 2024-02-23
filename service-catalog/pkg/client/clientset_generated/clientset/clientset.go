@@ -1,5 +1,5 @@
 /*
-Copyright 2020 The Kubernetes Authors.
+Copyright 2021 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ package clientset
 import (
 	"fmt"
 
-	servicecatalogv1beta1 "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/typed/servicecatalog/v1beta1"
+	servicecatalogv1 "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/typed/servicecatalog/v1"
 	settingsv1alpha1 "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/typed/settings/v1alpha1"
 	discovery "k8s.io/client-go/discovery"
 	rest "k8s.io/client-go/rest"
@@ -30,7 +30,7 @@ import (
 
 type Interface interface {
 	Discovery() discovery.DiscoveryInterface
-	ServicecatalogV1beta1() servicecatalogv1beta1.ServicecatalogV1beta1Interface
+	Servicecatalogv1() servicecatalogv1.Servicecatalogv1Interface
 	SettingsV1alpha1() settingsv1alpha1.SettingsV1alpha1Interface
 }
 
@@ -38,13 +38,13 @@ type Interface interface {
 // version included in a Clientset.
 type Clientset struct {
 	*discovery.DiscoveryClient
-	servicecatalogV1beta1 *servicecatalogv1beta1.ServicecatalogV1beta1Client
+	servicecatalogv1 *servicecatalogv1.Servicecatalogv1Client
 	settingsV1alpha1      *settingsv1alpha1.SettingsV1alpha1Client
 }
 
-// ServicecatalogV1beta1 retrieves the ServicecatalogV1beta1Client
-func (c *Clientset) ServicecatalogV1beta1() servicecatalogv1beta1.ServicecatalogV1beta1Interface {
-	return c.servicecatalogV1beta1
+// Servicecatalogv1 retrieves the Servicecatalogv1Client
+func (c *Clientset) Servicecatalogv1() servicecatalogv1.Servicecatalogv1Interface {
+	return c.servicecatalogv1
 }
 
 // SettingsV1alpha1 retrieves the SettingsV1alpha1Client
@@ -73,7 +73,7 @@ func NewForConfig(c *rest.Config) (*Clientset, error) {
 	}
 	var cs Clientset
 	var err error
-	cs.servicecatalogV1beta1, err = servicecatalogv1beta1.NewForConfig(&configShallowCopy)
+	cs.servicecatalogv1, err = servicecatalogv1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +93,7 @@ func NewForConfig(c *rest.Config) (*Clientset, error) {
 // panics if there is an error in the config.
 func NewForConfigOrDie(c *rest.Config) *Clientset {
 	var cs Clientset
-	cs.servicecatalogV1beta1 = servicecatalogv1beta1.NewForConfigOrDie(c)
+	cs.servicecatalogv1 = servicecatalogv1.NewForConfigOrDie(c)
 	cs.settingsV1alpha1 = settingsv1alpha1.NewForConfigOrDie(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClientForConfigOrDie(c)
@@ -103,7 +103,7 @@ func NewForConfigOrDie(c *rest.Config) *Clientset {
 // New creates a new Clientset for the given RESTClient.
 func New(c rest.Interface) *Clientset {
 	var cs Clientset
-	cs.servicecatalogV1beta1 = servicecatalogv1beta1.New(c)
+	cs.servicecatalogv1 = servicecatalogv1.New(c)
 	cs.settingsV1alpha1 = settingsv1alpha1.New(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClient(c)

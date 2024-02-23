@@ -25,7 +25,7 @@ import (
 
 	"github.com/kubernetes-sigs/service-catalog/contrib/pkg/brokerapi"
 	"github.com/kubernetes-sigs/service-catalog/contrib/pkg/brokerapi/openservicebroker/util"
-	servicecatalog "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	servicecatalog "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 )
 
 const (

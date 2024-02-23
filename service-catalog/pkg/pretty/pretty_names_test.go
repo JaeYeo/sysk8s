@@ -19,7 +19,7 @@ package pretty
 import (
 	"testing"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -33,7 +33,7 @@ func TestPrettyNames(t *testing.T) {
 
 func TestServiceInstanceName(t *testing.T) {
 	e := `ServiceInstance "namespace/name"`
-	serviceInstance := &v1beta1.ServiceInstance{
+	serviceInstance := &v1.ServiceInstance{
 		ObjectMeta: metav1.ObjectMeta{Name: "name", Namespace: "namespace"},
 	}
 	g := ServiceInstanceName(serviceInstance)
@@ -51,10 +51,10 @@ func TestClusterServiceBrokerName(t *testing.T) {
 }
 
 func TestClusterServiceClassName(t *testing.T) {
-	serviceClass := &v1beta1.ClusterServiceClass{
+	serviceClass := &v1.ClusterServiceClass{
 		ObjectMeta: metav1.ObjectMeta{Name: "service-class"},
-		Spec: v1beta1.ClusterServiceClassSpec{
-			CommonServiceClassSpec: v1beta1.CommonServiceClassSpec{
+		Spec: v1.ClusterServiceClassSpec{
+			CommonServiceClassSpec: v1.CommonServiceClassSpec{
 				ExternalName: "external-class-name",
 			},
 		},
@@ -67,10 +67,10 @@ func TestClusterServiceClassName(t *testing.T) {
 }
 
 func TestClusterServicePlanName(t *testing.T) {
-	servicePlan := &v1beta1.ClusterServicePlan{
+	servicePlan := &v1.ClusterServicePlan{
 		ObjectMeta: metav1.ObjectMeta{Name: "service-plan"},
-		Spec: v1beta1.ClusterServicePlanSpec{
-			CommonServicePlanSpec: v1beta1.CommonServicePlanSpec{
+		Spec: v1.ClusterServicePlanSpec{
+			CommonServicePlanSpec: v1.CommonServicePlanSpec{
 				ExternalName: "external-plan-name",
 			},
 		},

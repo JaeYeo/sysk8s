@@ -45,10 +45,10 @@ import (
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/util/workqueue"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
-	servicecatalogclientset "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/typed/servicecatalog/v1beta1"
-	informers "github.com/kubernetes-sigs/service-catalog/pkg/client/informers_generated/externalversions/servicecatalog/v1beta1"
-	listers "github.com/kubernetes-sigs/service-catalog/pkg/client/listers_generated/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
+	servicecatalogclientset "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/typed/servicecatalog/v1"
+	informers "github.com/kubernetes-sigs/service-catalog/pkg/client/informers_generated/externalversions/servicecatalog/v1"
+	listers "github.com/kubernetes-sigs/service-catalog/pkg/client/listers_generated/servicecatalog/v1"
 	scfeatures "github.com/kubernetes-sigs/service-catalog/pkg/features"
 	"github.com/kubernetes-sigs/service-catalog/pkg/filter"
 	"github.com/kubernetes-sigs/service-catalog/pkg/pretty"
@@ -76,7 +76,7 @@ const (
 // NewController returns a new Open Service Broker catalog controller.
 func NewController(
 	kubeClient kubernetes.Interface,
-	serviceCatalogClient servicecatalogclientset.ServicecatalogV1beta1Interface,
+	serviceCatalogClient servicecatalogclientset.Servicecatalogv1Interface,
 	clusterServiceBrokerInformer informers.ClusterServiceBrokerInformer,
 	serviceBrokerInformer informers.ServiceBrokerInformer,
 	clusterServiceClassInformer informers.ClusterServiceClassInformer,
@@ -192,7 +192,7 @@ type Controller interface {
 // controller is a concrete Controller.
 type controller struct {
 	kubeClient                  kubernetes.Interface
-	serviceCatalogClient        servicecatalogclientset.ServicecatalogV1beta1Interface
+	serviceCatalogClient        servicecatalogclientset.Servicecatalogv1Interface
 	clusterServiceBrokerLister  listers.ClusterServiceBrokerLister
 	serviceBrokerLister         listers.ServiceBrokerLister
 	clusterServiceClassLister   listers.ClusterServiceClassLister
@@ -424,13 +424,13 @@ func (e *operationError) Error() string { return e.message }
 // The ClusterServicePlan returned will be nil if the ClusterServicePlanRef
 // is nil. This will happen when deleting a ServiceInstance that previously
 // had an update to a non-existent plan.
-func (c *controller) getClusterServiceClassPlanAndClusterServiceBroker(instance *v1beta1.ServiceInstance) (*v1beta1.ClusterServiceClass, *v1beta1.ClusterServicePlan, string, osb.Client, error) {
+func (c *controller) getClusterServiceClassPlanAndClusterServiceBroker(instance *v1.ServiceInstance) (*v1.ClusterServiceClass, *v1.ClusterServicePlan, string, osb.Client, error) {
 	serviceClass, brokerName, brokerClient, err := c.getClusterServiceClassAndClusterServiceBroker(instance)
 	if err != nil {
 		return nil, nil, "", nil, err
 	}
 
-	var servicePlan *v1beta1.ClusterServicePlan
+	var servicePlan *v1.ClusterServicePlan
 	if instance.Spec.ClusterServicePlanRef != nil {
 		var err error
 		servicePlan, err = c.clusterServicePlanLister.Get(instance.Spec.ClusterServicePlanRef.Name)
@@ -447,13 +447,13 @@ func (c *controller) getClusterServiceClassPlanAndClusterServiceBroker(instance 
 	return serviceClass, servicePlan, brokerName, brokerClient, nil
 }
 
-func (c *controller) getServiceClassPlanAndServiceBroker(instance *v1beta1.ServiceInstance) (*v1beta1.ServiceClass, *v1beta1.ServicePlan, string, osb.Client, error) {
+func (c *controller) getServiceClassPlanAndServiceBroker(instance *v1.ServiceInstance) (*v1.ServiceClass, *v1.ServicePlan, string, osb.Client, error) {
 	serviceClass, brokerName, brokerClient, err := c.getServiceClassAndServiceBroker(instance)
 	if err != nil {
 		return nil, nil, "", nil, err
 	}
 
-	var servicePlan *v1beta1.ServicePlan
+	var servicePlan *v1.ServicePlan
 	if instance.Spec.ServicePlanRef != nil {
 		var err error
 		servicePlan, err = c.servicePlanLister.ServicePlans(instance.Namespace).Get(instance.Spec.ServicePlanRef.Name)
@@ -473,7 +473,7 @@ func (c *controller) getServiceClassPlanAndServiceBroker(instance *v1beta1.Servi
 // getClusterServiceClassAndClusterServiceBroker is a sequence of operations that's done in couple of
 // places so this method fetches the Service Class and creates
 // a brokerClient to use for that method given an ServiceInstance.
-func (c *controller) getClusterServiceClassAndClusterServiceBroker(instance *v1beta1.ServiceInstance) (*v1beta1.ClusterServiceClass, string, osb.Client, error) {
+func (c *controller) getClusterServiceClassAndClusterServiceBroker(instance *v1.ServiceInstance) (*v1.ClusterServiceClass, string, osb.Client, error) {
 	serviceClass, err := c.clusterServiceClassLister.Get(instance.Spec.ClusterServiceClassRef.Name)
 	if err != nil {
 		return nil, "", nil, &operationError{
@@ -507,7 +507,7 @@ func (c *controller) getClusterServiceClassAndClusterServiceBroker(instance *v1b
 // getServiceClassAndServiceBroker is a sequence of operations that's done in couple of
 // places so this method fetches the Service Class and creates
 // a brokerClient to use for that method given a ServiceInstance.
-func (c *controller) getServiceClassAndServiceBroker(instance *v1beta1.ServiceInstance) (*v1beta1.ServiceClass, string, osb.Client, error) {
+func (c *controller) getServiceClassAndServiceBroker(instance *v1.ServiceInstance) (*v1.ServiceClass, string, osb.Client, error) {
 	serviceClass, err := c.serviceClassLister.ServiceClasses(instance.Namespace).Get(instance.Spec.ServiceClassRef.Name)
 	if err != nil {
 		return nil, "", nil, &operationError{
@@ -542,7 +542,7 @@ func (c *controller) getServiceClassAndServiceBroker(instance *v1beta1.ServiceIn
 // done to validate service plan, service class exist, and handles creating
 // a brokerclient to use for a given ServiceInstance.
 // Sets ClusterServiceClassRef and/or ClusterServicePlanRef if they haven't been already set.
-func (c *controller) getClusterServiceClassPlanAndClusterServiceBrokerForServiceBinding(instance *v1beta1.ServiceInstance, binding *v1beta1.ServiceBinding) (*v1beta1.ClusterServiceClass, *v1beta1.ClusterServicePlan, string, osb.Client, error) {
+func (c *controller) getClusterServiceClassPlanAndClusterServiceBrokerForServiceBinding(instance *v1.ServiceInstance, binding *v1.ServiceBinding) (*v1.ClusterServiceClass, *v1.ClusterServicePlan, string, osb.Client, error) {
 	serviceClass, serviceBrokerName, osbClient, err := c.getClusterServiceClassAndClusterServiceBrokerForServiceBinding(instance, binding)
 	if err != nil {
 		return nil, nil, "", nil, err
@@ -555,7 +555,7 @@ func (c *controller) getClusterServiceClassPlanAndClusterServiceBrokerForService
 	return serviceClass, servicePlan, serviceBrokerName, osbClient, nil
 }
 
-func (c *controller) getClusterServiceClassAndClusterServiceBrokerForServiceBinding(instance *v1beta1.ServiceInstance, binding *v1beta1.ServiceBinding) (*v1beta1.ClusterServiceClass, string, osb.Client, error) {
+func (c *controller) getClusterServiceClassAndClusterServiceBrokerForServiceBinding(instance *v1.ServiceInstance, binding *v1.ServiceBinding) (*v1.ClusterServiceClass, string, osb.Client, error) {
 	serviceClass, err := c.getClusterServiceClassForServiceBinding(instance, binding)
 	if err != nil {
 		return nil, "", nil, err
@@ -574,7 +574,7 @@ func (c *controller) getClusterServiceClassAndClusterServiceBrokerForServiceBind
 	return serviceClass, serviceBroker.Name, osbClient, nil
 }
 
-func (c *controller) getClusterServiceClassForServiceBinding(instance *v1beta1.ServiceInstance, binding *v1beta1.ServiceBinding) (*v1beta1.ClusterServiceClass, error) {
+func (c *controller) getClusterServiceClassForServiceBinding(instance *v1.ServiceInstance, binding *v1.ServiceBinding) (*v1.ClusterServiceClass, error) {
 	pcb := pretty.NewInstanceContextBuilder(instance)
 	serviceClass, err := c.clusterServiceClassLister.Get(instance.Spec.ClusterServiceClassRef.Name)
 	if err != nil {
@@ -585,8 +585,8 @@ func (c *controller) getClusterServiceClassForServiceBinding(instance *v1beta1.S
 		klog.Warning(pcb.Message(s))
 		c.updateServiceBindingCondition(
 			binding,
-			v1beta1.ServiceBindingConditionReady,
-			v1beta1.ConditionFalse,
+			v1.ServiceBindingConditionReady,
+			v1.ConditionFalse,
 			errorNonexistentClusterServiceClassReason,
 			"The binding references a ClusterServiceClass that does not exist. "+s,
 		)
@@ -596,7 +596,7 @@ func (c *controller) getClusterServiceClassForServiceBinding(instance *v1beta1.S
 	return serviceClass, nil
 }
 
-func (c *controller) getClusterServicePlanForServiceBinding(instance *v1beta1.ServiceInstance, binding *v1beta1.ServiceBinding, serviceClass *v1beta1.ClusterServiceClass) (*v1beta1.ClusterServicePlan, error) {
+func (c *controller) getClusterServicePlanForServiceBinding(instance *v1.ServiceInstance, binding *v1.ServiceBinding, serviceClass *v1.ClusterServiceClass) (*v1.ClusterServicePlan, error) {
 	pcb := pretty.NewInstanceContextBuilder(instance)
 	servicePlan, err := c.clusterServicePlanLister.Get(instance.Spec.ClusterServicePlanRef.Name)
 	if nil != err {
@@ -607,8 +607,8 @@ func (c *controller) getClusterServicePlanForServiceBinding(instance *v1beta1.Se
 		klog.Warning(pcb.Message(s))
 		c.updateServiceBindingCondition(
 			binding,
-			v1beta1.ServiceBindingConditionReady,
-			v1beta1.ConditionFalse,
+			v1.ServiceBindingConditionReady,
+			v1.ConditionFalse,
 			errorNonexistentClusterServicePlanReason,
 			"The ServiceBinding references an ServiceInstance which references ClusterServicePlan that does not exist. "+s,
 		)
@@ -618,7 +618,7 @@ func (c *controller) getClusterServicePlanForServiceBinding(instance *v1beta1.Se
 	return servicePlan, nil
 }
 
-func (c *controller) getClusterServiceBrokerForServiceBinding(instance *v1beta1.ServiceInstance, binding *v1beta1.ServiceBinding, serviceClass *v1beta1.ClusterServiceClass) (*v1beta1.ClusterServiceBroker, error) {
+func (c *controller) getClusterServiceBrokerForServiceBinding(instance *v1.ServiceInstance, binding *v1.ServiceBinding, serviceClass *v1.ClusterServiceClass) (*v1.ClusterServiceBroker, error) {
 	pcb := pretty.NewInstanceContextBuilder(instance)
 
 	broker, err := c.clusterServiceBrokerLister.Get(serviceClass.Spec.ClusterServiceBrokerName)
@@ -627,8 +627,8 @@ func (c *controller) getClusterServiceBrokerForServiceBinding(instance *v1beta1.
 		klog.Warning(pcb.Message(s))
 		c.updateServiceBindingCondition(
 			binding,
-			v1beta1.ServiceBindingConditionReady,
-			v1beta1.ConditionFalse,
+			v1.ServiceBindingConditionReady,
+			v1.ConditionFalse,
 			errorNonexistentClusterServiceBrokerReason,
 			"The binding references a ClusterServiceBroker that does not exist. "+s,
 		)
@@ -638,7 +638,7 @@ func (c *controller) getClusterServiceBrokerForServiceBinding(instance *v1beta1.
 	return broker, nil
 }
 
-func (c *controller) getBrokerClientForServiceBinding(instance *v1beta1.ServiceInstance, binding *v1beta1.ServiceBinding) (osb.Client, error) {
+func (c *controller) getBrokerClientForServiceBinding(instance *v1.ServiceInstance, binding *v1.ServiceBinding) (osb.Client, error) {
 	var brokerClient osb.Client
 
 	if instance.Spec.ClusterServiceClassSpecified() {
@@ -680,7 +680,7 @@ func (c *controller) getBrokerClientForServiceBinding(instance *v1beta1.ServiceI
 // getAuthCredentialsFromClusterServiceBroker returns the auth credentials, if any, or
 // returns an error. If the AuthInfo field is nil, empty values are
 // returned.
-func (c *controller) getAuthCredentialsFromClusterServiceBroker(broker *v1beta1.ClusterServiceBroker) (*osb.AuthConfig, error) {
+func (c *controller) getAuthCredentialsFromClusterServiceBroker(broker *v1.ClusterServiceBroker) (*osb.AuthConfig, error) {
 	if broker.Spec.AuthInfo == nil {
 		return nil, nil
 	}
@@ -718,7 +718,7 @@ func (c *controller) getAuthCredentialsFromClusterServiceBroker(broker *v1beta1.
 
 // getAuthCredentialsFromServiceBroker returns the auth credentials, if any, or
 // returns an error. If the AuthInfo field is nil, empty values are returned.
-func (c *controller) getAuthCredentialsFromServiceBroker(broker *v1beta1.ServiceBroker) (*osb.AuthConfig, error) {
+func (c *controller) getAuthCredentialsFromServiceBroker(broker *v1.ServiceBroker) (*osb.AuthConfig, error) {
 	if broker.Spec.AuthInfo == nil {
 		return nil, nil
 	}
@@ -787,7 +787,7 @@ func getBearerConfig(secret *corev1.Secret) (*osb.BearerConfig, error) {
 // these through the restrictions provided. The ServiceClasses and
 // ServicePlans returned by this method are named in K8S with the OSB ID
 // filtered to adhere to K8S naming restrictions.
-func convertAndFilterCatalogToNamespacedTypes(namespace string, in *osb.CatalogResponse, restrictions *v1beta1.CatalogRestrictions, existingServiceClasses map[string]*v1beta1.ServiceClass, existingServicePlans map[string]*v1beta1.ServicePlan) ([]*v1beta1.ServiceClass, []*v1beta1.ServicePlan, error) {
+func convertAndFilterCatalogToNamespacedTypes(namespace string, in *osb.CatalogResponse, restrictions *v1.CatalogRestrictions, existingServiceClasses map[string]*v1.ServiceClass, existingServicePlans map[string]*v1.ServicePlan) ([]*v1.ServiceClass, []*v1.ServicePlan, error) {
 	var predicate filter.Predicate
 	var err error
 	if restrictions != nil && len(restrictions.ServiceClass) > 0 {
@@ -799,12 +799,12 @@ func convertAndFilterCatalogToNamespacedTypes(namespace string, in *osb.CatalogR
 		predicate = filter.NewPredicate()
 	}
 
-	serviceClasses := []*v1beta1.ServiceClass(nil)
-	servicePlans := []*v1beta1.ServicePlan(nil)
+	serviceClasses := []*v1.ServiceClass(nil)
+	servicePlans := []*v1.ServicePlan(nil)
 	for _, svc := range in.Services {
-		serviceClass := &v1beta1.ServiceClass{
-			Spec: v1beta1.ServiceClassSpec{
-				CommonServiceClassSpec: v1beta1.CommonServiceClassSpec{
+		serviceClass := &v1.ServiceClass{
+			Spec: v1.ServiceClassSpec{
+				CommonServiceClassSpec: v1.CommonServiceClassSpec{
 					Bindable:      svc.Bindable,
 					PlanUpdatable: svc.PlanUpdatable != nil && *svc.PlanUpdatable,
 					ExternalID:    svc.ID,
@@ -839,7 +839,7 @@ func convertAndFilterCatalogToNamespacedTypes(namespace string, in *osb.CatalogR
 		serviceClass.SetNamespace(namespace)
 
 		// If this service class passes the predicate, process the plans for the class.
-		if fields := v1beta1.ConvertServiceClassToProperties(serviceClass); predicate.Accepts(fields) {
+		if fields := v1.ConvertServiceClassToProperties(serviceClass); predicate.Accepts(fields) {
 			// set up the plans using the ServiceClass Name
 			plans, err := convertServicePlans(namespace, svc.Plans, serviceClass.Name, existingServicePlans)
 			if err != nil {
@@ -917,7 +917,7 @@ func GenerateEscapedName(externalID string) string {
 // ClusterServiceClasses and an array of ClusterServicePlans and filters these
 // through the restrictions provided. The ClusterServiceClasses and
 // ClusterServicePlans returned by this method are named in K8S with the OSB ID.
-func convertAndFilterCatalog(in *osb.CatalogResponse, restrictions *v1beta1.CatalogRestrictions, existingServiceClasses map[string]*v1beta1.ClusterServiceClass, existingServicePlans map[string]*v1beta1.ClusterServicePlan) ([]*v1beta1.ClusterServiceClass, []*v1beta1.ClusterServicePlan, error) {
+func convertAndFilterCatalog(in *osb.CatalogResponse, restrictions *v1.CatalogRestrictions, existingServiceClasses map[string]*v1.ClusterServiceClass, existingServicePlans map[string]*v1.ClusterServicePlan) ([]*v1.ClusterServiceClass, []*v1.ClusterServicePlan, error) {
 	var predicate filter.Predicate
 	var err error
 	if restrictions != nil && len(restrictions.ServiceClass) > 0 {
@@ -929,12 +929,12 @@ func convertAndFilterCatalog(in *osb.CatalogResponse, restrictions *v1beta1.Cata
 		predicate = filter.NewPredicate()
 	}
 
-	serviceClasses := []*v1beta1.ClusterServiceClass(nil)
-	servicePlans := []*v1beta1.ClusterServicePlan(nil)
+	serviceClasses := []*v1.ClusterServiceClass(nil)
+	servicePlans := []*v1.ClusterServicePlan(nil)
 	for _, svc := range in.Services {
-		serviceClass := &v1beta1.ClusterServiceClass{
-			Spec: v1beta1.ClusterServiceClassSpec{
-				CommonServiceClassSpec: v1beta1.CommonServiceClassSpec{
+		serviceClass := &v1.ClusterServiceClass{
+			Spec: v1.ClusterServiceClassSpec{
+				CommonServiceClassSpec: v1.CommonServiceClassSpec{
 					Bindable:      svc.Bindable,
 					PlanUpdatable: svc.PlanUpdatable != nil && *svc.PlanUpdatable,
 					ExternalID:    svc.ID,
@@ -968,7 +968,7 @@ func convertAndFilterCatalog(in *osb.CatalogResponse, restrictions *v1beta1.Cata
 		}
 
 		// If this service class passes the predicate, process the plans for the class.
-		if fields := v1beta1.ConvertClusterServiceClassToProperties(serviceClass); predicate.Accepts(fields) {
+		if fields := v1.ConvertClusterServiceClassToProperties(serviceClass); predicate.Accepts(fields) {
 			// set up the plans using the ClusterServiceClass Name
 			plans, err := convertClusterServicePlans(svc.Plans, serviceClass.Name, existingServicePlans)
 			if err != nil {
@@ -990,7 +990,7 @@ func convertAndFilterCatalog(in *osb.CatalogResponse, restrictions *v1beta1.Cata
 	return serviceClasses, servicePlans, nil
 }
 
-func filterNamespacedServicePlans(restrictions *v1beta1.CatalogRestrictions, servicePlans []*v1beta1.ServicePlan) ([]*v1beta1.ServicePlan, []*v1beta1.ServicePlan, error) {
+func filterNamespacedServicePlans(restrictions *v1.CatalogRestrictions, servicePlans []*v1.ServicePlan) ([]*v1.ServicePlan, []*v1.ServicePlan, error) {
 	var predicate filter.Predicate
 	var err error
 	if restrictions != nil && len(restrictions.ServicePlan) > 0 {
@@ -1004,13 +1004,13 @@ func filterNamespacedServicePlans(restrictions *v1beta1.CatalogRestrictions, ser
 
 	// If the predicate is empty, all plans will pass. No need to run through the list.
 	if predicate.Empty() {
-		return servicePlans, []*v1beta1.ServicePlan(nil), nil
+		return servicePlans, []*v1.ServicePlan(nil), nil
 	}
 
-	accepted := []*v1beta1.ServicePlan(nil)
-	rejected := []*v1beta1.ServicePlan(nil)
+	accepted := []*v1.ServicePlan(nil)
+	rejected := []*v1.ServicePlan(nil)
 	for _, sp := range servicePlans {
-		fields := v1beta1.ConvertServicePlanToProperties(sp)
+		fields := v1.ConvertServicePlanToProperties(sp)
 		if predicate.Accepts(fields) {
 			accepted = append(accepted, sp)
 		} else {
@@ -1021,7 +1021,7 @@ func filterNamespacedServicePlans(restrictions *v1beta1.CatalogRestrictions, ser
 	return accepted, rejected, nil
 }
 
-func filterServicePlans(restrictions *v1beta1.CatalogRestrictions, servicePlans []*v1beta1.ClusterServicePlan) ([]*v1beta1.ClusterServicePlan, []*v1beta1.ClusterServicePlan, error) {
+func filterServicePlans(restrictions *v1.CatalogRestrictions, servicePlans []*v1.ClusterServicePlan) ([]*v1.ClusterServicePlan, []*v1.ClusterServicePlan, error) {
 	var predicate filter.Predicate
 	var err error
 	if restrictions != nil && len(restrictions.ServicePlan) > 0 {
@@ -1035,13 +1035,13 @@ func filterServicePlans(restrictions *v1beta1.CatalogRestrictions, servicePlans 
 
 	// If the predicate is empty, all plans will pass. No need to run through the list.
 	if predicate.Empty() {
-		return servicePlans, []*v1beta1.ClusterServicePlan(nil), nil
+		return servicePlans, []*v1.ClusterServicePlan(nil), nil
 	}
 
-	accepted := []*v1beta1.ClusterServicePlan(nil)
-	rejected := []*v1beta1.ClusterServicePlan(nil)
+	accepted := []*v1.ClusterServicePlan(nil)
+	rejected := []*v1.ClusterServicePlan(nil)
 	for _, sp := range servicePlans {
-		fields := v1beta1.ConvertClusterServicePlanToProperties(sp)
+		fields := v1.ConvertClusterServicePlanToProperties(sp)
 		if predicate.Accepts(fields) {
 			accepted = append(accepted, sp)
 		} else {
@@ -1052,21 +1052,21 @@ func filterServicePlans(restrictions *v1beta1.CatalogRestrictions, servicePlans 
 	return accepted, rejected, nil
 }
 
-func convertServicePlans(namespace string, plans []osb.Plan, serviceClassID string, existingServicePlans map[string]*v1beta1.ServicePlan) ([]*v1beta1.ServicePlan, error) {
+func convertServicePlans(namespace string, plans []osb.Plan, serviceClassID string, existingServicePlans map[string]*v1.ServicePlan) ([]*v1.ServicePlan, error) {
 	if 0 == len(plans) {
 		return nil, fmt.Errorf("ServiceClass (K8S: %q) must have at least one plan", serviceClassID)
 	}
-	servicePlans := make([]*v1beta1.ServicePlan, len(plans))
+	servicePlans := make([]*v1.ServicePlan, len(plans))
 	for i, plan := range plans {
-		servicePlan := &v1beta1.ServicePlan{
-			Spec: v1beta1.ServicePlanSpec{
-				CommonServicePlanSpec: v1beta1.CommonServicePlanSpec{
+		servicePlan := &v1.ServicePlan{
+			Spec: v1.ServicePlanSpec{
+				CommonServicePlanSpec: v1.CommonServicePlanSpec{
 					ExternalName: plan.Name,
 					ExternalID:   plan.ID,
 					Free:         plan.Free != nil && *plan.Free,
 					Description:  plan.Description,
 				},
-				ServiceClassRef: v1beta1.LocalObjectReference{Name: serviceClassID},
+				ServiceClassRef: v1.LocalObjectReference{Name: serviceClassID},
 			},
 		}
 		servicePlans[i] = servicePlan
@@ -1087,7 +1087,7 @@ func convertServicePlans(namespace string, plans []osb.Plan, serviceClassID stri
 	return servicePlans, nil
 }
 
-func convertCommonServicePlan(plan osb.Plan, commonServicePlanSpec *v1beta1.CommonServicePlanSpec) error {
+func convertCommonServicePlan(plan osb.Plan, commonServicePlanSpec *v1.CommonServicePlanSpec) error {
 	if plan.Bindable != nil {
 		b := plan.Bindable
 		commonServicePlanSpec.Bindable = b
@@ -1141,21 +1141,21 @@ func convertCommonServicePlan(plan osb.Plan, commonServicePlanSpec *v1beta1.Comm
 	return nil
 }
 
-func convertClusterServicePlans(plans []osb.Plan, serviceClassID string, existingServicePlans map[string]*v1beta1.ClusterServicePlan) ([]*v1beta1.ClusterServicePlan, error) {
+func convertClusterServicePlans(plans []osb.Plan, serviceClassID string, existingServicePlans map[string]*v1.ClusterServicePlan) ([]*v1.ClusterServicePlan, error) {
 	if 0 == len(plans) {
 		return nil, fmt.Errorf("ClusterServiceClass (K8S: %q) must have at least one plan", serviceClassID)
 	}
-	servicePlans := make([]*v1beta1.ClusterServicePlan, len(plans))
+	servicePlans := make([]*v1.ClusterServicePlan, len(plans))
 	for i, plan := range plans {
-		servicePlans[i] = &v1beta1.ClusterServicePlan{
-			Spec: v1beta1.ClusterServicePlanSpec{
-				CommonServicePlanSpec: v1beta1.CommonServicePlanSpec{
+		servicePlans[i] = &v1.ClusterServicePlan{
+			Spec: v1.ClusterServicePlanSpec{
+				CommonServicePlanSpec: v1.CommonServicePlanSpec{
 					ExternalName: plan.Name,
 					ExternalID:   plan.ID,
 					Free:         plan.Free != nil && *plan.Free,
 					Description:  plan.Description,
 				},
-				ClusterServiceClassRef: v1beta1.ClusterObjectReference{Name: serviceClassID},
+				ClusterServiceClassRef: v1.ClusterObjectReference{Name: serviceClassID},
 			},
 		}
 		// need to check for pre-existing legacy names from
@@ -1222,10 +1222,10 @@ func convertClusterServicePlans(plans []osb.Plan, serviceClassID string, existin
 
 // isServiceInstanceConditionTrue returns whether the given instance has a given condition
 // with status true.
-func isServiceInstanceConditionTrue(instance *v1beta1.ServiceInstance, conditionType v1beta1.ServiceInstanceConditionType) bool {
+func isServiceInstanceConditionTrue(instance *v1.ServiceInstance, conditionType v1.ServiceInstanceConditionType) bool {
 	for _, cond := range instance.Status.Conditions {
 		if cond.Type == conditionType {
-			return cond.Status == v1beta1.ConditionTrue
+			return cond.Status == v1.ConditionTrue
 		}
 	}
 
@@ -1234,25 +1234,25 @@ func isServiceInstanceConditionTrue(instance *v1beta1.ServiceInstance, condition
 
 // isServiceInstanceReady returns whether the given instance has a ready condition
 // with status true.
-func isServiceInstanceReady(instance *v1beta1.ServiceInstance) bool {
-	return isServiceInstanceConditionTrue(instance, v1beta1.ServiceInstanceConditionReady)
+func isServiceInstanceReady(instance *v1.ServiceInstance) bool {
+	return isServiceInstanceConditionTrue(instance, v1.ServiceInstanceConditionReady)
 }
 
 // isServiceInstanceFailed returns whether the instance has a failed condition with
 // status true.
-func isServiceInstanceFailed(instance *v1beta1.ServiceInstance) bool {
-	return isServiceInstanceConditionTrue(instance, v1beta1.ServiceInstanceConditionFailed)
+func isServiceInstanceFailed(instance *v1.ServiceInstance) bool {
+	return isServiceInstanceConditionTrue(instance, v1.ServiceInstanceConditionFailed)
 }
 
 // isServiceInstanceOrphanMitigation returns whether the given instance has an
 // orphan mitigation condition with status true.
-func isServiceInstanceOrphanMitigation(instance *v1beta1.ServiceInstance) bool {
-	return isServiceInstanceConditionTrue(instance, v1beta1.ServiceInstanceConditionOrphanMitigation)
+func isServiceInstanceOrphanMitigation(instance *v1.ServiceInstance) bool {
+	return isServiceInstanceConditionTrue(instance, v1.ServiceInstanceConditionOrphanMitigation)
 }
 
 // NewClientConfigurationForBroker creates a new ClientConfiguration for connecting
 // to the specified Broker
-func NewClientConfigurationForBroker(meta metav1.ObjectMeta, commonSpec *v1beta1.CommonServiceBrokerSpec, authConfig *osb.AuthConfig, osbAPITimeOut time.Duration) *osb.ClientConfiguration {
+func NewClientConfigurationForBroker(meta metav1.ObjectMeta, commonSpec *v1.CommonServiceBrokerSpec, authConfig *osb.AuthConfig, osbAPITimeOut time.Duration) *osb.ClientConfiguration {
 	clientConfig := osb.DefaultClientConfiguration()
 	clientConfig.Name = meta.Name
 	clientConfig.URL = commonSpec.URL
@@ -1332,7 +1332,7 @@ func (c *controller) setClusterID(id string) {
 // done to validate service plan, service class exist, and handles creating
 // a brokerclient to use for a given ServiceInstance.
 // Sets ServiceClassRef and/or ServicePlanRef if they haven't been already set.
-func (c *controller) getServiceClassPlanAndServiceBrokerForServiceBinding(instance *v1beta1.ServiceInstance, binding *v1beta1.ServiceBinding) (*v1beta1.ServiceClass, *v1beta1.ServicePlan, string, osb.Client, error) {
+func (c *controller) getServiceClassPlanAndServiceBrokerForServiceBinding(instance *v1.ServiceInstance, binding *v1.ServiceBinding) (*v1.ServiceClass, *v1.ServicePlan, string, osb.Client, error) {
 	serviceClass, serviceBrokerName, osbClient, err := c.getServiceClassAndServiceBrokerForServiceBinding(instance, binding)
 	if err != nil {
 		return nil, nil, "", nil, err
@@ -1345,7 +1345,7 @@ func (c *controller) getServiceClassPlanAndServiceBrokerForServiceBinding(instan
 	return serviceClass, servicePlan, serviceBrokerName, osbClient, nil
 }
 
-func (c *controller) getServiceClassAndServiceBrokerForServiceBinding(instance *v1beta1.ServiceInstance, binding *v1beta1.ServiceBinding) (*v1beta1.ServiceClass, string, osb.Client, error) {
+func (c *controller) getServiceClassAndServiceBrokerForServiceBinding(instance *v1.ServiceInstance, binding *v1.ServiceBinding) (*v1.ServiceClass, string, osb.Client, error) {
 	serviceClass, err := c.getServiceClassForServiceBinding(instance, binding)
 	if err != nil {
 		return nil, "", nil, err
@@ -1364,7 +1364,7 @@ func (c *controller) getServiceClassAndServiceBrokerForServiceBinding(instance *
 	return serviceClass, serviceBroker.Name, osbClient, nil
 }
 
-func (c *controller) getServiceClassForServiceBinding(instance *v1beta1.ServiceInstance, binding *v1beta1.ServiceBinding) (*v1beta1.ServiceClass, error) {
+func (c *controller) getServiceClassForServiceBinding(instance *v1.ServiceInstance, binding *v1.ServiceBinding) (*v1.ServiceClass, error) {
 	pcb := pretty.NewInstanceContextBuilder(instance)
 	serviceClass, err := c.serviceClassLister.ServiceClasses(instance.Namespace).Get(instance.Spec.ServiceClassRef.Name)
 	if err != nil {
@@ -1375,8 +1375,8 @@ func (c *controller) getServiceClassForServiceBinding(instance *v1beta1.ServiceI
 		klog.Warning(pcb.Message(s))
 		c.updateServiceBindingCondition(
 			binding,
-			v1beta1.ServiceBindingConditionReady,
-			v1beta1.ConditionFalse,
+			v1.ServiceBindingConditionReady,
+			v1.ConditionFalse,
 			errorNonexistentClusterServiceClassReason,
 			"The binding references a ServiceClass that does not exist. "+s,
 		)
@@ -1386,7 +1386,7 @@ func (c *controller) getServiceClassForServiceBinding(instance *v1beta1.ServiceI
 	return serviceClass, nil
 }
 
-func (c *controller) getServicePlanForServiceBinding(instance *v1beta1.ServiceInstance, binding *v1beta1.ServiceBinding, serviceClass *v1beta1.ServiceClass) (*v1beta1.ServicePlan, error) {
+func (c *controller) getServicePlanForServiceBinding(instance *v1.ServiceInstance, binding *v1.ServiceBinding, serviceClass *v1.ServiceClass) (*v1.ServicePlan, error) {
 	pcb := pretty.NewInstanceContextBuilder(instance)
 	servicePlan, err := c.servicePlanLister.ServicePlans(instance.Namespace).Get(instance.Spec.ServicePlanRef.Name)
 	if nil != err {
@@ -1397,8 +1397,8 @@ func (c *controller) getServicePlanForServiceBinding(instance *v1beta1.ServiceIn
 		klog.Warning(pcb.Message(s))
 		c.updateServiceBindingCondition(
 			binding,
-			v1beta1.ServiceBindingConditionReady,
-			v1beta1.ConditionFalse,
+			v1.ServiceBindingConditionReady,
+			v1.ConditionFalse,
 			errorNonexistentClusterServicePlanReason,
 			"The ServiceBinding references an ServiceInstance which references ServicePlan that does not exist. "+s,
 		)
@@ -1408,7 +1408,7 @@ func (c *controller) getServicePlanForServiceBinding(instance *v1beta1.ServiceIn
 	return servicePlan, nil
 }
 
-func (c *controller) getServiceBrokerForServiceBinding(instance *v1beta1.ServiceInstance, binding *v1beta1.ServiceBinding, serviceClass *v1beta1.ServiceClass) (*v1beta1.ServiceBroker, error) {
+func (c *controller) getServiceBrokerForServiceBinding(instance *v1.ServiceInstance, binding *v1.ServiceBinding, serviceClass *v1.ServiceClass) (*v1.ServiceBroker, error) {
 	pcb := pretty.NewInstanceContextBuilder(instance)
 
 	broker, err := c.serviceBrokerLister.ServiceBrokers(instance.Namespace).Get(serviceClass.Spec.ServiceBrokerName)
@@ -1417,8 +1417,8 @@ func (c *controller) getServiceBrokerForServiceBinding(instance *v1beta1.Service
 		klog.Warning(pcb.Message(s))
 		c.updateServiceBindingCondition(
 			binding,
-			v1beta1.ServiceBindingConditionReady,
-			v1beta1.ConditionFalse,
+			v1.ServiceBindingConditionReady,
+			v1.ConditionFalse,
 			errorNonexistentClusterServiceBrokerReason,
 			"The binding references a ServiceBroker that does not exist. "+s,
 		)
@@ -1432,7 +1432,7 @@ func (c *controller) getServiceBrokerForServiceBinding(instance *v1beta1.Service
 // returns true unless the broker has a ready condition with status true and
 // the controller's broker relist interval has not elapsed since the broker's
 // ready condition became true, or if the broker's RelistBehavior is set to Manual.
-func shouldReconcileServiceBrokerCommon(pcb *pretty.ContextBuilder, brokerMeta *metav1.ObjectMeta, brokerSpec *v1beta1.CommonServiceBrokerSpec, brokerStatus *v1beta1.CommonServiceBrokerStatus, now time.Time, defaultRelistInterval time.Duration) bool {
+func shouldReconcileServiceBrokerCommon(pcb *pretty.ContextBuilder, brokerMeta *metav1.ObjectMeta, brokerSpec *v1.CommonServiceBrokerSpec, brokerStatus *v1.CommonServiceBrokerStatus, now time.Time, defaultRelistInterval time.Duration) bool {
 	if brokerStatus.ReconciledGeneration != brokerMeta.Generation {
 		// If the spec has changed, we should reconcile the broker.
 		return true
@@ -1445,14 +1445,14 @@ func shouldReconcileServiceBrokerCommon(pcb *pretty.ContextBuilder, brokerMeta *
 
 	// find the ready condition in the broker's status
 	for _, condition := range brokerStatus.Conditions {
-		if condition.Type == v1beta1.ServiceBrokerConditionReady {
+		if condition.Type == v1.ServiceBrokerConditionReady {
 			// The broker has a ready condition
 
-			if condition.Status == v1beta1.ConditionTrue {
+			if condition.Status == v1.ConditionTrue {
 
 				// The broker's ready condition has status true, meaning that
 				// at some point, we successfully listed the broker's catalog.
-				if brokerSpec.RelistBehavior == v1beta1.ServiceBrokerRelistBehaviorManual {
+				if brokerSpec.RelistBehavior == v1.ServiceBrokerRelistBehaviorManual {
 					// If a broker is configured with RelistBehaviorManual, it should
 					// ignore the Duration and only relist based on spec changes
 

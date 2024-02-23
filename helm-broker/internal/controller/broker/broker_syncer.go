@@ -5,7 +5,7 @@ import (
 
 	"context"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	apiErrors "k8s.io/apimachinery/pkg/api/errors"
@@ -34,7 +34,7 @@ const maxSyncRetries = 5
 func (r *Syncer) Sync() error {
 	r.log.Infof("- syncing ServiceBroker %s/%s", NamespacedBrokerName, r.namespace)
 	for i := 0; i < maxSyncRetries; i++ {
-		broker := &v1beta1.ServiceBroker{}
+		broker := &v1.ServiceBroker{}
 		err := r.client.Get(context.Background(), types.NamespacedName{Name: NamespacedBrokerName, Namespace: r.namespace}, broker)
 		switch {
 		case apiErrors.IsNotFound(err):

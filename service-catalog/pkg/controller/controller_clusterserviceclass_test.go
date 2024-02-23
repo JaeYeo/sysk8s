@@ -26,13 +26,13 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgotesting "k8s.io/client-go/testing"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/util"
 	"github.com/kubernetes-sigs/service-catalog/test/fake"
 )
 
 func TestReconcileClusterServiceClassRemovedFromCatalog(t *testing.T) {
-	getRemovedServiceClass := func() *v1beta1.ClusterServiceClass {
+	getRemovedServiceClass := func() *v1.ClusterServiceClass {
 		p := getTestClusterServiceClass()
 		p.Status.RemovedFromBrokerCatalog = true
 		return p
@@ -40,8 +40,8 @@ func TestReconcileClusterServiceClassRemovedFromCatalog(t *testing.T) {
 
 	cases := []struct {
 		name                    string
-		serviceClass            *v1beta1.ClusterServiceClass
-		instances               []v1beta1.ServiceInstance
+		serviceClass            *v1.ClusterServiceClass
+		instances               []v1.ServiceInstance
 		catalogClientPrepFunc   func(*fake.Clientset)
 		shouldError             bool
 		errText                 *string
@@ -55,18 +55,18 @@ func TestReconcileClusterServiceClassRemovedFromCatalog(t *testing.T) {
 		{
 			name:         "removed from catalog, instances left",
 			serviceClass: getRemovedServiceClass(),
-			instances:    []v1beta1.ServiceInstance{*getTestServiceInstance()},
+			instances:    []v1.ServiceInstance{*getTestServiceInstance()},
 			shouldError:  false,
 			catalogActionsCheckFunc: func(t *testing.T, actions []clientgotesting.Action) {
 				listRestrictions := clientgotesting.ListRestrictions{
 					Labels: labels.SelectorFromSet(labels.Set{
-						v1beta1.GroupName + "/" + v1beta1.FilterSpecClusterServiceClassRefName: util.GenerateSHA("cscguid"),
+						v1.GroupName + "/" + v1.FilterSpecClusterServiceClassRefName: util.GenerateSHA("cscguid"),
 					}),
 					Fields: fields.Everything(),
 				}
 
 				assertNumberOfActions(t, actions, 1)
-				assertList(t, actions[0], &v1beta1.ServiceInstance{}, listRestrictions)
+				assertList(t, actions[0], &v1.ServiceInstance{}, listRestrictions)
 			},
 		},
 		{
@@ -77,13 +77,13 @@ func TestReconcileClusterServiceClassRemovedFromCatalog(t *testing.T) {
 			catalogActionsCheckFunc: func(t *testing.T, actions []clientgotesting.Action) {
 				listRestrictions := clientgotesting.ListRestrictions{
 					Labels: labels.SelectorFromSet(labels.Set{
-						v1beta1.GroupName + "/" + v1beta1.FilterSpecClusterServiceClassRefName: util.GenerateSHA("cscguid"),
+						v1.GroupName + "/" + v1.FilterSpecClusterServiceClassRefName: util.GenerateSHA("cscguid"),
 					}),
 					Fields: fields.Everything(),
 				}
 
 				assertNumberOfActions(t, actions, 2)
-				assertList(t, actions[0], &v1beta1.ServiceInstance{}, listRestrictions)
+				assertList(t, actions[0], &v1.ServiceInstance{}, listRestrictions)
 				assertDelete(t, actions[1], getRemovedServiceClass())
 			},
 		},
@@ -101,13 +101,13 @@ func TestReconcileClusterServiceClassRemovedFromCatalog(t *testing.T) {
 			catalogActionsCheckFunc: func(t *testing.T, actions []clientgotesting.Action) {
 				listRestrictions := clientgotesting.ListRestrictions{
 					Labels: labels.SelectorFromSet(labels.Set{
-						v1beta1.GroupName + "/" + v1beta1.FilterSpecClusterServiceClassRefName: util.GenerateSHA("cscguid"),
+						v1.GroupName + "/" + v1.FilterSpecClusterServiceClassRefName: util.GenerateSHA("cscguid"),
 					}),
 					Fields: fields.Everything(),
 				}
 
 				assertNumberOfActions(t, actions, 2)
-				assertList(t, actions[0], &v1beta1.ServiceInstance{}, listRestrictions)
+				assertList(t, actions[0], &v1.ServiceInstance{}, listRestrictions)
 				assertDelete(t, actions[1], getRemovedServiceClass())
 			},
 		},
@@ -118,7 +118,7 @@ func TestReconcileClusterServiceClassRemovedFromCatalog(t *testing.T) {
 			_, fakeCatalogClient, _, testController, _ := newTestController(t, noFakeActions())
 
 			fakeCatalogClient.AddReactor("list", "serviceinstances", func(action clientgotesting.Action) (bool, runtime.Object, error) {
-				return true, &v1beta1.ServiceInstanceList{Items: tc.instances}, nil
+				return true, &v1.ServiceInstanceList{Items: tc.instances}, nil
 			})
 
 			if tc.catalogClientPrepFunc != nil {
@@ -145,7 +145,7 @@ func TestReconcileClusterServiceClassRemovedFromCatalog(t *testing.T) {
 	}
 }
 
-func reconcileClusterServiceClass(t *testing.T, testController *controller, clusterServiceClass *v1beta1.ClusterServiceClass) error {
+func reconcileClusterServiceClass(t *testing.T, testController *controller, clusterServiceClass *v1.ClusterServiceClass) error {
 	clone := clusterServiceClass.DeepCopy()
 	err := testController.reconcileClusterServiceClass(clusterServiceClass)
 	if !reflect.DeepEqual(clusterServiceClass, clone) {

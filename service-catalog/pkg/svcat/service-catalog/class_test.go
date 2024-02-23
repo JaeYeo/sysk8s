@@ -20,7 +20,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/fake"
 	"github.com/kubernetes-sigs/service-catalog/pkg/util"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -38,54 +38,54 @@ var _ = Describe("Class", func() {
 	var (
 		sdk          *SDK
 		svcCatClient *fake.Clientset
-		csc          *v1beta1.ClusterServiceClass
-		csc2         *v1beta1.ClusterServiceClass
-		sc           *v1beta1.ServiceClass
-		sc2          *v1beta1.ServiceClass
+		csc          *v1.ClusterServiceClass
+		csc2         *v1.ClusterServiceClass
+		sc           *v1.ServiceClass
+		sc2          *v1.ServiceClass
 	)
 
 	BeforeEach(func() {
-		csc = &v1beta1.ClusterServiceClass{
+		csc = &v1.ClusterServiceClass{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "foobar", ResourceVersion: "1",
 				Labels: map[string]string{
-					v1beta1.GroupName + "/" + v1beta1.FilterSpecExternalName: util.GenerateSHA("foobar"),
+					v1.GroupName + "/" + v1.FilterSpecExternalName: util.GenerateSHA("foobar"),
 				},
 			},
-			Spec: v1beta1.ClusterServiceClassSpec{
+			Spec: v1.ClusterServiceClassSpec{
 				ClusterServiceBrokerName: "mysql-broker",
 			},
 		}
-		csc2 = &v1beta1.ClusterServiceClass{
+		csc2 = &v1.ClusterServiceClass{
 			ObjectMeta: metav1.ObjectMeta{Name: "barbaz", ResourceVersion: "1",
 				Labels: map[string]string{
-					v1beta1.GroupName + "/" + v1beta1.FilterSpecExternalName: util.GenerateSHA("barbaz"),
+					v1.GroupName + "/" + v1.FilterSpecExternalName: util.GenerateSHA("barbaz"),
 				},
 			},
-			Spec: v1beta1.ClusterServiceClassSpec{
+			Spec: v1.ClusterServiceClassSpec{
 				ClusterServiceBrokerName: "not-mysql-broker",
 			},
 		}
 
-		sc = &v1beta1.ServiceClass{
+		sc = &v1.ServiceClass{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "foobar", Namespace: "default", ResourceVersion: "1",
 				Labels: map[string]string{
-					v1beta1.GroupName + "/" + v1beta1.FilterSpecExternalName: util.GenerateSHA("foobar"),
+					v1.GroupName + "/" + v1.FilterSpecExternalName: util.GenerateSHA("foobar"),
 				},
 			},
-			Spec: v1beta1.ServiceClassSpec{
+			Spec: v1.ServiceClassSpec{
 				ServiceBrokerName: "mysql-broker",
 			},
 		}
-		sc2 = &v1beta1.ServiceClass{
+		sc2 = &v1.ServiceClass{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "barbaz", Namespace: "ns2", ResourceVersion: "1",
 				Labels: map[string]string{
-					v1beta1.GroupName + "/" + v1beta1.FilterSpecExternalName: util.GenerateSHA("barbaz"),
+					v1.GroupName + "/" + v1.FilterSpecExternalName: util.GenerateSHA("barbaz"),
 				},
 			},
-			Spec: v1beta1.ServiceClassSpec{
+			Spec: v1.ServiceClassSpec{
 				ServiceBrokerName: "no-mysql-broker",
 			},
 		}
@@ -96,7 +96,7 @@ var _ = Describe("Class", func() {
 	})
 
 	Describe("RetrieveClasses", func() {
-		It("Calls the generated v1beta1 List methods", func() {
+		It("Calls the generated v1 List methods", func() {
 			classes, err := sdk.RetrieveClasses(ScopeOptions{Scope: AllScope}, "")
 
 			Expect(err).NotTo(HaveOccurred())
@@ -147,7 +147,7 @@ var _ = Describe("Class", func() {
 		})
 	})
 	Describe("RetrieveClassByName", func() {
-		It("Calls the generated v1beta1 List method with the passed in class name", func() {
+		It("Calls the generated v1 List method with the passed in class name", func() {
 			className := csc.Name
 			realClient := fake.NewSimpleClientset(csc)
 			sdk = &SDK{
@@ -192,7 +192,7 @@ var _ = Describe("Class", func() {
 		})
 	})
 	Describe("RetrieveClassByID", func() {
-		It("Calls the generated v1beta1 get methods for clusterserviceclass and serviceclass with the passed in name", func() {
+		It("Calls the generated v1 get methods for clusterserviceclass and serviceclass with the passed in name", func() {
 			classID := csc.Name
 			realClient := fake.NewSimpleClientset(csc)
 			sdk = &SDK{
@@ -212,7 +212,7 @@ var _ = Describe("Class", func() {
 			Expect(actions[1].Matches("get", "serviceclasses")).To(BeTrue())
 			Expect(actions[1].(testing.GetActionImpl).Name).To(Equal(classID))
 		})
-		It("Calls only the generated v1beta1 get method for clusterserviceclass when called with cluster scope", func() {
+		It("Calls only the generated v1 get method for clusterserviceclass when called with cluster scope", func() {
 			classID := csc.Name
 			realClient := fake.NewSimpleClientset(csc)
 			sdk = &SDK{
@@ -230,7 +230,7 @@ var _ = Describe("Class", func() {
 			Expect(actions[0].Matches("get", "clusterserviceclasses")).To(BeTrue())
 			Expect(actions[0].(testing.GetActionImpl).Name).To(Equal(classID))
 		})
-		It("Calls only the generated v1beta1 get method for serviceclass when called with namespace scope", func() {
+		It("Calls only the generated v1 get method for serviceclass when called with namespace scope", func() {
 			classID := sc.Name
 			realClient := fake.NewSimpleClientset(sc)
 			sdk = &SDK{
@@ -294,7 +294,7 @@ var _ = Describe("Class", func() {
 			classID := sc.Name
 			realClient := fake.NewSimpleClientset(sc)
 			realClient.PrependReactor("get", "clusterserviceclasses", func(action testing.Action) (bool, runtime.Object, error) {
-				return true, nil, apierrors.NewNotFound(v1beta1.Resource("clusterserviceclass"), classID)
+				return true, nil, apierrors.NewNotFound(v1.Resource("clusterserviceclass"), classID)
 			})
 			sdk = &SDK{
 				ServiceCatalogClient: realClient,
@@ -317,10 +317,10 @@ var _ = Describe("Class", func() {
 			classID := sc.Name
 			realClient := fake.NewSimpleClientset()
 			realClient.PrependReactor("get", "clusterserviceclasses", func(action testing.Action) (bool, runtime.Object, error) {
-				return true, nil, apierrors.NewNotFound(v1beta1.Resource("clusterserviceclass"), classID)
+				return true, nil, apierrors.NewNotFound(v1.Resource("clusterserviceclass"), classID)
 			})
 			realClient.PrependReactor("get", "serviceclasses", func(action testing.Action) (bool, runtime.Object, error) {
-				return true, nil, apierrors.NewNotFound(v1beta1.Resource("clusterserviceclass"), classID)
+				return true, nil, apierrors.NewNotFound(v1.Resource("clusterserviceclass"), classID)
 			})
 			sdk = &SDK{
 				ServiceCatalogClient: realClient,
@@ -342,13 +342,13 @@ var _ = Describe("Class", func() {
 		})
 	})
 	Describe("RetrieveClassByPlan", func() {
-		It("Calls the generated v1beta1 get method for ClusterServiceClasses with the plan's parent service class's name if the plan is a ClusterServicePlan", func() {
-			classPlan := &v1beta1.ClusterServicePlan{
+		It("Calls the generated v1 get method for ClusterServiceClasses with the plan's parent service class's name if the plan is a ClusterServicePlan", func() {
+			classPlan := &v1.ClusterServicePlan{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: "foobar_plan",
 				},
-				Spec: v1beta1.ClusterServicePlanSpec{
-					ClusterServiceClassRef: v1beta1.ClusterObjectReference{
+				Spec: v1.ClusterServicePlanSpec{
+					ClusterServiceClassRef: v1.ClusterObjectReference{
 						Name: csc.Name,
 					},
 				},
@@ -365,16 +365,16 @@ var _ = Describe("Class", func() {
 			Expect(actions[0].Matches("get", "clusterserviceclasses")).To(BeTrue())
 			Expect(actions[0].(testing.GetActionImpl).Name).To(Equal(csc.Name))
 		})
-		It("Bubbles up errors from the v1beta1 ClusterServiceClass method", func() {
+		It("Bubbles up errors from the v1 ClusterServiceClass method", func() {
 			fakeClassName := "not_real"
 			errorMessage := "not found"
 
-			classPlan := &v1beta1.ClusterServicePlan{
+			classPlan := &v1.ClusterServicePlan{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: "foobar_plan",
 				},
-				Spec: v1beta1.ClusterServicePlanSpec{
-					ClusterServiceClassRef: v1beta1.ClusterObjectReference{
+				Spec: v1.ClusterServicePlanSpec{
+					ClusterServiceClassRef: v1.ClusterObjectReference{
 						Name: fakeClassName,
 					},
 				},
@@ -397,22 +397,22 @@ var _ = Describe("Class", func() {
 		})
 		Context("ServiceClass", func() {
 			var (
-				classPlan *v1beta1.ServicePlan
+				classPlan *v1.ServicePlan
 			)
 			BeforeEach(func() {
-				classPlan = &v1beta1.ServicePlan{
+				classPlan = &v1.ServicePlan{
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      "foobar_plan",
 						Namespace: sc.Namespace,
 					},
-					Spec: v1beta1.ServicePlanSpec{
-						ServiceClassRef: v1beta1.LocalObjectReference{
+					Spec: v1.ServicePlanSpec{
+						ServiceClassRef: v1.LocalObjectReference{
 							Name: sc.Name,
 						},
 					},
 				}
 			})
-			It("Calls the generated v1beta1 get method for ServiceClasses with the plan's parent service class's name if the plan is a ServicePlan", func() {
+			It("Calls the generated v1 get method for ServiceClasses with the plan's parent service class's name if the plan is a ServicePlan", func() {
 				realClient := fake.NewSimpleClientset(sc)
 				sdk = &SDK{
 					ServiceCatalogClient: realClient,
@@ -426,7 +426,7 @@ var _ = Describe("Class", func() {
 				Expect(actions[0].(testing.GetActionImpl).Name).To(Equal(classPlan.Spec.ServiceClassRef.Name))
 				Expect(actions[0].(testing.GetActionImpl).Namespace).To(Equal(classPlan.Namespace))
 			})
-			It("Bubbles up errors from the v1beta1 ServiceClass method", func() {
+			It("Bubbles up errors from the v1 ServiceClass method", func() {
 				errorMessage := "not found"
 
 				badClient := fake.NewSimpleClientset()
@@ -449,7 +449,7 @@ var _ = Describe("Class", func() {
 		})
 	})
 	Describe("CreateClassFrom", func() {
-		It("Calls the generated v1beta1 create method for cluster service class with the passed in class", func() {
+		It("Calls the generated v1 create method for cluster service class with the passed in class", func() {
 			className := "newclass"
 
 			realClient := fake.NewSimpleClientset(csc)
@@ -464,11 +464,11 @@ var _ = Describe("Class", func() {
 			actions := realClient.Actions()
 			Expect(actions[0].Matches("list", "clusterserviceclasses")).To(BeTrue())
 			Expect(actions[1].Matches("create", "clusterserviceclasses")).To(BeTrue())
-			objectFromRequest := actions[1].(testing.CreateActionImpl).Object.(*v1beta1.ClusterServiceClass)
+			objectFromRequest := actions[1].(testing.CreateActionImpl).Object.(*v1.ClusterServiceClass)
 			Expect(objectFromRequest.Name).To(Equal(className))
 			Expect(objectFromRequest.ResourceVersion).To(BeEmpty())
 		})
-		It("Calls the generated v1beta1 create method for service class with the passed in class", func() {
+		It("Calls the generated v1 create method for service class with the passed in class", func() {
 			className := "newclass"
 			classNamespace := sc.Namespace
 			realClient := fake.NewSimpleClientset(sc)
@@ -484,7 +484,7 @@ var _ = Describe("Class", func() {
 			actions := realClient.Actions()
 			Expect(actions[0].Matches("list", "serviceclasses")).To(BeTrue())
 			Expect(actions[1].Matches("create", "serviceclasses")).To(BeTrue())
-			objectFromRequest := actions[1].(testing.CreateActionImpl).Object.(*v1beta1.ServiceClass)
+			objectFromRequest := actions[1].(testing.CreateActionImpl).Object.(*v1.ServiceClass)
 			Expect(objectFromRequest.Name).To(Equal(className))
 			Expect(objectFromRequest.Namespace).To(Equal(classNamespace))
 			Expect(objectFromRequest.ResourceVersion).To(BeEmpty())

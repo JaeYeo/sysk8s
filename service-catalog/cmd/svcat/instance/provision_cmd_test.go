@@ -25,7 +25,7 @@ import (
 	. "github.com/kubernetes-sigs/service-catalog/cmd/svcat/instance"
 	"github.com/kubernetes-sigs/service-catalog/cmd/svcat/test"
 	_ "github.com/kubernetes-sigs/service-catalog/internal/test"
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/svcat"
 	servicecatalog "github.com/kubernetes-sigs/service-catalog/pkg/svcat/service-catalog"
 	"github.com/kubernetes-sigs/service-catalog/pkg/svcat/service-catalog/service-catalogfakes"
@@ -156,7 +156,7 @@ var _ = Describe("Provision Command", func() {
 			fakeApp          *svcat.App
 			fakeSDK          *servicecatalogfakes.FakeSvcatClient
 			instanceName     string
-			instanceToReturn *v1beta1.ServiceInstance
+			instanceToReturn *v1.ServiceInstance
 			namespace        string
 			outputBuffer     *bytes.Buffer
 			params           map[string]interface{}
@@ -180,32 +180,32 @@ var _ = Describe("Provision Command", func() {
 			paramsJSON, err := json.Marshal(params)
 			Expect(err).To(BeNil())
 			specParams := &runtime.RawExtension{Raw: paramsJSON}
-			instanceToReturn = &v1beta1.ServiceInstance{
+			instanceToReturn = &v1.ServiceInstance{
 				ObjectMeta: v1.ObjectMeta{
 					Name:      instanceName,
 					Namespace: namespace,
 				},
-				Spec: v1beta1.ServiceInstanceSpec{
-					ClusterServiceClassRef: &v1beta1.ClusterObjectReference{
+				Spec: v1.ServiceInstanceSpec{
+					ClusterServiceClassRef: &v1.ClusterObjectReference{
 						Name: classKubeName,
 					},
-					ClusterServicePlanRef: &v1beta1.ClusterObjectReference{
+					ClusterServicePlanRef: &v1.ClusterObjectReference{
 						Name: planKubeName,
 					},
 					ExternalID: externalID,
 					Parameters: specParams,
-					PlanReference: v1beta1.PlanReference{
+					PlanReference: v1.PlanReference{
 						ClusterServiceClassExternalName: className,
 						ClusterServicePlanExternalName:  planName,
 					},
 				},
 			}
-			classToReturn = &v1beta1.ClusterServiceClass{
+			classToReturn = &v1.ClusterServiceClass{
 				ObjectMeta: v1.ObjectMeta{
 					Name: classKubeName,
 				},
 			}
-			planToReturn = &v1beta1.ClusterServicePlan{
+			planToReturn = &v1.ClusterServicePlan{
 				ObjectMeta: v1.ObjectMeta{
 					Name: planKubeName,
 				},
@@ -351,31 +351,31 @@ var _ = Describe("Provision Command", func() {
 			Expect(returnedProvisionClusterInstance).To(BeTrue())
 		})
 		It("sets scope to namespaced for RetrievePlanByClassIDAndName and sets ProvisionClusterInstance to false if provisioning a namespace class instance", func() {
-			instanceToReturn = &v1beta1.ServiceInstance{
+			instanceToReturn = &v1.ServiceInstance{
 				ObjectMeta: v1.ObjectMeta{
 					Name:      instanceName,
 					Namespace: namespace,
 				},
-				Spec: v1beta1.ServiceInstanceSpec{
-					ServiceClassRef: &v1beta1.LocalObjectReference{
+				Spec: v1.ServiceInstanceSpec{
+					ServiceClassRef: &v1.LocalObjectReference{
 						Name: classKubeName,
 					},
-					ServicePlanRef: &v1beta1.LocalObjectReference{
+					ServicePlanRef: &v1.LocalObjectReference{
 						Name: planKubeName,
 					},
 					ExternalID: externalID,
-					PlanReference: v1beta1.PlanReference{
+					PlanReference: v1.PlanReference{
 						ServiceClassExternalName: className,
 						ServicePlanExternalName:  planName,
 					},
 				},
 			}
-			classToReturn = &v1beta1.ServiceClass{
+			classToReturn = &v1.ServiceClass{
 				ObjectMeta: v1.ObjectMeta{
 					Name: classKubeName,
 				},
 			}
-			planToReturn = &v1beta1.ServicePlan{
+			planToReturn = &v1.ServicePlan{
 				ObjectMeta: v1.ObjectMeta{
 					Name: planKubeName,
 				},

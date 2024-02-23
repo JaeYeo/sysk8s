@@ -26,7 +26,7 @@ import (
 	"k8s.io/klog"
 
 	authorizationv1 "k8s.io/api/authorization/v1"
-	authorizationv1beta1 "k8s.io/api/authorization/v1beta1"
+	authorizationv1 "k8s.io/api/authorization/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -106,11 +106,11 @@ func newWithBackoff(subjectAccessReview subjectAccessReviewer, authorizedTTL, un
 }
 
 // Authorize makes a REST request to the remote service describing the attempted action as a JSON
-// serialized api.authorization.v1beta1.SubjectAccessReview object. An example request body is
+// serialized api.authorization.v1.SubjectAccessReview object. An example request body is
 // provided below.
 //
 //     {
-//       "apiVersion": "authorization.k8s.io/v1beta1",
+//       "apiVersion": "authorization.k8s.io/v1",
 //       "kind": "SubjectAccessReview",
 //       "spec": {
 //         "resourceAttributes": {
@@ -131,7 +131,7 @@ func newWithBackoff(subjectAccessReview subjectAccessReviewer, authorizedTTL, un
 // disallow access. A permissive response would return:
 //
 //     {
-//       "apiVersion": "authorization.k8s.io/v1beta1",
+//       "apiVersion": "authorization.k8s.io/v1",
 //       "kind": "SubjectAccessReview",
 //       "status": {
 //         "allowed": true
@@ -141,7 +141,7 @@ func newWithBackoff(subjectAccessReview subjectAccessReviewer, authorizedTTL, un
 // To disallow access, the remote service would return:
 //
 //     {
-//       "apiVersion": "authorization.k8s.io/v1beta1",
+//       "apiVersion": "authorization.k8s.io/v1",
 //       "kind": "SubjectAccessReview",
 //       "status": {
 //         "allowed": false,
@@ -264,8 +264,8 @@ func subjectAccessReviewInterfaceFromKubeconfig(kubeConfigFile string, version s
 		}
 		return &subjectAccessReviewV1Client{gw}, nil
 
-	case authorizationv1beta1.SchemeGroupVersion.Version:
-		groupVersions := []schema.GroupVersion{authorizationv1beta1.SchemeGroupVersion}
+	case authorizationv1.SchemeGroupVersion.Version:
+		groupVersions := []schema.GroupVersion{authorizationv1.SchemeGroupVersion}
 		if err := localScheme.SetVersionPriority(groupVersions...); err != nil {
 			return nil, err
 		}
@@ -273,14 +273,14 @@ func subjectAccessReviewInterfaceFromKubeconfig(kubeConfigFile string, version s
 		if err != nil {
 			return nil, err
 		}
-		return &subjectAccessReviewV1beta1Client{gw}, nil
+		return &subjectAccessReviewv1Client{gw}, nil
 
 	default:
 		return nil, fmt.Errorf(
 			"unsupported webhook authorizer version %q, supported versions are %q, %q",
 			version,
 			authorizationv1.SchemeGroupVersion.Version,
-			authorizationv1beta1.SchemeGroupVersion.Version,
+			authorizationv1.SchemeGroupVersion.Version,
 		)
 	}
 }
@@ -295,16 +295,16 @@ func (t *subjectAccessReviewV1Client) Create(ctx context.Context, subjectAccessR
 	return result, err
 }
 
-type subjectAccessReviewV1beta1Client struct {
+type subjectAccessReviewv1Client struct {
 	w *webhook.GenericWebhook
 }
 
-func (t *subjectAccessReviewV1beta1Client) Create(ctx context.Context, subjectAccessReview *authorizationv1.SubjectAccessReview, _ metav1.CreateOptions) (*authorizationv1.SubjectAccessReview, error) {
-	v1beta1Review := &authorizationv1beta1.SubjectAccessReview{Spec: v1SpecToV1beta1Spec(&subjectAccessReview.Spec)}
-	v1beta1Result := &authorizationv1beta1.SubjectAccessReview{}
-	err := t.w.RestClient.Post().Body(v1beta1Review).Do(ctx).Into(v1beta1Result)
+func (t *subjectAccessReviewv1Client) Create(ctx context.Context, subjectAccessReview *authorizationv1.SubjectAccessReview, _ metav1.CreateOptions) (*authorizationv1.SubjectAccessReview, error) {
+	v1Review := &authorizationv1.SubjectAccessReview{Spec: v1SpecTov1Spec(&subjectAccessReview.Spec)}
+	v1Result := &authorizationv1.SubjectAccessReview{}
+	err := t.w.RestClient.Post().Body(v1Review).Do(ctx).Into(v1Result)
 	if err == nil {
-		subjectAccessReview.Status = v1beta1StatusToV1Status(&v1beta1Result.Status)
+		subjectAccessReview.Status = v1StatusToV1Status(&v1Result.Status)
 	}
 	return subjectAccessReview, err
 }
@@ -323,7 +323,7 @@ func shouldCache(attr authorizer.Attributes) bool {
 	return controlledAttrSize < maxControlledAttrCacheSize
 }
 
-func v1beta1StatusToV1Status(in *authorizationv1beta1.SubjectAccessReviewStatus) authorizationv1.SubjectAccessReviewStatus {
+func v1StatusToV1Status(in *authorizationv1.SubjectAccessReviewStatus) authorizationv1.SubjectAccessReviewStatus {
 	return authorizationv1.SubjectAccessReviewStatus{
 		Allowed:         in.Allowed,
 		Denied:          in.Denied,
@@ -332,22 +332,22 @@ func v1beta1StatusToV1Status(in *authorizationv1beta1.SubjectAccessReviewStatus)
 	}
 }
 
-func v1SpecToV1beta1Spec(in *authorizationv1.SubjectAccessReviewSpec) authorizationv1beta1.SubjectAccessReviewSpec {
-	return authorizationv1beta1.SubjectAccessReviewSpec{
-		ResourceAttributes:    v1ResourceAttributesToV1beta1ResourceAttributes(in.ResourceAttributes),
-		NonResourceAttributes: v1NonResourceAttributesToV1beta1NonResourceAttributes(in.NonResourceAttributes),
+func v1SpecTov1Spec(in *authorizationv1.SubjectAccessReviewSpec) authorizationv1.SubjectAccessReviewSpec {
+	return authorizationv1.SubjectAccessReviewSpec{
+		ResourceAttributes:    v1ResourceAttributesTov1ResourceAttributes(in.ResourceAttributes),
+		NonResourceAttributes: v1NonResourceAttributesTov1NonResourceAttributes(in.NonResourceAttributes),
 		User:                  in.User,
 		Groups:                in.Groups,
-		Extra:                 v1ExtraToV1beta1Extra(in.Extra),
+		Extra:                 v1ExtraTov1Extra(in.Extra),
 		UID:                   in.UID,
 	}
 }
 
-func v1ResourceAttributesToV1beta1ResourceAttributes(in *authorizationv1.ResourceAttributes) *authorizationv1beta1.ResourceAttributes {
+func v1ResourceAttributesTov1ResourceAttributes(in *authorizationv1.ResourceAttributes) *authorizationv1.ResourceAttributes {
 	if in == nil {
 		return nil
 	}
-	return &authorizationv1beta1.ResourceAttributes{
+	return &authorizationv1.ResourceAttributes{
 		Namespace:   in.Namespace,
 		Verb:        in.Verb,
 		Group:       in.Group,
@@ -358,23 +358,23 @@ func v1ResourceAttributesToV1beta1ResourceAttributes(in *authorizationv1.Resourc
 	}
 }
 
-func v1NonResourceAttributesToV1beta1NonResourceAttributes(in *authorizationv1.NonResourceAttributes) *authorizationv1beta1.NonResourceAttributes {
+func v1NonResourceAttributesTov1NonResourceAttributes(in *authorizationv1.NonResourceAttributes) *authorizationv1.NonResourceAttributes {
 	if in == nil {
 		return nil
 	}
-	return &authorizationv1beta1.NonResourceAttributes{
+	return &authorizationv1.NonResourceAttributes{
 		Path: in.Path,
 		Verb: in.Verb,
 	}
 }
 
-func v1ExtraToV1beta1Extra(in map[string]authorizationv1.ExtraValue) map[string]authorizationv1beta1.ExtraValue {
+func v1ExtraTov1Extra(in map[string]authorizationv1.ExtraValue) map[string]authorizationv1.ExtraValue {
 	if in == nil {
 		return nil
 	}
-	ret := make(map[string]authorizationv1beta1.ExtraValue, len(in))
+	ret := make(map[string]authorizationv1.ExtraValue, len(in))
 	for k, v := range in {
-		ret[k] = authorizationv1beta1.ExtraValue(v)
+		ret[k] = authorizationv1.ExtraValue(v)
 	}
 	return ret
 }

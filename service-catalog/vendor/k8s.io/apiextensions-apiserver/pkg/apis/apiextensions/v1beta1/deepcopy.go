@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package v1beta1
+package v1
 
 // TODO: Update this after a tag is created for interface fields in DeepCopy
 func (in *JSONSchemaProps) DeepCopy() *JSONSchemaProps {

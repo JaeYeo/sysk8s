@@ -23,7 +23,7 @@ import (
 
 	"github.com/kubernetes-sigs/service-catalog/cmd/svcat/command"
 	"github.com/kubernetes-sigs/service-catalog/cmd/svcat/test"
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	svcatfake "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/fake"
 	"github.com/kubernetes-sigs/service-catalog/pkg/svcat"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -64,12 +64,12 @@ func TestDescribeCommand(t *testing.T) {
 			k8sClient := k8sfake.NewSimpleClientset()
 			var fakes []runtime.Object
 			for _, name := range tc.fakeBindings {
-				fakes = append(fakes, &v1beta1.ServiceBinding{
+				fakes = append(fakes, &v1.ServiceBinding{
 					ObjectMeta: v1.ObjectMeta{
 						Namespace: namespace,
 						Name:      name,
 					},
-					Spec: v1beta1.ServiceBindingSpec{},
+					Spec: v1.ServiceBindingSpec{},
 				})
 			}
 

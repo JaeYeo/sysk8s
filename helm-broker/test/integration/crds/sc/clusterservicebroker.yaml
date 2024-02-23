@@ -1,28 +1,53 @@
-apiVersion: apiextensions.k8s.io/v1beta1
+apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   name: clusterservicebrokers.servicecatalog.k8s.io
 spec:
   group: servicecatalog.k8s.io
-  version: v1beta1
-  scope: Cluster
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            apiVersion:
+              type: string
+            kind:
+              type: string
+            metadata:
+              type: object
+            spec:
+              type: object
+              properties:
+                url:
+                  type: string
+                # Add other properties as needed
+              required:
+                - url
+            status:
+              type: object
+              properties:
+                lastConditionState:
+                  type: string
+                # Add other status properties as needed
+      additionalPrinterColumns:
+        - name: URL
+          type: string
+          jsonPath: .spec.url
+        - name: Status
+          type: string
+          jsonPath: .status.lastConditionState
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
   names:
     plural: clusterservicebrokers
     singular: clusterservicebroker
     kind: ClusterServiceBroker
-    # categories is a list of grouped resources the custom resource belongs to.
     categories:
       - all
       - svcat
-  additionalPrinterColumns:
-    - name: URL
-      type: string
-      JSONPath: .spec.url
-    - name: Status
-      type: string
-      JSONPath: .status.lastConditionState
-    - name: Age
-      type: date
-      JSONPath: .metadata.creationTimestamp
-  subresources:
-    status: {}
+  scope: Cluster
+

@@ -21,7 +21,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -41,14 +41,14 @@ const (
 	FormatYAML = "yaml"
 )
 
-func formatStatusShort(condition string, conditionStatus v1beta1.ConditionStatus, reason string) string {
-	if conditionStatus == v1beta1.ConditionTrue {
+func formatStatusShort(condition string, conditionStatus v1.ConditionStatus, reason string) string {
+	if conditionStatus == v1.ConditionTrue {
 		return condition
 	}
 	return reason
 }
 
-func formatStatusFull(condition string, conditionStatus v1beta1.ConditionStatus, reason string, message string, timestamp v1.Time) string {
+func formatStatusFull(condition string, conditionStatus v1.ConditionStatus, reason string, message string, timestamp v1.Time) string {
 	status := formatStatusShort(condition, conditionStatus, reason)
 	if status == "" {
 		return ""

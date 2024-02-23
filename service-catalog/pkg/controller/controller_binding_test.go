@@ -29,8 +29,8 @@ import (
 	osb "github.com/kubernetes-sigs/go-open-service-broker-client/v2"
 	fakeosb "github.com/kubernetes-sigs/go-open-service-broker-client/v2/fake"
 	scmeta "github.com/kubernetes-sigs/service-catalog/pkg/api/meta"
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
-	v1beta1informers "github.com/kubernetes-sigs/service-catalog/pkg/client/informers_generated/externalversions/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
+	v1informers "github.com/kubernetes-sigs/service-catalog/pkg/client/informers_generated/externalversions/servicecatalog/v1"
 	sctestutil "github.com/kubernetes-sigs/service-catalog/test/util"
 	corev1 "k8s.io/api/core/v1"
 
@@ -51,21 +51,21 @@ import (
 func TestReconcileServiceBindingNotInitializedStatus(t *testing.T) {
 	_, fakeServiceCatalogClient, fakeClusterServiceBrokerClient, testController, _ := newTestController(t, noFakeActions())
 
-	binding := &v1beta1.ServiceBinding{
+	binding := &v1.ServiceBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:       testServiceBindingName,
 			Namespace:  testNamespace,
 			Generation: 1,
 		},
-		Spec: v1beta1.ServiceBindingSpec{
-			InstanceRef: v1beta1.LocalObjectReference{Name: "test"},
+		Spec: v1.ServiceBindingSpec{
+			InstanceRef: v1.LocalObjectReference{Name: "test"},
 		},
-		Status: v1beta1.ServiceBindingStatus{},
+		Status: v1.ServiceBindingStatus{},
 	}
 
-	expectedStatus := v1beta1.ServiceBindingStatus{
-		Conditions:   []v1beta1.ServiceBindingCondition{},
-		UnbindStatus: v1beta1.ServiceBindingUnbindStatusNotRequired,
+	expectedStatus := v1.ServiceBindingStatus{
+		Conditions:   []v1.ServiceBindingCondition{},
+		UnbindStatus: v1.ServiceBindingUnbindStatusNotRequired,
 	}
 
 	err := reconcileServiceBinding(t, testController, binding)
@@ -80,9 +80,9 @@ func TestReconcileServiceBindingNotInitializedStatus(t *testing.T) {
 	assertNumberOfActions(t, actions, 1)
 
 	updatedObjBinding := assertUpdateStatus(t, actions[0], binding)
-	updatedBinding, ok := updatedObjBinding.(*v1beta1.ServiceBinding)
+	updatedBinding, ok := updatedObjBinding.(*v1.ServiceBinding)
 	if !ok {
-		t.Fatalf("cast error: want: *v1beta1.ServiceBinding, got: %T", updatedObjBinding)
+		t.Fatalf("cast error: want: *v1.ServiceBinding, got: %T", updatedObjBinding)
 	}
 	if !reflect.DeepEqual(updatedBinding.Status, expectedStatus) {
 		t.Errorf("unexpected diff: %v", diff.ObjectReflectDiff(updatedBinding.Status, expectedStatus))
@@ -94,17 +94,17 @@ func TestReconcileServiceBindingNotInitializedStatus(t *testing.T) {
 func TestReconcileServiceBindingNonExistingServiceInstance(t *testing.T) {
 	_, fakeCatalogClient, fakeClusterServiceBrokerClient, testController, _ := newTestController(t, noFakeActions())
 
-	binding := &v1beta1.ServiceBinding{
+	binding := &v1.ServiceBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:       testServiceBindingName,
 			Generation: 1,
 		},
-		Spec: v1beta1.ServiceBindingSpec{
-			InstanceRef: v1beta1.LocalObjectReference{Name: testNonExistentClusterServiceClassName},
+		Spec: v1.ServiceBindingSpec{
+			InstanceRef: v1.LocalObjectReference{Name: testNonExistentClusterServiceClassName},
 			ExternalID:  testServiceBindingGUID,
 		},
-		Status: v1beta1.ServiceBindingStatus{
-			UnbindStatus: v1beta1.ServiceBindingUnbindStatusNotRequired,
+		Status: v1.ServiceBindingStatus{
+			UnbindStatus: v1.ServiceBindingUnbindStatusNotRequired,
 		},
 	}
 
@@ -143,10 +143,10 @@ func TestReconcileServiceBindingUnresolvedClusterServiceClassReference(t *testin
 
 	sharedInformers.ClusterServiceBrokers().Informer().GetStore().Add(getTestClusterServiceBroker())
 	sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(getTestClusterServiceClass())
-	instance := &v1beta1.ServiceInstance{
+	instance := &v1.ServiceInstance{
 		ObjectMeta: metav1.ObjectMeta{Name: testServiceInstanceName, Namespace: testNamespace},
-		Spec: v1beta1.ServiceInstanceSpec{
-			PlanReference: v1beta1.PlanReference{
+		Spec: v1.ServiceInstanceSpec{
+			PlanReference: v1.PlanReference{
 				ClusterServiceClassExternalName: testNonExistentClusterServiceClassName,
 				ClusterServicePlanExternalName:  testClusterServicePlanName,
 			},
@@ -156,18 +156,18 @@ func TestReconcileServiceBindingUnresolvedClusterServiceClassReference(t *testin
 	sharedInformers.ServiceInstances().Informer().GetStore().Add(instance)
 	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
 
-	binding := &v1beta1.ServiceBinding{
+	binding := &v1.ServiceBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:       testServiceBindingName,
 			Namespace:  testNamespace,
 			Generation: 1,
 		},
-		Spec: v1beta1.ServiceBindingSpec{
-			InstanceRef: v1beta1.LocalObjectReference{Name: testServiceInstanceName},
+		Spec: v1.ServiceBindingSpec{
+			InstanceRef: v1.LocalObjectReference{Name: testServiceInstanceName},
 			ExternalID:  testServiceBindingGUID,
 		},
-		Status: v1beta1.ServiceBindingStatus{
-			UnbindStatus: v1beta1.ServiceBindingUnbindStatusNotRequired,
+		Status: v1.ServiceBindingStatus{
+			UnbindStatus: v1.ServiceBindingUnbindStatusNotRequired,
 		},
 	}
 
@@ -208,32 +208,32 @@ func TestReconcileServiceBindingUnresolvedClusterServicePlanReference(t *testing
 
 	sharedInformers.ClusterServiceBrokers().Informer().GetStore().Add(getTestClusterServiceBroker())
 	sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(getTestClusterServiceClass())
-	instance := &v1beta1.ServiceInstance{
+	instance := &v1.ServiceInstance{
 		ObjectMeta: metav1.ObjectMeta{Name: testServiceInstanceName, Namespace: testNamespace},
-		Spec: v1beta1.ServiceInstanceSpec{
-			PlanReference: v1beta1.PlanReference{
+		Spec: v1.ServiceInstanceSpec{
+			PlanReference: v1.PlanReference{
 				ClusterServiceClassExternalName: testNonExistentClusterServiceClassName,
 				ClusterServicePlanExternalName:  testClusterServicePlanName,
 			},
 			ExternalID:             testServiceInstanceGUID,
-			ClusterServiceClassRef: &v1beta1.ClusterObjectReference{Name: "Some Ref"},
+			ClusterServiceClassRef: &v1.ClusterObjectReference{Name: "Some Ref"},
 		},
 	}
 	sharedInformers.ServiceInstances().Informer().GetStore().Add(instance)
 	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
 
-	binding := &v1beta1.ServiceBinding{
+	binding := &v1.ServiceBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:       testServiceBindingName,
 			Namespace:  testNamespace,
 			Generation: 1,
 		},
-		Spec: v1beta1.ServiceBindingSpec{
-			InstanceRef: v1beta1.LocalObjectReference{Name: testServiceInstanceName},
+		Spec: v1.ServiceBindingSpec{
+			InstanceRef: v1.LocalObjectReference{Name: testServiceInstanceName},
 			ExternalID:  testServiceBindingGUID,
 		},
-		Status: v1beta1.ServiceBindingStatus{
-			UnbindStatus: v1beta1.ServiceBindingUnbindStatusNotRequired,
+		Status: v1.ServiceBindingStatus{
+			UnbindStatus: v1.ServiceBindingUnbindStatusNotRequired,
 		},
 	}
 
@@ -275,33 +275,33 @@ func TestReconcileServiceBindingNonExistingClusterServiceClass(t *testing.T) {
 
 	sharedInformers.ClusterServiceBrokers().Informer().GetStore().Add(getTestClusterServiceBroker())
 	sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(getTestClusterServiceClass())
-	instance := &v1beta1.ServiceInstance{
+	instance := &v1.ServiceInstance{
 		ObjectMeta: metav1.ObjectMeta{Name: testServiceInstanceName, Namespace: testNamespace},
-		Spec: v1beta1.ServiceInstanceSpec{
-			PlanReference: v1beta1.PlanReference{
+		Spec: v1.ServiceInstanceSpec{
+			PlanReference: v1.PlanReference{
 				ClusterServiceClassExternalName: testNonExistentClusterServiceClassName,
 				ClusterServicePlanExternalName:  testClusterServicePlanName,
 			},
 			ExternalID:             testServiceInstanceGUID,
-			ClusterServiceClassRef: &v1beta1.ClusterObjectReference{Name: "nosuchclassid"},
-			ClusterServicePlanRef:  &v1beta1.ClusterObjectReference{Name: "nosuchplanid"},
+			ClusterServiceClassRef: &v1.ClusterObjectReference{Name: "nosuchclassid"},
+			ClusterServicePlanRef:  &v1.ClusterObjectReference{Name: "nosuchplanid"},
 		},
 	}
 	sharedInformers.ServiceInstances().Informer().GetStore().Add(instance)
 	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
 
-	binding := &v1beta1.ServiceBinding{
+	binding := &v1.ServiceBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:       testServiceBindingName,
 			Namespace:  testNamespace,
 			Generation: 1,
 		},
-		Spec: v1beta1.ServiceBindingSpec{
-			InstanceRef: v1beta1.LocalObjectReference{Name: testServiceInstanceName},
+		Spec: v1.ServiceBindingSpec{
+			InstanceRef: v1.LocalObjectReference{Name: testServiceInstanceName},
 			ExternalID:  testServiceBindingGUID,
 		},
-		Status: v1beta1.ServiceBindingStatus{
-			UnbindStatus: v1beta1.ServiceBindingUnbindStatusNotRequired,
+		Status: v1.ServiceBindingStatus{
+			UnbindStatus: v1.ServiceBindingUnbindStatusNotRequired,
 		},
 	}
 
@@ -357,22 +357,22 @@ func TestReconcileServiceBindingWithSecretConflict(t *testing.T) {
 
 	sharedInformers.ClusterServiceBrokers().Informer().GetStore().Add(getTestClusterServiceBroker())
 	sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(getTestClusterServiceClass())
-	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1beta1.ConditionTrue))
+	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1.ConditionTrue))
 	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
 
-	binding := &v1beta1.ServiceBinding{
+	binding := &v1.ServiceBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:       testServiceBindingName,
 			Namespace:  testNamespace,
 			Generation: 1,
 		},
-		Spec: v1beta1.ServiceBindingSpec{
-			InstanceRef: v1beta1.LocalObjectReference{Name: testServiceInstanceName},
+		Spec: v1.ServiceBindingSpec{
+			InstanceRef: v1.LocalObjectReference{Name: testServiceInstanceName},
 			ExternalID:  testServiceBindingGUID,
 			SecretName:  testServiceBindingSecretName,
 		},
-		Status: v1beta1.ServiceBindingStatus{
-			UnbindStatus: v1beta1.ServiceBindingUnbindStatusNotRequired,
+		Status: v1.ServiceBindingStatus{
+			UnbindStatus: v1.ServiceBindingUnbindStatusNotRequired,
 		},
 	}
 
@@ -409,10 +409,10 @@ func TestReconcileServiceBindingWithSecretConflict(t *testing.T) {
 	actions := fakeCatalogClient.Actions()
 	assertNumberOfActions(t, actions, 1)
 
-	updatedServiceBinding := assertUpdateStatus(t, actions[0], binding).(*v1beta1.ServiceBinding)
+	updatedServiceBinding := assertUpdateStatus(t, actions[0], binding).(*v1.ServiceBinding)
 
 	assertServiceBindingReadyFalse(t, updatedServiceBinding, errorInjectingBindResultReason)
-	assertServiceBindingCurrentOperation(t, updatedServiceBinding, v1beta1.ServiceBindingOperationBind)
+	assertServiceBindingCurrentOperation(t, updatedServiceBinding, v1.ServiceBindingOperationBind)
 	assertServiceBindingOperationStartTimeSet(t, updatedServiceBinding, true)
 	assertServiceBindingReconciledGeneration(t, updatedServiceBinding, binding.Status.ReconciledGeneration)
 	assertServiceBindingInProgressPropertiesParameters(t, updatedServiceBinding, nil, "")
@@ -454,23 +454,23 @@ func TestReconcileServiceBindingWithParameters(t *testing.T) {
 
 	sharedInformers.ClusterServiceBrokers().Informer().GetStore().Add(getTestClusterServiceBroker())
 	sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(getTestClusterServiceClass())
-	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1beta1.ConditionTrue))
+	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1.ConditionTrue))
 	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
 
-	binding := &v1beta1.ServiceBinding{
+	binding := &v1.ServiceBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:       testServiceBindingName,
 			Namespace:  testNamespace,
-			Finalizers: []string{v1beta1.FinalizerServiceCatalog},
+			Finalizers: []string{v1.FinalizerServiceCatalog},
 			Generation: 1,
 		},
-		Spec: v1beta1.ServiceBindingSpec{
-			InstanceRef: v1beta1.LocalObjectReference{Name: testServiceInstanceName},
+		Spec: v1.ServiceBindingSpec{
+			InstanceRef: v1.LocalObjectReference{Name: testServiceInstanceName},
 			ExternalID:  testServiceBindingGUID,
 			SecretName:  testServiceBindingSecretName,
 		},
-		Status: v1beta1.ServiceBindingStatus{
-			UnbindStatus: v1beta1.ServiceBindingUnbindStatusNotRequired,
+		Status: v1.ServiceBindingStatus{
+			UnbindStatus: v1.ServiceBindingUnbindStatusNotRequired,
 		},
 	}
 
@@ -496,7 +496,7 @@ func TestReconcileServiceBindingWithParameters(t *testing.T) {
 	}
 	expectedParametersChecksum := generateChecksumOfParametersOrFail(t, expectedParameters)
 
-	binding = assertServiceBindingOperationInProgressWithParametersIsTheOnlyCatalogAction(t, fakeCatalogClient, binding, v1beta1.ServiceBindingOperationBind, expectedParameters, expectedParametersChecksum)
+	binding = assertServiceBindingOperationInProgressWithParametersIsTheOnlyCatalogAction(t, fakeCatalogClient, binding, v1.ServiceBindingOperationBind, expectedParameters, expectedParametersChecksum)
 	fakeCatalogClient.ClearActions()
 
 	assertGetNamespaceAction(t, fakeKubeClient.Actions())
@@ -533,8 +533,8 @@ func TestReconcileServiceBindingWithParameters(t *testing.T) {
 	actions := fakeCatalogClient.Actions()
 	assertNumberOfActions(t, actions, 1)
 
-	updatedServiceBinding := assertUpdateStatus(t, actions[0], binding).(*v1beta1.ServiceBinding)
-	assertServiceBindingOperationSuccessWithParameters(t, updatedServiceBinding, v1beta1.ServiceBindingOperationBind, expectedParameters, expectedParametersChecksum, binding)
+	updatedServiceBinding := assertUpdateStatus(t, actions[0], binding).(*v1.ServiceBinding)
+	assertServiceBindingOperationSuccessWithParameters(t, updatedServiceBinding, v1.ServiceBindingOperationBind, expectedParameters, expectedParametersChecksum, binding)
 	assertServiceBindingOrphanMitigationSet(t, updatedServiceBinding, false)
 
 	kubeActions := fakeKubeClient.Actions()
@@ -602,33 +602,33 @@ func TestReconcileServiceBindingWithSecretTransform(t *testing.T) {
 	sharedInformers.ClusterServiceBrokers().Informer().GetStore().Add(getTestClusterServiceBroker())
 	sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(getTestClusterServiceClass())
 	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
-	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1beta1.ConditionTrue))
+	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1.ConditionTrue))
 
-	binding := &v1beta1.ServiceBinding{
+	binding := &v1.ServiceBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:       testServiceBindingName,
 			Namespace:  testNamespace,
-			Finalizers: []string{v1beta1.FinalizerServiceCatalog},
+			Finalizers: []string{v1.FinalizerServiceCatalog},
 			Generation: 1,
 		},
-		Spec: v1beta1.ServiceBindingSpec{
-			InstanceRef: v1beta1.LocalObjectReference{Name: testServiceInstanceName},
+		Spec: v1.ServiceBindingSpec{
+			InstanceRef: v1.LocalObjectReference{Name: testServiceInstanceName},
 			ExternalID:  testServiceBindingGUID,
 			SecretName:  testServiceBindingSecretName,
 		},
-		Status: v1beta1.ServiceBindingStatus{
-			UnbindStatus: v1beta1.ServiceBindingUnbindStatusNotRequired,
+		Status: v1.ServiceBindingStatus{
+			UnbindStatus: v1.ServiceBindingUnbindStatusNotRequired,
 		},
 	}
-	binding.Spec.SecretTransforms = []v1beta1.SecretTransform{
+	binding.Spec.SecretTransforms = []v1.SecretTransform{
 		{
-			RenameKey: &v1beta1.RenameKeyTransform{
+			RenameKey: &v1.RenameKeyTransform{
 				From: "a",
 				To:   "renamedA",
 			},
 		},
 		{
-			AddKey: &v1beta1.AddKeyTransform{
+			AddKey: &v1.AddKeyTransform{
 				Key:   "e",
 				Value: []byte("e"),
 			},
@@ -669,8 +669,8 @@ func TestReconcileServiceBindingWithSecretTransform(t *testing.T) {
 	actions := fakeCatalogClient.Actions()
 	assertNumberOfActions(t, actions, 1)
 
-	updatedServiceBinding := assertUpdateStatus(t, actions[0], binding).(*v1beta1.ServiceBinding)
-	assertServiceBindingOperationSuccess(t, updatedServiceBinding, v1beta1.ServiceBindingOperationBind, binding)
+	updatedServiceBinding := assertUpdateStatus(t, actions[0], binding).(*v1.ServiceBinding)
+	assertServiceBindingOperationSuccess(t, updatedServiceBinding, v1.ServiceBindingOperationBind, binding)
 	assertServiceBindingOrphanMitigationSet(t, updatedServiceBinding, false)
 
 	kubeActions := fakeKubeClient.Actions()
@@ -724,18 +724,18 @@ func TestReconcileServiceBindingNonbindableClusterServiceClass(t *testing.T) {
 	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestNonbindableServiceInstance())
 	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlanNonbindable())
 
-	binding := &v1beta1.ServiceBinding{
+	binding := &v1.ServiceBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:       testServiceBindingName,
 			Namespace:  testNamespace,
 			Generation: 1,
 		},
-		Spec: v1beta1.ServiceBindingSpec{
-			InstanceRef: v1beta1.LocalObjectReference{Name: testServiceInstanceName},
+		Spec: v1.ServiceBindingSpec{
+			InstanceRef: v1.LocalObjectReference{Name: testServiceInstanceName},
 			ExternalID:  testServiceBindingGUID,
 		},
-		Status: v1beta1.ServiceBindingStatus{
-			UnbindStatus: v1beta1.ServiceBindingUnbindStatusNotRequired,
+		Status: v1.ServiceBindingStatus{
+			UnbindStatus: v1.ServiceBindingUnbindStatusNotRequired,
 		},
 	}
 
@@ -788,13 +788,13 @@ func TestReconcileServiceBindingNonbindableClusterServiceClassBindablePlan(t *te
 
 	sharedInformers.ClusterServiceBrokers().Informer().GetStore().Add(getTestClusterServiceBroker())
 	sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(getTestNonbindableClusterServiceClass())
-	sharedInformers.ServiceInstances().Informer().GetStore().Add(func() *v1beta1.ServiceInstance {
+	sharedInformers.ServiceInstances().Informer().GetStore().Add(func() *v1.ServiceInstance {
 		i := getTestServiceInstanceNonbindableServiceBindablePlan()
-		i.Status = v1beta1.ServiceInstanceStatus{
-			Conditions: []v1beta1.ServiceInstanceCondition{
+		i.Status = v1.ServiceInstanceStatus{
+			Conditions: []v1.ServiceInstanceCondition{
 				{
-					Type:   v1beta1.ServiceInstanceConditionReady,
-					Status: v1beta1.ConditionTrue,
+					Type:   v1.ServiceInstanceConditionReady,
+					Status: v1.ConditionTrue,
 				},
 			},
 		}
@@ -802,20 +802,20 @@ func TestReconcileServiceBindingNonbindableClusterServiceClassBindablePlan(t *te
 	}())
 	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
 
-	binding := &v1beta1.ServiceBinding{
+	binding := &v1.ServiceBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:       testServiceBindingName,
 			Namespace:  testNamespace,
-			Finalizers: []string{v1beta1.FinalizerServiceCatalog},
+			Finalizers: []string{v1.FinalizerServiceCatalog},
 			Generation: 1,
 		},
-		Spec: v1beta1.ServiceBindingSpec{
-			InstanceRef: v1beta1.LocalObjectReference{Name: testServiceInstanceName},
+		Spec: v1.ServiceBindingSpec{
+			InstanceRef: v1.LocalObjectReference{Name: testServiceInstanceName},
 			ExternalID:  testServiceBindingGUID,
 			SecretName:  testServiceBindingSecretName,
 		},
-		Status: v1beta1.ServiceBindingStatus{
-			UnbindStatus: v1beta1.ServiceBindingUnbindStatusNotRequired,
+		Status: v1.ServiceBindingStatus{
+			UnbindStatus: v1.ServiceBindingUnbindStatusNotRequired,
 		},
 	}
 
@@ -853,7 +853,7 @@ func TestReconcileServiceBindingNonbindableClusterServiceClassBindablePlan(t *te
 	assertNumberOfActions(t, actions, 1)
 
 	updatedServiceBinding := assertUpdateStatus(t, actions[0], binding)
-	assertServiceBindingOperationSuccess(t, updatedServiceBinding, v1beta1.ServiceBindingOperationBind, binding)
+	assertServiceBindingOperationSuccess(t, updatedServiceBinding, v1.ServiceBindingOperationBind, binding)
 	assertServiceBindingOrphanMitigationSet(t, updatedServiceBinding, false)
 
 	kubeActions := fakeKubeClient.Actions()
@@ -900,18 +900,18 @@ func TestReconcileServiceBindingBindableClusterServiceClassNonbindablePlan(t *te
 	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceBindableServiceNonbindablePlan())
 	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlanNonbindable())
 
-	binding := &v1beta1.ServiceBinding{
+	binding := &v1.ServiceBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:       testServiceBindingName,
 			Namespace:  testNamespace,
 			Generation: 1,
 		},
-		Spec: v1beta1.ServiceBindingSpec{
-			InstanceRef: v1beta1.LocalObjectReference{Name: testServiceInstanceName},
+		Spec: v1.ServiceBindingSpec{
+			InstanceRef: v1.LocalObjectReference{Name: testServiceInstanceName},
 			ExternalID:  testServiceBindingGUID,
 		},
-		Status: v1beta1.ServiceBindingStatus{
-			UnbindStatus: v1beta1.ServiceBindingUnbindStatusNotRequired,
+		Status: v1.ServiceBindingStatus{
+			UnbindStatus: v1.ServiceBindingUnbindStatusNotRequired,
 		},
 	}
 
@@ -960,18 +960,18 @@ func TestReconcileServiceBindingServiceInstanceNotReady(t *testing.T) {
 	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithClusterRefs())
 	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
 
-	binding := &v1beta1.ServiceBinding{
+	binding := &v1.ServiceBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:       testServiceBindingName,
 			Namespace:  testNamespace,
 			Generation: 1,
 		},
-		Spec: v1beta1.ServiceBindingSpec{
-			InstanceRef: v1beta1.LocalObjectReference{Name: testServiceInstanceName},
+		Spec: v1.ServiceBindingSpec{
+			InstanceRef: v1.LocalObjectReference{Name: testServiceInstanceName},
 			ExternalID:  testServiceBindingGUID,
 		},
-		Status: v1beta1.ServiceBindingStatus{
-			UnbindStatus: v1beta1.ServiceBindingUnbindStatusNotRequired,
+		Status: v1.ServiceBindingStatus{
+			UnbindStatus: v1.ServiceBindingUnbindStatusNotRequired,
 		},
 	}
 
@@ -1017,21 +1017,21 @@ func TestReconcileServiceBindingNamespaceError(t *testing.T) {
 	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
 
 	instance := getTestServiceInstanceWithClusterRefs()
-	setServiceInstanceCondition(instance, v1beta1.ServiceInstanceConditionReady, v1beta1.ConditionTrue, "", "")
+	setServiceInstanceCondition(instance, v1.ServiceInstanceConditionReady, v1.ConditionTrue, "", "")
 	sharedInformers.ServiceInstances().Informer().GetStore().Add(instance)
 
-	binding := &v1beta1.ServiceBinding{
+	binding := &v1.ServiceBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:       testServiceBindingName,
 			Namespace:  testNamespace,
 			Generation: 1,
 		},
-		Spec: v1beta1.ServiceBindingSpec{
-			InstanceRef: v1beta1.LocalObjectReference{Name: testServiceInstanceName},
+		Spec: v1.ServiceBindingSpec{
+			InstanceRef: v1.LocalObjectReference{Name: testServiceInstanceName},
 			ExternalID:  testServiceBindingGUID,
 		},
-		Status: v1beta1.ServiceBindingStatus{
-			UnbindStatus: v1beta1.ServiceBindingUnbindStatusNotRequired,
+		Status: v1.ServiceBindingStatus{
+			UnbindStatus: v1.ServiceBindingUnbindStatusNotRequired,
 		},
 	}
 
@@ -1067,69 +1067,69 @@ func TestReconcileServiceBindingNamespaceError(t *testing.T) {
 func TestReconcileServiceBindingDelete(t *testing.T) {
 	cases := []struct {
 		name     string
-		instance *v1beta1.ServiceInstance
-		binding  *v1beta1.ServiceBinding
+		instance *v1.ServiceInstance
+		binding  *v1.ServiceBinding
 	}{
 		{
 			name:     "normal binding",
 			instance: getTestServiceInstanceWithRefsAndExternalProperties(),
-			binding: &v1beta1.ServiceBinding{
+			binding: &v1.ServiceBinding{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:              testServiceBindingName,
 					Namespace:         testNamespace,
 					DeletionTimestamp: &metav1.Time{},
-					Finalizers:        []string{v1beta1.FinalizerServiceCatalog},
+					Finalizers:        []string{v1.FinalizerServiceCatalog},
 					Generation:        2,
 				},
-				Spec: v1beta1.ServiceBindingSpec{
-					InstanceRef: v1beta1.LocalObjectReference{Name: testServiceInstanceName},
+				Spec: v1.ServiceBindingSpec{
+					InstanceRef: v1.LocalObjectReference{Name: testServiceInstanceName},
 					ExternalID:  testServiceBindingGUID,
 					SecretName:  testServiceBindingSecretName,
 				},
-				Status: v1beta1.ServiceBindingStatus{
+				Status: v1.ServiceBindingStatus{
 					ReconciledGeneration: 1,
-					ExternalProperties:   &v1beta1.ServiceBindingPropertiesState{},
-					UnbindStatus:         v1beta1.ServiceBindingUnbindStatusRequired,
+					ExternalProperties:   &v1.ServiceBindingPropertiesState{},
+					UnbindStatus:         v1.ServiceBindingUnbindStatusRequired,
 				},
 			},
 		},
 		{
 			name: "binding with instance pointing to non-existent plan",
-			instance: &v1beta1.ServiceInstance{
+			instance: &v1.ServiceInstance{
 				ObjectMeta: metav1.ObjectMeta{Name: testServiceInstanceName, Namespace: testNamespace},
-				Spec: v1beta1.ServiceInstanceSpec{
+				Spec: v1.ServiceInstanceSpec{
 					ExternalID:             testServiceInstanceGUID,
-					ClusterServiceClassRef: &v1beta1.ClusterObjectReference{Name: testClusterServiceClassGUID},
+					ClusterServiceClassRef: &v1.ClusterObjectReference{Name: testClusterServiceClassGUID},
 					ClusterServicePlanRef:  nil,
-					PlanReference: v1beta1.PlanReference{
+					PlanReference: v1.PlanReference{
 						ClusterServiceClassExternalName: testClusterServiceClassName,
 						ClusterServicePlanExternalName:  testNonExistentClusterServicePlanName,
 					},
 				},
-				Status: v1beta1.ServiceInstanceStatus{
-					ExternalProperties: &v1beta1.ServiceInstancePropertiesState{
+				Status: v1.ServiceInstanceStatus{
+					ExternalProperties: &v1.ServiceInstancePropertiesState{
 						ClusterServicePlanExternalID:   testClusterServicePlanGUID,
 						ClusterServicePlanExternalName: testClusterServicePlanName,
 					},
 				},
 			},
-			binding: &v1beta1.ServiceBinding{
+			binding: &v1.ServiceBinding{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:              testServiceBindingName,
 					Namespace:         testNamespace,
 					DeletionTimestamp: &metav1.Time{},
-					Finalizers:        []string{v1beta1.FinalizerServiceCatalog},
+					Finalizers:        []string{v1.FinalizerServiceCatalog},
 					Generation:        2,
 				},
-				Spec: v1beta1.ServiceBindingSpec{
-					InstanceRef: v1beta1.LocalObjectReference{Name: testServiceInstanceName},
+				Spec: v1.ServiceBindingSpec{
+					InstanceRef: v1.LocalObjectReference{Name: testServiceInstanceName},
 					ExternalID:  testServiceBindingGUID,
 					SecretName:  testServiceBindingSecretName,
 				},
-				Status: v1beta1.ServiceBindingStatus{
+				Status: v1.ServiceBindingStatus{
 					ReconciledGeneration: 1,
-					ExternalProperties:   &v1beta1.ServiceBindingPropertiesState{},
-					UnbindStatus:         v1beta1.ServiceBindingUnbindStatusRequired,
+					ExternalProperties:   &v1.ServiceBindingPropertiesState{},
+					UnbindStatus:         v1.ServiceBindingUnbindStatusRequired,
 				},
 			},
 		},
@@ -1196,7 +1196,7 @@ func TestReconcileServiceBindingDelete(t *testing.T) {
 
 			assertUpdateStatus(t, actions[0], binding)
 			updatedServiceBinding := assertUpdate(t, actions[1], binding)
-			assertServiceBindingOperationSuccess(t, updatedServiceBinding, v1beta1.ServiceBindingOperationUnbind, binding)
+			assertServiceBindingOperationSuccess(t, updatedServiceBinding, v1.ServiceBindingOperationUnbind, binding)
 			assertServiceBindingOrphanMitigationSet(t, updatedServiceBinding, false)
 
 			events := getRecordedEvents(testController)
@@ -1217,10 +1217,10 @@ func TestReconcileServiceBindingDeleteUnresolvedClusterServiceClassReference(t *
 
 	sharedInformers.ClusterServiceBrokers().Informer().GetStore().Add(getTestClusterServiceBroker())
 	sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(getTestClusterServiceClass())
-	instance := &v1beta1.ServiceInstance{
+	instance := &v1.ServiceInstance{
 		ObjectMeta: metav1.ObjectMeta{Name: testServiceInstanceName, Namespace: testNamespace},
-		Spec: v1beta1.ServiceInstanceSpec{
-			PlanReference: v1beta1.PlanReference{
+		Spec: v1.ServiceInstanceSpec{
+			PlanReference: v1.PlanReference{
 				ClusterServiceClassExternalName: testNonExistentClusterServiceClassName,
 				ClusterServicePlanExternalName:  testClusterServicePlanName,
 			},
@@ -1230,20 +1230,20 @@ func TestReconcileServiceBindingDeleteUnresolvedClusterServiceClassReference(t *
 	sharedInformers.ServiceInstances().Informer().GetStore().Add(instance)
 	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
 
-	binding := &v1beta1.ServiceBinding{
+	binding := &v1.ServiceBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:              testServiceBindingName,
 			Namespace:         testNamespace,
 			DeletionTimestamp: &metav1.Time{},
-			Finalizers:        []string{v1beta1.FinalizerServiceCatalog},
+			Finalizers:        []string{v1.FinalizerServiceCatalog},
 			Generation:        1,
 		},
-		Spec: v1beta1.ServiceBindingSpec{
-			InstanceRef: v1beta1.LocalObjectReference{Name: testServiceInstanceName},
+		Spec: v1.ServiceBindingSpec{
+			InstanceRef: v1.LocalObjectReference{Name: testServiceInstanceName},
 			ExternalID:  testServiceBindingGUID,
 		},
-		Status: v1beta1.ServiceBindingStatus{
-			UnbindStatus: v1beta1.ServiceBindingUnbindStatusNotRequired,
+		Status: v1.ServiceBindingStatus{
+			UnbindStatus: v1.ServiceBindingUnbindStatusNotRequired,
 		},
 	}
 
@@ -1271,11 +1271,11 @@ func TestReconcileServiceBindingDeleteUnresolvedClusterServiceClassReference(t *
 // the results as expected with respect to the changed condition and transition
 // time.
 func TestSetServiceBindingCondition(t *testing.T) {
-	bindingWithCondition := func(condition *v1beta1.ServiceBindingCondition) *v1beta1.ServiceBinding {
+	bindingWithCondition := func(condition *v1.ServiceBindingCondition) *v1.ServiceBinding {
 		binding := getTestServiceBinding()
-		binding.Status = v1beta1.ServiceBindingStatus{
-			Conditions:   []v1beta1.ServiceBindingCondition{*condition},
-			UnbindStatus: v1beta1.ServiceBindingUnbindStatusRequired,
+		binding.Status = v1.ServiceBindingStatus{
+			Conditions:   []v1.ServiceBindingCondition{*condition},
+			UnbindStatus: v1.ServiceBindingUnbindStatusRequired,
 		}
 
 		return binding
@@ -1289,8 +1289,8 @@ func TestSetServiceBindingCondition(t *testing.T) {
 	oldTs := metav1.NewTime(newTs.Add(-5 * time.Minute))
 
 	// condition is a shortcut method for creating conditions with the 'old' timestamp.
-	condition := func(cType v1beta1.ServiceBindingConditionType, status v1beta1.ConditionStatus, s ...string) *v1beta1.ServiceBindingCondition {
-		c := &v1beta1.ServiceBindingCondition{
+	condition := func(cType v1.ServiceBindingConditionType, status v1.ConditionStatus, s ...string) *v1.ServiceBindingCondition {
+		c := &v1.ServiceBindingCondition{
 			Type:   cType,
 			Status: status,
 		}
@@ -1312,25 +1312,25 @@ func TestSetServiceBindingCondition(t *testing.T) {
 
 	// shortcut methods for creating conditions of different types
 
-	readyFalse := func() *v1beta1.ServiceBindingCondition {
-		return condition(v1beta1.ServiceBindingConditionReady, v1beta1.ConditionFalse, "Reason", "Message")
+	readyFalse := func() *v1.ServiceBindingCondition {
+		return condition(v1.ServiceBindingConditionReady, v1.ConditionFalse, "Reason", "Message")
 	}
 
-	readyFalsef := func(reason, message string) *v1beta1.ServiceBindingCondition {
-		return condition(v1beta1.ServiceBindingConditionReady, v1beta1.ConditionFalse, reason, message)
+	readyFalsef := func(reason, message string) *v1.ServiceBindingCondition {
+		return condition(v1.ServiceBindingConditionReady, v1.ConditionFalse, reason, message)
 	}
 
-	readyTrue := func() *v1beta1.ServiceBindingCondition {
-		return condition(v1beta1.ServiceBindingConditionReady, v1beta1.ConditionTrue, "Reason", "Message")
+	readyTrue := func() *v1.ServiceBindingCondition {
+		return condition(v1.ServiceBindingConditionReady, v1.ConditionTrue, "Reason", "Message")
 	}
 
-	failedTrue := func() *v1beta1.ServiceBindingCondition {
-		return condition(v1beta1.ServiceBindingConditionFailed, v1beta1.ConditionTrue, "Reason", "Message")
+	failedTrue := func() *v1.ServiceBindingCondition {
+		return condition(v1.ServiceBindingConditionFailed, v1.ConditionTrue, "Reason", "Message")
 	}
 
 	// withNewTs sets the LastTransitionTime to the 'new' basis time and
 	// returns it.
-	withNewTs := func(c *v1beta1.ServiceBindingCondition) *v1beta1.ServiceBindingCondition {
+	withNewTs := func(c *v1.ServiceBindingCondition) *v1.ServiceBindingCondition {
 		c.LastTransitionTime = newTs
 		return c
 	}
@@ -1345,9 +1345,9 @@ func TestSetServiceBindingCondition(t *testing.T) {
 	// changed.
 	cases := []struct {
 		name      string
-		input     *v1beta1.ServiceBinding
-		condition *v1beta1.ServiceBindingCondition
-		result    *v1beta1.ServiceBinding
+		input     *v1.ServiceBinding
+		condition *v1.ServiceBindingCondition
+		result    *v1.ServiceBinding
 	}{
 		{
 			name:      "new ready condition",
@@ -1389,7 +1389,7 @@ func TestSetServiceBindingCondition(t *testing.T) {
 			name:      "not ready -> not ready + failed",
 			input:     bindingWithCondition(readyFalse()),
 			condition: failedTrue(),
-			result: func() *v1beta1.ServiceBinding {
+			result: func() *v1.ServiceBinding {
 				i := bindingWithCondition(readyFalse())
 				i.Status.Conditions = append(i.Status.Conditions, *withNewTs(failedTrue()))
 				return i
@@ -1422,9 +1422,9 @@ func TestReconcileServiceBindingDeleteFailedServiceBinding(t *testing.T) {
 
 	binding := getTestServiceBindingWithFailedStatus()
 	binding.ObjectMeta.DeletionTimestamp = &metav1.Time{}
-	binding.ObjectMeta.Finalizers = []string{v1beta1.FinalizerServiceCatalog}
-	binding.Status.ExternalProperties = &v1beta1.ServiceBindingPropertiesState{}
-	binding.Status.UnbindStatus = v1beta1.ServiceBindingUnbindStatusRequired
+	binding.ObjectMeta.Finalizers = []string{v1.FinalizerServiceCatalog}
+	binding.Status.ExternalProperties = &v1.ServiceBindingPropertiesState{}
+	binding.Status.UnbindStatus = v1.ServiceBindingUnbindStatusRequired
 
 	binding.ObjectMeta.Generation = 2
 	binding.Status.ReconciledGeneration = 1
@@ -1488,7 +1488,7 @@ func TestReconcileServiceBindingDeleteFailedServiceBinding(t *testing.T) {
 
 	assertUpdateStatus(t, actions[0], binding)
 	updatedServiceBinding := assertUpdate(t, actions[1], binding)
-	assertServiceBindingOperationSuccess(t, updatedServiceBinding, v1beta1.ServiceBindingOperationUnbind, binding)
+	assertServiceBindingOperationSuccess(t, updatedServiceBinding, v1.ServiceBindingOperationUnbind, binding)
 	assertServiceBindingOrphanMitigationSet(t, updatedServiceBinding, false)
 
 	events := getRecordedEvents(testController)
@@ -1517,22 +1517,22 @@ func TestReconcileServiceBindingWithClusterServiceBrokerError(t *testing.T) {
 
 	sharedInformers.ClusterServiceBrokers().Informer().GetStore().Add(getTestClusterServiceBroker())
 	sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(getTestClusterServiceClass())
-	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1beta1.ConditionTrue))
+	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1.ConditionTrue))
 	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
 
-	binding := &v1beta1.ServiceBinding{
+	binding := &v1.ServiceBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:       testServiceBindingName,
 			Namespace:  testNamespace,
 			Generation: 1,
 		},
-		Spec: v1beta1.ServiceBindingSpec{
-			InstanceRef: v1beta1.LocalObjectReference{Name: testServiceInstanceName},
+		Spec: v1.ServiceBindingSpec{
+			InstanceRef: v1.LocalObjectReference{Name: testServiceInstanceName},
 			ExternalID:  testServiceBindingGUID,
 			SecretName:  testServiceBindingSecretName,
 		},
-		Status: v1beta1.ServiceBindingStatus{
-			UnbindStatus: v1beta1.ServiceBindingUnbindStatusNotRequired,
+		Status: v1.ServiceBindingStatus{
+			UnbindStatus: v1.ServiceBindingUnbindStatusNotRequired,
 		},
 	}
 
@@ -1551,7 +1551,7 @@ func TestReconcileServiceBindingWithClusterServiceBrokerError(t *testing.T) {
 	assertNumberOfActions(t, actions, 1)
 
 	updatedServiceBinding := assertUpdateStatus(t, actions[0], binding)
-	assertServiceBindingRequestRetriableError(t, updatedServiceBinding, v1beta1.ServiceBindingOperationBind, errorBindCallReason, binding)
+	assertServiceBindingRequestRetriableError(t, updatedServiceBinding, v1.ServiceBindingOperationBind, errorBindCallReason, binding)
 	assertServiceBindingOrphanMitigationSet(t, updatedServiceBinding, false)
 
 	events := getRecordedEvents(testController)
@@ -1582,23 +1582,23 @@ func TestReconcileServiceBindingWithClusterServiceBrokerHTTPError(t *testing.T) 
 
 	sharedInformers.ClusterServiceBrokers().Informer().GetStore().Add(getTestClusterServiceBroker())
 	sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(getTestClusterServiceClass())
-	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1beta1.ConditionTrue))
+	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1.ConditionTrue))
 	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
 
-	binding := &v1beta1.ServiceBinding{
+	binding := &v1.ServiceBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:       testServiceBindingName,
 			Namespace:  testNamespace,
-			Finalizers: []string{v1beta1.FinalizerServiceCatalog},
+			Finalizers: []string{v1.FinalizerServiceCatalog},
 			Generation: 1,
 		},
-		Spec: v1beta1.ServiceBindingSpec{
-			InstanceRef: v1beta1.LocalObjectReference{Name: testServiceInstanceName},
+		Spec: v1.ServiceBindingSpec{
+			InstanceRef: v1.LocalObjectReference{Name: testServiceInstanceName},
 			ExternalID:  testServiceBindingGUID,
 			SecretName:  testServiceBindingSecretName,
 		},
-		Status: v1beta1.ServiceBindingStatus{
-			UnbindStatus: v1beta1.ServiceBindingUnbindStatusNotRequired,
+		Status: v1.ServiceBindingStatus{
+			UnbindStatus: v1.ServiceBindingUnbindStatusNotRequired,
 		},
 	}
 
@@ -1617,7 +1617,7 @@ func TestReconcileServiceBindingWithClusterServiceBrokerHTTPError(t *testing.T) 
 	assertNumberOfActions(t, actions, 1)
 
 	updatedServiceBinding := assertUpdateStatus(t, actions[0], binding)
-	assertServiceBindingRequestFailingError(t, updatedServiceBinding, v1beta1.ServiceBindingOperationBind, errorBindCallReason, "ServiceBindingReturnedFailure", binding)
+	assertServiceBindingRequestFailingError(t, updatedServiceBinding, v1.ServiceBindingOperationBind, errorBindCallReason, "ServiceBindingReturnedFailure", binding)
 	assertServiceBindingOrphanMitigationSet(t, updatedServiceBinding, false)
 
 	events := getRecordedEvents(testController)
@@ -1639,7 +1639,7 @@ func TestReconcileServiceBindingWithFailureCondition(t *testing.T) {
 
 	sharedInformers.ClusterServiceBrokers().Informer().GetStore().Add(getTestClusterServiceBroker())
 	sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(getTestClusterServiceClass())
-	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1beta1.ConditionTrue))
+	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1.ConditionTrue))
 	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
 
 	binding := getTestServiceBindingWithFailedStatus()
@@ -1672,7 +1672,7 @@ func TestReconcileServiceBindingWithServiceBindingCallFailure(t *testing.T) {
 
 	sharedInformers.ClusterServiceBrokers().Informer().GetStore().Add(getTestClusterServiceBroker())
 	sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(getTestClusterServiceClass())
-	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1beta1.ConditionTrue))
+	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1.ConditionTrue))
 	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
 
 	binding := getTestServiceBinding()
@@ -1704,7 +1704,7 @@ func TestReconcileServiceBindingWithServiceBindingCallFailure(t *testing.T) {
 	assertNumberOfActions(t, actions, 1)
 
 	updatedServiceBinding := assertUpdateStatus(t, actions[0], binding)
-	assertServiceBindingRequestRetriableError(t, updatedServiceBinding, v1beta1.ServiceBindingOperationBind, errorBindCallReason, binding)
+	assertServiceBindingRequestRetriableError(t, updatedServiceBinding, v1.ServiceBindingOperationBind, errorBindCallReason, binding)
 	assertServiceBindingOrphanMitigationSet(t, updatedServiceBinding, false)
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
@@ -1747,7 +1747,7 @@ func TestReconcileServiceBindingWithServiceBindingFailure(t *testing.T) {
 
 	sharedInformers.ClusterServiceBrokers().Informer().GetStore().Add(getTestClusterServiceBroker())
 	sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(getTestClusterServiceClass())
-	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1beta1.ConditionTrue))
+	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1.ConditionTrue))
 	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
 
 	binding := getTestServiceBinding()
@@ -1779,7 +1779,7 @@ func TestReconcileServiceBindingWithServiceBindingFailure(t *testing.T) {
 	assertNumberOfActions(t, actions, 1)
 
 	updatedServiceBinding := assertUpdateStatus(t, actions[0], binding)
-	assertServiceBindingRequestFailingError(t, updatedServiceBinding, v1beta1.ServiceBindingOperationBind, errorBindCallReason, "ServiceBindingReturnedFailure", binding)
+	assertServiceBindingRequestFailingError(t, updatedServiceBinding, v1.ServiceBindingOperationBind, errorBindCallReason, "ServiceBindingReturnedFailure", binding)
 	assertServiceBindingOrphanMitigationSet(t, updatedServiceBinding, false)
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
@@ -1825,11 +1825,11 @@ func TestReconcileServiceBindingWithServiceBindingFailure(t *testing.T) {
 // - a binding with condition status true set to false will update the transition
 //   time
 func TestUpdateServiceBindingCondition(t *testing.T) {
-	getTestServiceBindingWithStatus := func(status v1beta1.ConditionStatus) *v1beta1.ServiceBinding {
+	getTestServiceBindingWithStatus := func(status v1.ConditionStatus) *v1.ServiceBinding {
 		instance := getTestServiceBinding()
-		instance.Status = v1beta1.ServiceBindingStatus{
-			Conditions: []v1beta1.ServiceBindingCondition{{
-				Type:               v1beta1.ServiceBindingConditionReady,
+		instance.Status = v1.ServiceBindingStatus{
+			Conditions: []v1.ServiceBindingCondition{{
+				Type:               v1.ServiceBindingConditionReady,
 				Status:             status,
 				Message:            "message",
 				LastTransitionTime: metav1.NewTime(time.Now().Add(-5 * time.Minute)),
@@ -1848,8 +1848,8 @@ func TestUpdateServiceBindingCondition(t *testing.T) {
 	// transitionTimeChanged: toggle for verifying transition time was updated
 	cases := []struct {
 		name                  string
-		input                 *v1beta1.ServiceBinding
-		status                v1beta1.ConditionStatus
+		input                 *v1.ServiceBinding
+		status                v1.ConditionStatus
 		reason                string
 		message               string
 		transitionTimeChanged bool
@@ -1859,21 +1859,21 @@ func TestUpdateServiceBindingCondition(t *testing.T) {
 		{
 			name:                  "initially unset",
 			input:                 getTestServiceBinding(),
-			status:                v1beta1.ConditionFalse,
+			status:                v1.ConditionFalse,
 			transitionTimeChanged: true,
 			expectedLastCondition: "",
 		},
 		{
 			name:                  "not ready -> not ready",
-			input:                 getTestServiceBindingWithStatus(v1beta1.ConditionFalse),
-			status:                v1beta1.ConditionFalse,
+			input:                 getTestServiceBindingWithStatus(v1.ConditionFalse),
+			status:                v1.ConditionFalse,
 			transitionTimeChanged: false,
 			expectedLastCondition: "",
 		},
 		{
 			name:                  "not ready -> not ready, message and reason change",
-			input:                 getTestServiceBindingWithStatus(v1beta1.ConditionFalse),
-			status:                v1beta1.ConditionFalse,
+			input:                 getTestServiceBindingWithStatus(v1.ConditionFalse),
+			status:                v1.ConditionFalse,
 			reason:                "foo",
 			message:               "bar",
 			transitionTimeChanged: false,
@@ -1881,22 +1881,22 @@ func TestUpdateServiceBindingCondition(t *testing.T) {
 		},
 		{
 			name:                  "not ready -> ready",
-			input:                 getTestServiceBindingWithStatus(v1beta1.ConditionFalse),
-			status:                v1beta1.ConditionTrue,
+			input:                 getTestServiceBindingWithStatus(v1.ConditionFalse),
+			status:                v1.ConditionTrue,
 			transitionTimeChanged: true,
 			expectedLastCondition: "Ready",
 		},
 		{
 			name:                  "ready -> ready",
-			input:                 getTestServiceBindingWithStatus(v1beta1.ConditionTrue),
-			status:                v1beta1.ConditionTrue,
+			input:                 getTestServiceBindingWithStatus(v1.ConditionTrue),
+			status:                v1.ConditionTrue,
 			transitionTimeChanged: false,
 			expectedLastCondition: "Ready",
 		},
 		{
 			name:                  "ready -> not ready",
-			input:                 getTestServiceBindingWithStatus(v1beta1.ConditionTrue),
-			status:                v1beta1.ConditionFalse,
+			input:                 getTestServiceBindingWithStatus(v1.ConditionTrue),
+			status:                v1.ConditionFalse,
 			reason:                "foo",
 			transitionTimeChanged: true,
 			expectedLastCondition: "foo",
@@ -1909,7 +1909,7 @@ func TestUpdateServiceBindingCondition(t *testing.T) {
 
 			inputClone := tc.input.DeepCopy()
 
-			err := testController.updateServiceBindingCondition(tc.input, v1beta1.ServiceBindingConditionReady, tc.status, tc.reason, tc.message)
+			err := testController.updateServiceBindingCondition(tc.input, v1.ServiceBindingConditionReady, tc.status, tc.reason, tc.message)
 			if err != nil {
 				t.Fatalf("%v: error updating broker condition: %v", tc.name, err)
 			}
@@ -1923,7 +1923,7 @@ func TestUpdateServiceBindingCondition(t *testing.T) {
 
 			updatedServiceBinding := assertUpdateStatus(t, actions[0], tc.input)
 
-			updateActionObject, ok := updatedServiceBinding.(*v1beta1.ServiceBinding)
+			updateActionObject, ok := updatedServiceBinding.(*v1.ServiceBinding)
 			if !ok {
 				t.Fatalf("%v: couldn't convert to binding", tc.name)
 			}
@@ -1971,28 +1971,28 @@ func TestReconcileUnbindingWithClusterServiceBrokerError(t *testing.T) {
 
 	sharedInformers.ClusterServiceBrokers().Informer().GetStore().Add(getTestClusterServiceBroker())
 	sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(getTestClusterServiceClass())
-	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1beta1.ConditionTrue))
+	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1.ConditionTrue))
 	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
 
 	t1 := metav1.NewTime(time.Now())
-	binding := &v1beta1.ServiceBinding{
+	binding := &v1.ServiceBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:              testServiceBindingName,
 			Namespace:         testNamespace,
 			DeletionTimestamp: &t1,
 			Generation:        1,
 		},
-		Spec: v1beta1.ServiceBindingSpec{
-			InstanceRef: v1beta1.LocalObjectReference{Name: testServiceInstanceName},
+		Spec: v1.ServiceBindingSpec{
+			InstanceRef: v1.LocalObjectReference{Name: testServiceInstanceName},
 			ExternalID:  testServiceBindingGUID,
 			SecretName:  testServiceBindingSecretName,
 		},
-		Status: v1beta1.ServiceBindingStatus{
-			ExternalProperties: &v1beta1.ServiceBindingPropertiesState{},
-			UnbindStatus:       v1beta1.ServiceBindingUnbindStatusRequired,
+		Status: v1.ServiceBindingStatus{
+			ExternalProperties: &v1.ServiceBindingPropertiesState{},
+			UnbindStatus:       v1.ServiceBindingUnbindStatusRequired,
 		},
 	}
-	if err := scmeta.AddFinalizer(binding, v1beta1.FinalizerServiceCatalog); err != nil {
+	if err := scmeta.AddFinalizer(binding, v1.FinalizerServiceCatalog); err != nil {
 		t.Fatalf("Finalizer error: %v", err)
 	}
 
@@ -2010,7 +2010,7 @@ func TestReconcileUnbindingWithClusterServiceBrokerError(t *testing.T) {
 	assertNumberOfActions(t, actions, 1)
 
 	updatedServiceBinding := assertUpdateStatus(t, actions[0], binding)
-	assertServiceBindingRequestRetriableError(t, updatedServiceBinding, v1beta1.ServiceBindingOperationUnbind, errorUnbindCallReason, binding)
+	assertServiceBindingRequestRetriableError(t, updatedServiceBinding, v1.ServiceBindingOperationUnbind, errorUnbindCallReason, binding)
 	assertServiceBindingOrphanMitigationSet(t, updatedServiceBinding, false)
 
 	events := getRecordedEvents(testController)
@@ -2039,28 +2039,28 @@ func TestReconcileUnbindingWithClusterServiceBrokerHTTPError(t *testing.T) {
 
 	sharedInformers.ClusterServiceBrokers().Informer().GetStore().Add(getTestClusterServiceBroker())
 	sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(getTestClusterServiceClass())
-	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1beta1.ConditionTrue))
+	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1.ConditionTrue))
 	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
 
 	t1 := metav1.NewTime(time.Now())
-	binding := &v1beta1.ServiceBinding{
+	binding := &v1.ServiceBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:              testServiceBindingName,
 			Namespace:         testNamespace,
 			DeletionTimestamp: &t1,
 			Generation:        1,
 		},
-		Spec: v1beta1.ServiceBindingSpec{
-			InstanceRef: v1beta1.LocalObjectReference{Name: testServiceInstanceName},
+		Spec: v1.ServiceBindingSpec{
+			InstanceRef: v1.LocalObjectReference{Name: testServiceInstanceName},
 			ExternalID:  testServiceBindingGUID,
 			SecretName:  testServiceBindingSecretName,
 		},
-		Status: v1beta1.ServiceBindingStatus{
-			ExternalProperties: &v1beta1.ServiceBindingPropertiesState{},
-			UnbindStatus:       v1beta1.ServiceBindingUnbindStatusRequired,
+		Status: v1.ServiceBindingStatus{
+			ExternalProperties: &v1.ServiceBindingPropertiesState{},
+			UnbindStatus:       v1.ServiceBindingUnbindStatusRequired,
 		},
 	}
-	if err := scmeta.AddFinalizer(binding, v1beta1.FinalizerServiceCatalog); err != nil {
+	if err := scmeta.AddFinalizer(binding, v1.FinalizerServiceCatalog); err != nil {
 		t.Fatalf("Finalizer error: %v", err)
 	}
 
@@ -2078,7 +2078,7 @@ func TestReconcileUnbindingWithClusterServiceBrokerHTTPError(t *testing.T) {
 	assertNumberOfActions(t, actions, 1)
 
 	updatedServiceBinding := assertUpdateStatus(t, actions[0], binding)
-	assertServiceBindingRequestRetriableError(t, updatedServiceBinding, v1beta1.ServiceBindingOperationUnbind, errorUnbindCallReason, binding)
+	assertServiceBindingRequestRetriableError(t, updatedServiceBinding, v1.ServiceBindingOperationUnbind, errorUnbindCallReason, binding)
 	assertServiceBindingOrphanMitigationSet(t, updatedServiceBinding, false)
 
 	events := getRecordedEvents(testController)
@@ -2110,7 +2110,7 @@ func TestReconcileBindingUsingOriginatingIdentity(t *testing.T) {
 			sharedInformers.ClusterServiceBrokers().Informer().GetStore().Add(getTestClusterServiceBroker())
 			sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(getTestClusterServiceClass())
 			sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
-			sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1beta1.ConditionTrue))
+			sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1.ConditionTrue))
 
 			binding := getTestServiceBinding()
 			if tc.includeUserInfo {
@@ -2167,11 +2167,11 @@ func TestReconcileBindingDeleteUsingOriginatingIdentity(t *testing.T) {
 			sharedInformers.ClusterServiceBrokers().Informer().GetStore().Add(getTestClusterServiceBroker())
 			sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(getTestClusterServiceClass())
 			sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
-			sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1beta1.ConditionTrue))
+			sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1.ConditionTrue))
 
 			binding := getTestServiceBinding()
 			binding.DeletionTimestamp = &metav1.Time{}
-			binding.Finalizers = []string{v1beta1.FinalizerServiceCatalog}
+			binding.Finalizers = []string{v1.FinalizerServiceCatalog}
 			if tc.includeUserInfo {
 				binding.Spec.UserInfo = testUserInfo
 			}
@@ -2228,13 +2228,13 @@ func TestReconcileBindingSuccessOnFinalRetry(t *testing.T) {
 	sharedInformers.ClusterServiceBrokers().Informer().GetStore().Add(getTestClusterServiceBroker())
 	sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(getTestClusterServiceClass())
 	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
-	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1beta1.ConditionTrue))
+	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1.ConditionTrue))
 
 	binding := getTestServiceBinding()
-	binding.Status.CurrentOperation = v1beta1.ServiceBindingOperationBind
+	binding.Status.CurrentOperation = v1.ServiceBindingOperationBind
 	startTime := metav1.NewTime(time.Now().Add(-7 * 24 * time.Hour))
 	binding.Status.OperationStartTime = &startTime
-	binding.Status.InProgressProperties = &v1beta1.ServiceBindingPropertiesState{}
+	binding.Status.InProgressProperties = &v1.ServiceBindingPropertiesState{}
 
 	if err := reconcileServiceBinding(t, testController, binding); err != nil {
 		t.Fatalf("a valid binding should not fail: %v", err)
@@ -2257,8 +2257,8 @@ func TestReconcileBindingSuccessOnFinalRetry(t *testing.T) {
 	actions := fakeCatalogClient.Actions()
 	assertNumberOfActions(t, actions, 1)
 
-	updatedServiceBinding := assertUpdateStatus(t, actions[0], binding).(*v1beta1.ServiceBinding)
-	assertServiceBindingOperationSuccess(t, updatedServiceBinding, v1beta1.ServiceBindingOperationBind, binding)
+	updatedServiceBinding := assertUpdateStatus(t, actions[0], binding).(*v1.ServiceBinding)
+	assertServiceBindingOperationSuccess(t, updatedServiceBinding, v1.ServiceBindingOperationBind, binding)
 	assertServiceBindingOrphanMitigationSet(t, updatedServiceBinding, false)
 
 	events := getRecordedEvents(testController)
@@ -2287,10 +2287,10 @@ func TestReconcileBindingFailureOnFinalRetry(t *testing.T) {
 	sharedInformers.ClusterServiceBrokers().Informer().GetStore().Add(getTestClusterServiceBroker())
 	sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(getTestClusterServiceClass())
 	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
-	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1beta1.ConditionTrue))
+	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1.ConditionTrue))
 
 	binding := getTestServiceBinding()
-	binding.Status.CurrentOperation = v1beta1.ServiceBindingOperationBind
+	binding.Status.CurrentOperation = v1.ServiceBindingOperationBind
 	startTime := metav1.NewTime(time.Now().Add(-7 * 24 * time.Hour))
 	binding.Status.OperationStartTime = &startTime
 
@@ -2301,8 +2301,8 @@ func TestReconcileBindingFailureOnFinalRetry(t *testing.T) {
 	actions := fakeCatalogClient.Actions()
 	assertNumberOfActions(t, actions, 1)
 
-	updatedServiceBinding := assertUpdateStatus(t, actions[0], binding).(*v1beta1.ServiceBinding)
-	assertServiceBindingRequestFailingError(t, updatedServiceBinding, v1beta1.ServiceBindingOperationBind, errorBindCallReason, errorReconciliationRetryTimeoutReason, binding)
+	updatedServiceBinding := assertUpdateStatus(t, actions[0], binding).(*v1.ServiceBinding)
+	assertServiceBindingRequestFailingError(t, updatedServiceBinding, v1.ServiceBindingOperationBind, errorBindCallReason, errorReconciliationRetryTimeoutReason, binding)
 	assertServiceBindingOrphanMitigationSet(t, updatedServiceBinding, false)
 
 	events := getRecordedEvents(testController)
@@ -2340,25 +2340,25 @@ func TestReconcileBindingWithSecretConflictFailedAfterFinalRetry(t *testing.T) {
 	sharedInformers.ClusterServiceBrokers().Informer().GetStore().Add(getTestClusterServiceBroker())
 	sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(getTestClusterServiceClass())
 	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
-	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1beta1.ConditionTrue))
+	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1.ConditionTrue))
 
 	startTime := metav1.NewTime(time.Now().Add(-7 * 24 * time.Hour))
-	binding := &v1beta1.ServiceBinding{
+	binding := &v1.ServiceBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:       testServiceBindingName,
 			Namespace:  testNamespace,
 			Generation: 1,
 		},
-		Spec: v1beta1.ServiceBindingSpec{
-			InstanceRef: v1beta1.LocalObjectReference{Name: testServiceInstanceName},
+		Spec: v1.ServiceBindingSpec{
+			InstanceRef: v1.LocalObjectReference{Name: testServiceInstanceName},
 			ExternalID:  testServiceBindingGUID,
 			SecretName:  testServiceBindingSecretName,
 		},
-		Status: v1beta1.ServiceBindingStatus{
-			CurrentOperation:     v1beta1.ServiceBindingOperationBind,
+		Status: v1.ServiceBindingStatus{
+			CurrentOperation:     v1.ServiceBindingOperationBind,
 			OperationStartTime:   &startTime,
-			UnbindStatus:         v1beta1.ServiceBindingUnbindStatusRequired,
-			InProgressProperties: &v1beta1.ServiceBindingPropertiesState{},
+			UnbindStatus:         v1.ServiceBindingUnbindStatusRequired,
+			InProgressProperties: &v1.ServiceBindingPropertiesState{},
 		},
 	}
 
@@ -2383,10 +2383,10 @@ func TestReconcileBindingWithSecretConflictFailedAfterFinalRetry(t *testing.T) {
 	actions := fakeCatalogClient.Actions()
 	assertNumberOfActions(t, actions, 1)
 
-	updatedServiceBinding := assertUpdateStatus(t, actions[0], binding).(*v1beta1.ServiceBinding)
+	updatedServiceBinding := assertUpdateStatus(t, actions[0], binding).(*v1.ServiceBinding)
 
-	assertServiceBindingCondition(t, updatedServiceBinding, v1beta1.ServiceBindingConditionReady, v1beta1.ConditionFalse, errorServiceBindingOrphanMitigation)
-	assertServiceBindingCondition(t, updatedServiceBinding, v1beta1.ServiceBindingConditionFailed, v1beta1.ConditionTrue, errorReconciliationRetryTimeoutReason)
+	assertServiceBindingCondition(t, updatedServiceBinding, v1.ServiceBindingConditionReady, v1.ConditionFalse, errorServiceBindingOrphanMitigation)
+	assertServiceBindingCondition(t, updatedServiceBinding, v1.ServiceBindingConditionFailed, v1.ConditionTrue, errorReconciliationRetryTimeoutReason)
 	assertServiceBindingStartingOrphanMitigation(t, updatedServiceBinding, binding)
 	assertServiceBindingExternalPropertiesParameters(t, updatedServiceBinding, nil, "")
 
@@ -2420,7 +2420,7 @@ func TestReconcileServiceBindingWithStatusUpdateError(t *testing.T) {
 	sharedInformers.ClusterServiceBrokers().Informer().GetStore().Add(getTestClusterServiceBroker())
 	sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(getTestClusterServiceClass())
 	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
-	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1beta1.ConditionTrue))
+	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1.ConditionTrue))
 
 	binding := getTestServiceBinding()
 
@@ -2443,7 +2443,7 @@ func TestReconcileServiceBindingWithStatusUpdateError(t *testing.T) {
 	assertNumberOfActions(t, actions, 1)
 
 	updatedServiceBinding := assertUpdateStatus(t, actions[0], binding)
-	assertServiceBindingOperationInProgress(t, updatedServiceBinding, v1beta1.ServiceBindingOperationBind, binding)
+	assertServiceBindingOperationInProgress(t, updatedServiceBinding, v1.ServiceBindingOperationBind, binding)
 	assertServiceBindingOrphanMitigationSet(t, updatedServiceBinding, false)
 
 	events := getRecordedEvents(testController)
@@ -2483,22 +2483,22 @@ func TestReconcileServiceBindingWithSecretParameters(t *testing.T) {
 	sharedInformers.ClusterServiceBrokers().Informer().GetStore().Add(getTestClusterServiceBroker())
 	sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(getTestClusterServiceClass())
 	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
-	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1beta1.ConditionTrue))
+	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1.ConditionTrue))
 
-	binding := &v1beta1.ServiceBinding{
+	binding := &v1.ServiceBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:       testServiceBindingName,
 			Namespace:  testNamespace,
-			Finalizers: []string{v1beta1.FinalizerServiceCatalog},
+			Finalizers: []string{v1.FinalizerServiceCatalog},
 			Generation: 1,
 		},
-		Spec: v1beta1.ServiceBindingSpec{
-			InstanceRef: v1beta1.LocalObjectReference{Name: testServiceInstanceName},
+		Spec: v1.ServiceBindingSpec{
+			InstanceRef: v1.LocalObjectReference{Name: testServiceInstanceName},
 			ExternalID:  testServiceBindingGUID,
 			SecretName:  testServiceBindingSecretName,
 		},
-		Status: v1beta1.ServiceBindingStatus{
-			UnbindStatus: v1beta1.ServiceBindingUnbindStatusNotRequired,
+		Status: v1.ServiceBindingStatus{
+			UnbindStatus: v1.ServiceBindingUnbindStatusNotRequired,
 		},
 	}
 
@@ -2511,9 +2511,9 @@ func TestReconcileServiceBindingWithSecretParameters(t *testing.T) {
 	}
 	binding.Spec.Parameters = &runtime.RawExtension{Raw: b}
 
-	binding.Spec.ParametersFrom = []v1beta1.ParametersFromSource{
+	binding.Spec.ParametersFrom = []v1.ParametersFromSource{
 		{
-			SecretKeyRef: &v1beta1.SecretKeyReference{
+			SecretKeyRef: &v1.SecretKeyReference{
 				Name: "param-secret-name",
 				Key:  "param-secret-key",
 			},
@@ -2533,7 +2533,7 @@ func TestReconcileServiceBindingWithSecretParameters(t *testing.T) {
 		"b": "2",
 	})
 
-	binding = assertServiceBindingOperationInProgressWithParametersIsTheOnlyCatalogAction(t, fakeCatalogClient, binding, v1beta1.ServiceBindingOperationBind, expectedParameters, expectedParametersChecksum)
+	binding = assertServiceBindingOperationInProgressWithParametersIsTheOnlyCatalogAction(t, fakeCatalogClient, binding, v1.ServiceBindingOperationBind, expectedParameters, expectedParametersChecksum)
 	fakeCatalogClient.ClearActions()
 
 	kubeActions := fakeKubeClient.Actions()
@@ -2571,7 +2571,7 @@ func TestReconcileServiceBindingWithSecretParameters(t *testing.T) {
 	assertNumberOfActions(t, actions, 1)
 
 	updatedServiceBinding := assertUpdateStatus(t, actions[0], binding)
-	assertServiceBindingOperationSuccessWithParameters(t, updatedServiceBinding, v1beta1.ServiceBindingOperationBind, expectedParameters, expectedParametersChecksum, binding)
+	assertServiceBindingOperationSuccessWithParameters(t, updatedServiceBinding, v1.ServiceBindingOperationBind, expectedParameters, expectedParametersChecksum, binding)
 	assertServiceBindingOrphanMitigationSet(t, updatedServiceBinding, false)
 
 	kubeActions = fakeKubeClient.Actions()
@@ -2693,21 +2693,21 @@ func TestReconcileBindingWithSetOrphanMitigation(t *testing.T) {
 			sharedInformers.ClusterServiceBrokers().Informer().GetStore().Add(getTestClusterServiceBroker())
 			sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(getTestClusterServiceClass())
 			sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
-			sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1beta1.ConditionTrue))
+			sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1.ConditionTrue))
 
-			binding := &v1beta1.ServiceBinding{
+			binding := &v1.ServiceBinding{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:       testServiceBindingName,
 					Namespace:  testNamespace,
 					Generation: 1,
 				},
-				Spec: v1beta1.ServiceBindingSpec{
-					InstanceRef: v1beta1.LocalObjectReference{Name: testServiceInstanceName},
+				Spec: v1.ServiceBindingSpec{
+					InstanceRef: v1.LocalObjectReference{Name: testServiceInstanceName},
 					ExternalID:  testServiceBindingGUID,
 					SecretName:  testServiceBindingSecretName,
 				},
-				Status: v1beta1.ServiceBindingStatus{
-					UnbindStatus: v1beta1.ServiceBindingUnbindStatusNotRequired,
+				Status: v1.ServiceBindingStatus{
+					UnbindStatus: v1.ServiceBindingUnbindStatusNotRequired,
 				},
 			}
 			startTime := metav1.NewTime(time.Now().Add(-7 * 24 * time.Hour))
@@ -2750,7 +2750,7 @@ func TestReconcileBindingWithSetOrphanMitigation(t *testing.T) {
 			actions := fakeCatalogClient.Actions()
 			assertNumberOfActions(t, actions, 1)
 
-			updatedServiceBinding := assertUpdateStatus(t, actions[0], binding).(*v1beta1.ServiceBinding)
+			updatedServiceBinding := assertUpdateStatus(t, actions[0], binding).(*v1.ServiceBinding)
 
 			assertServiceBindingExternalPropertiesNil(t, updatedServiceBinding)
 
@@ -2758,7 +2758,7 @@ func TestReconcileBindingWithSetOrphanMitigation(t *testing.T) {
 				assertServiceBindingStartingOrphanMitigation(t, updatedServiceBinding, binding)
 			} else {
 				assertServiceBindingReadyFalse(t, updatedServiceBinding)
-				assertServiceBindingCondition(t, updatedServiceBinding, v1beta1.ServiceBindingConditionReady, v1beta1.ConditionFalse)
+				assertServiceBindingCondition(t, updatedServiceBinding, v1.ServiceBindingConditionReady, v1.ConditionFalse)
 				assertServiceBindingOrphanMitigationSet(t, updatedServiceBinding, false)
 			}
 		})
@@ -2784,25 +2784,25 @@ func TestReconcileBindingWithOrphanMitigationInProgress(t *testing.T) {
 	sharedInformers.ClusterServiceBrokers().Informer().GetStore().Add(getTestClusterServiceBroker())
 	sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(getTestClusterServiceClass())
 	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
-	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1beta1.ConditionTrue))
+	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1.ConditionTrue))
 
-	binding := &v1beta1.ServiceBinding{
+	binding := &v1.ServiceBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:       testServiceBindingName,
 			Namespace:  testNamespace,
-			Finalizers: []string{v1beta1.FinalizerServiceCatalog},
+			Finalizers: []string{v1.FinalizerServiceCatalog},
 			Generation: 1,
 		},
-		Spec: v1beta1.ServiceBindingSpec{
-			InstanceRef: v1beta1.LocalObjectReference{Name: testServiceInstanceName},
+		Spec: v1.ServiceBindingSpec{
+			InstanceRef: v1.LocalObjectReference{Name: testServiceInstanceName},
 			ExternalID:  testServiceBindingGUID,
 			SecretName:  testServiceBindingSecretName,
 		},
-		Status: v1beta1.ServiceBindingStatus{
-			UnbindStatus: v1beta1.ServiceBindingUnbindStatusRequired,
+		Status: v1.ServiceBindingStatus{
+			UnbindStatus: v1.ServiceBindingUnbindStatusRequired,
 		},
 	}
-	binding.Status.CurrentOperation = v1beta1.ServiceBindingOperationBind
+	binding.Status.CurrentOperation = v1.ServiceBindingOperationBind
 	binding.Status.OperationStartTime = nil
 	binding.Status.OrphanMitigationInProgress = true
 
@@ -2823,8 +2823,8 @@ func TestReconcileBindingWithOrphanMitigationInProgress(t *testing.T) {
 	actions := fakeCatalogClient.Actions()
 	assertNumberOfActions(t, actions, 1)
 
-	updatedServiceBinding := assertUpdateStatus(t, actions[0], binding).(*v1beta1.ServiceBinding)
-	assertServiceBindingCondition(t, updatedServiceBinding, v1beta1.ServiceBindingConditionReady, v1beta1.ConditionFalse, "OrphanMitigationSuccessful")
+	updatedServiceBinding := assertUpdateStatus(t, actions[0], binding).(*v1.ServiceBinding)
+	assertServiceBindingCondition(t, updatedServiceBinding, v1.ServiceBindingConditionReady, v1.ConditionFalse, "OrphanMitigationSuccessful")
 	assertServiceBindingOrphanMitigationSet(t, updatedServiceBinding, false)
 }
 
@@ -2849,33 +2849,33 @@ func TestReconcileBindingWithOrphanMitigationReconciliationRetryTimeOut(t *testi
 	sharedInformers.ClusterServiceBrokers().Informer().GetStore().Add(getTestClusterServiceBroker())
 	sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(getTestClusterServiceClass())
 	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
-	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1beta1.ConditionTrue))
+	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1.ConditionTrue))
 
-	binding := &v1beta1.ServiceBinding{
+	binding := &v1.ServiceBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:       testServiceBindingName,
 			Namespace:  testNamespace,
-			Finalizers: []string{v1beta1.FinalizerServiceCatalog},
+			Finalizers: []string{v1.FinalizerServiceCatalog},
 			Generation: 1,
 		},
-		Spec: v1beta1.ServiceBindingSpec{
-			InstanceRef: v1beta1.LocalObjectReference{Name: testServiceInstanceName},
+		Spec: v1.ServiceBindingSpec{
+			InstanceRef: v1.LocalObjectReference{Name: testServiceInstanceName},
 			ExternalID:  testServiceBindingGUID,
 			SecretName:  testServiceBindingSecretName,
 		},
-		Status: v1beta1.ServiceBindingStatus{
-			Conditions: []v1beta1.ServiceBindingCondition{
+		Status: v1.ServiceBindingStatus{
+			Conditions: []v1.ServiceBindingCondition{
 				{
-					Type:   v1beta1.ServiceBindingConditionFailed,
-					Status: v1beta1.ConditionTrue,
+					Type:   v1.ServiceBindingConditionFailed,
+					Status: v1.ConditionTrue,
 					Reason: "reason-orphan-mitigation-began",
 				},
 			},
-			UnbindStatus: v1beta1.ServiceBindingUnbindStatusRequired,
+			UnbindStatus: v1.ServiceBindingUnbindStatusRequired,
 		},
 	}
 	startTime := metav1.NewTime(time.Now().Add(-7 * 24 * time.Hour))
-	binding.Status.CurrentOperation = v1beta1.ServiceBindingOperationBind
+	binding.Status.CurrentOperation = v1.ServiceBindingOperationBind
 	binding.Status.OperationStartTime = &startTime
 	binding.Status.OrphanMitigationInProgress = true
 
@@ -2896,8 +2896,8 @@ func TestReconcileBindingWithOrphanMitigationReconciliationRetryTimeOut(t *testi
 	actions := fakeCatalogClient.Actions()
 	assertNumberOfActions(t, actions, 1)
 
-	updatedServiceBinding := assertUpdateStatus(t, actions[0], binding).(*v1beta1.ServiceBinding)
-	assertServiceBindingRequestFailingError(t, updatedServiceBinding, v1beta1.ServiceBindingOperationUnbind, errorOrphanMitigationFailedReason, "reason-orphan-mitigation-began", binding)
+	updatedServiceBinding := assertUpdateStatus(t, actions[0], binding).(*v1.ServiceBinding)
+	assertServiceBindingRequestFailingError(t, updatedServiceBinding, v1.ServiceBindingOperationUnbind, errorOrphanMitigationFailedReason, "reason-orphan-mitigation-began", binding)
 	assertServiceBindingOrphanMitigationSet(t, updatedServiceBinding, false)
 
 	events := getRecordedEvents(testController)
@@ -2927,23 +2927,23 @@ func TestReconcileServiceBindingDeleteDuringOngoingOperation(t *testing.T) {
 	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
 
 	startTime := metav1.NewTime(time.Now().Add(-1 * time.Hour))
-	binding := &v1beta1.ServiceBinding{
+	binding := &v1.ServiceBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:              testServiceBindingName,
 			Namespace:         testNamespace,
 			DeletionTimestamp: &metav1.Time{},
-			Finalizers:        []string{v1beta1.FinalizerServiceCatalog},
+			Finalizers:        []string{v1.FinalizerServiceCatalog},
 		},
-		Spec: v1beta1.ServiceBindingSpec{
-			InstanceRef: v1beta1.LocalObjectReference{Name: testServiceInstanceName},
+		Spec: v1.ServiceBindingSpec{
+			InstanceRef: v1.LocalObjectReference{Name: testServiceInstanceName},
 			ExternalID:  testServiceBindingGUID,
 			SecretName:  testServiceBindingSecretName,
 		},
-		Status: v1beta1.ServiceBindingStatus{
-			CurrentOperation:     v1beta1.ServiceBindingOperationBind,
+		Status: v1.ServiceBindingStatus{
+			CurrentOperation:     v1.ServiceBindingOperationBind,
 			OperationStartTime:   &startTime,
-			InProgressProperties: &v1beta1.ServiceBindingPropertiesState{},
-			UnbindStatus:         v1beta1.ServiceBindingUnbindStatusRequired,
+			InProgressProperties: &v1.ServiceBindingPropertiesState{},
+			UnbindStatus:         v1.ServiceBindingUnbindStatusRequired,
 		},
 	}
 
@@ -2998,7 +2998,7 @@ func TestReconcileServiceBindingDeleteDuringOngoingOperation(t *testing.T) {
 
 	assertUpdateStatus(t, actions[0], binding)
 	updatedServiceBinding := assertUpdate(t, actions[1], binding)
-	assertServiceBindingOperationSuccess(t, updatedServiceBinding, v1beta1.ServiceBindingOperationUnbind, binding)
+	assertServiceBindingOperationSuccess(t, updatedServiceBinding, v1.ServiceBindingOperationUnbind, binding)
 	assertServiceBindingOrphanMitigationSet(t, updatedServiceBinding, false)
 
 	events := getRecordedEvents(testController)
@@ -3024,23 +3024,23 @@ func TestReconcileServiceBindingDeleteDuringOrphanMitigation(t *testing.T) {
 	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
 
 	startTime := metav1.NewTime(time.Now().Add(-1 * time.Hour))
-	binding := &v1beta1.ServiceBinding{
+	binding := &v1.ServiceBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:              testServiceBindingName,
 			Namespace:         testNamespace,
 			DeletionTimestamp: &metav1.Time{},
-			Finalizers:        []string{v1beta1.FinalizerServiceCatalog},
+			Finalizers:        []string{v1.FinalizerServiceCatalog},
 		},
-		Spec: v1beta1.ServiceBindingSpec{
-			InstanceRef: v1beta1.LocalObjectReference{Name: testServiceInstanceName},
+		Spec: v1.ServiceBindingSpec{
+			InstanceRef: v1.LocalObjectReference{Name: testServiceInstanceName},
 			ExternalID:  testServiceBindingGUID,
 			SecretName:  testServiceBindingSecretName,
 		},
-		Status: v1beta1.ServiceBindingStatus{
-			CurrentOperation:           v1beta1.ServiceBindingOperationBind,
+		Status: v1.ServiceBindingStatus{
+			CurrentOperation:           v1.ServiceBindingOperationBind,
 			OperationStartTime:         &startTime,
 			OrphanMitigationInProgress: true,
-			UnbindStatus:               v1beta1.ServiceBindingUnbindStatusRequired,
+			UnbindStatus:               v1.ServiceBindingUnbindStatusRequired,
 		},
 	}
 
@@ -3095,7 +3095,7 @@ func TestReconcileServiceBindingDeleteDuringOrphanMitigation(t *testing.T) {
 
 	assertUpdateStatus(t, actions[0], binding)
 	updatedServiceBinding := assertUpdate(t, actions[1], binding)
-	assertServiceBindingOperationSuccess(t, updatedServiceBinding, v1beta1.ServiceBindingOperationUnbind, binding)
+	assertServiceBindingOperationSuccess(t, updatedServiceBinding, v1.ServiceBindingOperationUnbind, binding)
 	assertServiceBindingOrphanMitigationSet(t, updatedServiceBinding, false)
 
 	events := getRecordedEvents(testController)
@@ -3129,7 +3129,7 @@ func TestReconcileServiceBindingAsynchronousBind(t *testing.T) {
 	sharedInformers.ClusterServiceBrokers().Informer().GetStore().Add(getTestClusterServiceBroker())
 	sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(getTestBindingRetrievableClusterServiceClass())
 	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
-	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1beta1.ConditionTrue))
+	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1.ConditionTrue))
 
 	binding := getTestServiceBinding()
 	bindingKey := binding.Namespace + "/" + binding.Name
@@ -3186,8 +3186,8 @@ func TestReconcileServiceBindingAsynchronousBind(t *testing.T) {
 	actions := fakeCatalogClient.Actions()
 	assertNumberOfActions(t, actions, 1)
 
-	updatedServiceBinding := assertUpdateStatus(t, actions[0], binding).(*v1beta1.ServiceBinding)
-	assertServiceBindingAsyncInProgress(t, updatedServiceBinding, v1beta1.ServiceBindingOperationBind, asyncBindingReason, testOperation, binding)
+	updatedServiceBinding := assertUpdateStatus(t, actions[0], binding).(*v1.ServiceBinding)
+	assertServiceBindingAsyncInProgress(t, updatedServiceBinding, v1.ServiceBindingOperationBind, asyncBindingReason, testOperation, binding)
 
 	// Events
 	events := getRecordedEvents(testController)
@@ -3219,7 +3219,7 @@ func TestReconcileServiceBindingAsynchronousUnbind(t *testing.T) {
 	sharedInformers.ClusterServiceBrokers().Informer().GetStore().Add(getTestClusterServiceBroker())
 	sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(getTestBindingRetrievableClusterServiceClass())
 	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
-	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1beta1.ConditionTrue))
+	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1.ConditionTrue))
 
 	binding := getTestServiceBindingUnbinding()
 	bindingKey := binding.Namespace + "/" + binding.Name
@@ -3269,8 +3269,8 @@ func TestReconcileServiceBindingAsynchronousUnbind(t *testing.T) {
 	actions := fakeCatalogClient.Actions()
 	assertNumberOfActions(t, actions, 1)
 
-	updatedServiceBinding := assertUpdateStatus(t, actions[0], binding).(*v1beta1.ServiceBinding)
-	assertServiceBindingAsyncInProgress(t, updatedServiceBinding, v1beta1.ServiceBindingOperationUnbind, asyncUnbindingReason, testOperation, binding)
+	updatedServiceBinding := assertUpdateStatus(t, actions[0], binding).(*v1.ServiceBinding)
+	assertServiceBindingAsyncInProgress(t, updatedServiceBinding, v1.ServiceBindingOperationUnbind, asyncUnbindingReason, testOperation, binding)
 
 	// Events
 	events := getRecordedEvents(testController)
@@ -3323,13 +3323,13 @@ func TestPollServiceBinding(t *testing.T) {
 
 	cases := []struct {
 		name                       string
-		binding                    *v1beta1.ServiceBinding
+		binding                    *v1.ServiceBinding
 		pollReaction               *fakeosb.PollBindingLastOperationReaction
 		getBindingReaction         *fakeosb.GetBindingReaction
-		environmentSetupFunc       func(t *testing.T, fakeKubeClient *clientgofake.Clientset, sharedInformers v1beta1informers.Interface)
+		environmentSetupFunc       func(t *testing.T, fakeKubeClient *clientgofake.Clientset, sharedInformers v1informers.Interface)
 		validateBrokerActionsFunc  func(t *testing.T, actions []fakeosb.Action)
 		validateKubeActionsFunc    func(t *testing.T, actions []clientgotesting.Action)
-		assertPerformedActionsFunc func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1beta1.ServiceBinding)
+		assertPerformedActionsFunc func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1.ServiceBinding)
 		shouldError                bool
 		shouldFinishPolling        bool
 		expectedEvents             []string
@@ -3368,11 +3368,11 @@ func TestPollServiceBinding(t *testing.T) {
 				},
 			},
 			validateBrokerActionsFunc: validatePollBindingLastOperationAction,
-			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1beta1.ServiceBinding) {
+			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1.ServiceBinding) {
 				assertNumberOfActions(t, actions, 1)
 				updatedBinding := assertUpdateStatus(t, actions[0], originalBinding)
 
-				assertServiceBindingAsyncInProgress(t, updatedBinding, v1beta1.ServiceBindingOperationBind, asyncBindingReason, testOperation, originalBinding)
+				assertServiceBindingAsyncInProgress(t, updatedBinding, v1.ServiceBindingOperationBind, asyncBindingReason, testOperation, originalBinding)
 			},
 			shouldFinishPolling: false,
 			expectedEvents:      []string{corev1.EventTypeNormal + " " + asyncBindingReason + " " + "The binding is being created asynchronously (testdescr)"},
@@ -3387,14 +3387,14 @@ func TestPollServiceBinding(t *testing.T) {
 				},
 			},
 			validateBrokerActionsFunc: validatePollBindingLastOperationAction,
-			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1beta1.ServiceBinding) {
+			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1.ServiceBinding) {
 				assertNumberOfActions(t, actions, 1)
 				updatedBinding := assertUpdateStatus(t, actions[0], originalBinding)
 
 				assertServiceBindingRequestFailingError(
 					t,
 					updatedBinding,
-					v1beta1.ServiceBindingOperationBind,
+					v1.ServiceBindingOperationBind,
 					errorBindCallReason,
 					errorBindCallReason,
 					originalBinding,
@@ -3430,7 +3430,7 @@ func TestPollServiceBinding(t *testing.T) {
 				},
 			},
 			validateBrokerActionsFunc: validatePollBindingLastOperationAction,
-			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1beta1.ServiceBinding) {
+			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1.ServiceBinding) {
 				assertNumberOfActions(t, actions, 1)
 				updatedBinding := assertUpdateStatus(t, actions[0], originalBinding)
 
@@ -3453,7 +3453,7 @@ func TestPollServiceBinding(t *testing.T) {
 				},
 			},
 			validateBrokerActionsFunc: validatePollBindingLastOperationAction,
-			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1beta1.ServiceBinding) {
+			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1.ServiceBinding) {
 				assertNumberOfActions(t, actions, 1)
 				updatedBinding := assertUpdateStatus(t, actions[0], originalBinding)
 
@@ -3479,7 +3479,7 @@ func TestPollServiceBinding(t *testing.T) {
 				Error: fmt.Errorf("some error"),
 			},
 			validateBrokerActionsFunc: validatePollBindingLastOperationAndGetBindingActions,
-			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1beta1.ServiceBinding) {
+			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1.ServiceBinding) {
 				assertNumberOfActions(t, actions, 1)
 				updatedBinding := assertUpdateStatus(t, actions[0], originalBinding)
 
@@ -3509,11 +3509,11 @@ func TestPollServiceBinding(t *testing.T) {
 					},
 				},
 			},
-			environmentSetupFunc: func(t *testing.T, fakeKubeClient *clientgofake.Clientset, sharedInformers v1beta1informers.Interface) {
+			environmentSetupFunc: func(t *testing.T, fakeKubeClient *clientgofake.Clientset, sharedInformers v1informers.Interface) {
 				sharedInformers.ClusterServiceBrokers().Informer().GetStore().Add(getTestClusterServiceBroker())
 				sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(getTestBindingRetrievableClusterServiceClass())
 				sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
-				sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1beta1.ConditionTrue))
+				sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1.ConditionTrue))
 
 				addGetNamespaceReaction(fakeKubeClient)
 				addGetSecretReaction(fakeKubeClient, &corev1.Secret{
@@ -3525,7 +3525,7 @@ func TestPollServiceBinding(t *testing.T) {
 				assertNumberOfActions(t, actions, 1)
 				assertActionEquals(t, actions[0], "get", "secrets")
 			},
-			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1beta1.ServiceBinding) {
+			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1.ServiceBinding) {
 				assertNumberOfActions(t, actions, 1)
 				updatedBinding := assertUpdateStatus(t, actions[0], originalBinding)
 
@@ -3555,11 +3555,11 @@ func TestPollServiceBinding(t *testing.T) {
 					},
 				},
 			},
-			environmentSetupFunc: func(t *testing.T, fakeKubeClient *clientgofake.Clientset, sharedInformers v1beta1informers.Interface) {
+			environmentSetupFunc: func(t *testing.T, fakeKubeClient *clientgofake.Clientset, sharedInformers v1informers.Interface) {
 				sharedInformers.ClusterServiceBrokers().Informer().GetStore().Add(getTestClusterServiceBroker())
 				sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(getTestBindingRetrievableClusterServiceClass())
 				sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
-				sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1beta1.ConditionTrue))
+				sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1.ConditionTrue))
 
 				addGetNamespaceReaction(fakeKubeClient)
 				addGetSecretNotFoundReaction(fakeKubeClient)
@@ -3570,11 +3570,11 @@ func TestPollServiceBinding(t *testing.T) {
 				assertActionEquals(t, actions[0], "get", "secrets")
 				assertActionEquals(t, actions[1], "create", "secrets")
 			},
-			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1beta1.ServiceBinding) {
+			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1.ServiceBinding) {
 				assertNumberOfActions(t, actions, 1)
 				updatedBinding := assertUpdateStatus(t, actions[0], originalBinding)
 
-				assertServiceBindingOperationSuccess(t, updatedBinding, v1beta1.ServiceBindingOperationBind, originalBinding)
+				assertServiceBindingOperationSuccess(t, updatedBinding, v1.ServiceBindingOperationBind, originalBinding)
 			},
 			shouldFinishPolling: true,
 			expectedEvents:      []string{corev1.EventTypeNormal + " " + successInjectedBindResultReason + " " + successInjectedBindResultMessage},
@@ -3590,12 +3590,12 @@ func TestPollServiceBinding(t *testing.T) {
 				},
 			},
 			validateBrokerActionsFunc: validatePollBindingLastOperationAction,
-			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1beta1.ServiceBinding) {
+			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1.ServiceBinding) {
 				assertNumberOfActions(t, actions, 2)
 				assertUpdateStatus(t, actions[0], originalBinding)
 				updatedBinding := assertUpdate(t, actions[1], originalBinding)
 
-				assertServiceBindingOperationSuccess(t, updatedBinding, v1beta1.ServiceBindingOperationUnbind, originalBinding)
+				assertServiceBindingOperationSuccess(t, updatedBinding, v1.ServiceBindingOperationUnbind, originalBinding)
 			},
 			shouldFinishPolling: true,
 			expectedEvents:      []string{corev1.EventTypeNormal + " " + successUnboundReason + " " + "The binding was deleted successfully"},
@@ -3609,12 +3609,12 @@ func TestPollServiceBinding(t *testing.T) {
 				},
 			},
 			validateBrokerActionsFunc: validatePollBindingLastOperationAction,
-			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1beta1.ServiceBinding) {
+			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1.ServiceBinding) {
 				assertNumberOfActions(t, actions, 2)
 				assertUpdateStatus(t, actions[0], originalBinding)
 				updatedBinding := assertUpdate(t, actions[1], originalBinding)
 
-				assertServiceBindingOperationSuccess(t, updatedBinding, v1beta1.ServiceBindingOperationUnbind, originalBinding)
+				assertServiceBindingOperationSuccess(t, updatedBinding, v1.ServiceBindingOperationUnbind, originalBinding)
 			},
 			shouldFinishPolling: true,
 			expectedEvents:      []string{corev1.EventTypeNormal + " " + successUnboundReason + " " + "The binding was deleted successfully"},
@@ -3629,11 +3629,11 @@ func TestPollServiceBinding(t *testing.T) {
 				},
 			},
 			validateBrokerActionsFunc: validatePollBindingLastOperationAction,
-			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1beta1.ServiceBinding) {
+			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1.ServiceBinding) {
 				assertNumberOfActions(t, actions, 1)
 				updatedBinding := assertUpdateStatus(t, actions[0], originalBinding)
 
-				assertServiceBindingAsyncInProgress(t, updatedBinding, v1beta1.ServiceBindingOperationUnbind, asyncUnbindingReason, testOperation, originalBinding)
+				assertServiceBindingAsyncInProgress(t, updatedBinding, v1.ServiceBindingOperationUnbind, asyncUnbindingReason, testOperation, originalBinding)
 			},
 			shouldFinishPolling: false,
 			expectedEvents:      []string{corev1.EventTypeNormal + " " + asyncUnbindingReason + " " + "The binding is being deleted asynchronously (testdescr)"},
@@ -3659,14 +3659,14 @@ func TestPollServiceBinding(t *testing.T) {
 				},
 			},
 			validateBrokerActionsFunc: validatePollBindingLastOperationAction,
-			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1beta1.ServiceBinding) {
+			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1.ServiceBinding) {
 				assertNumberOfActions(t, actions, 1)
 				updatedBinding := assertUpdateStatus(t, actions[0], originalBinding)
 
 				assertServiceBindingRequestRetriableError(
 					t,
 					updatedBinding,
-					v1beta1.ServiceBindingOperationUnbind,
+					v1.ServiceBindingOperationUnbind,
 					errorUnbindCallReason,
 					originalBinding,
 				)
@@ -3699,14 +3699,14 @@ func TestPollServiceBinding(t *testing.T) {
 				},
 			},
 			validateBrokerActionsFunc: validatePollBindingLastOperationAction,
-			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1beta1.ServiceBinding) {
+			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1.ServiceBinding) {
 				assertNumberOfActions(t, actions, 1)
 				updatedBinding := assertUpdateStatus(t, actions[0], originalBinding)
 
 				assertServiceBindingAsyncUnbindRetryDurationExceeded(
 					t,
 					updatedBinding,
-					v1beta1.ServiceBindingOperationUnbind,
+					v1.ServiceBindingOperationUnbind,
 					errorAsyncOpTimeoutReason,
 					errorReconciliationRetryTimeoutReason,
 					originalBinding,
@@ -3728,14 +3728,14 @@ func TestPollServiceBinding(t *testing.T) {
 				},
 			},
 			validateBrokerActionsFunc: validatePollBindingLastOperationAction,
-			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1beta1.ServiceBinding) {
+			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1.ServiceBinding) {
 				assertNumberOfActions(t, actions, 1)
 				updatedBinding := assertUpdateStatus(t, actions[0], originalBinding)
 
 				assertServiceBindingAsyncUnbindRetryDurationExceeded(
 					t,
 					updatedBinding,
-					v1beta1.ServiceBindingOperationUnbind,
+					v1.ServiceBindingOperationUnbind,
 					errorAsyncOpTimeoutReason,
 					errorReconciliationRetryTimeoutReason,
 					originalBinding,
@@ -3757,14 +3757,14 @@ func TestPollServiceBinding(t *testing.T) {
 				},
 			},
 			validateBrokerActionsFunc: validatePollBindingLastOperationAction,
-			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1beta1.ServiceBinding) {
+			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1.ServiceBinding) {
 				assertNumberOfActions(t, actions, 1)
 				updatedBinding := assertUpdateStatus(t, actions[0], originalBinding)
 
 				assertServiceBindingRequestFailingError(
 					t,
 					updatedBinding,
-					v1beta1.ServiceBindingOperationUnbind,
+					v1.ServiceBindingOperationUnbind,
 					errorUnbindCallReason,
 					errorReconciliationRetryTimeoutReason,
 					originalBinding,
@@ -3787,7 +3787,7 @@ func TestPollServiceBinding(t *testing.T) {
 				},
 			},
 			validateBrokerActionsFunc: validatePollBindingLastOperationAction,
-			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1beta1.ServiceBinding) {
+			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1.ServiceBinding) {
 				assertNumberOfActions(t, actions, 1)
 				updatedBinding := assertUpdateStatus(t, actions[0], originalBinding)
 
@@ -3805,7 +3805,7 @@ func TestPollServiceBinding(t *testing.T) {
 				},
 			},
 			validateBrokerActionsFunc: validatePollBindingLastOperationAction,
-			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1beta1.ServiceBinding) {
+			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1.ServiceBinding) {
 				assertNumberOfActions(t, actions, 1)
 				updatedBinding := assertUpdateStatus(t, actions[0], originalBinding)
 
@@ -3824,11 +3824,11 @@ func TestPollServiceBinding(t *testing.T) {
 				},
 			},
 			validateBrokerActionsFunc: validatePollBindingLastOperationAction,
-			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1beta1.ServiceBinding) {
+			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1.ServiceBinding) {
 				assertNumberOfActions(t, actions, 1)
 				updatedBinding := assertUpdateStatus(t, actions[0], originalBinding)
 
-				assertServiceBindingAsyncInProgress(t, updatedBinding, v1beta1.ServiceBindingOperationBind, asyncUnbindingReason, testOperation, originalBinding)
+				assertServiceBindingAsyncInProgress(t, updatedBinding, v1.ServiceBindingOperationBind, asyncUnbindingReason, testOperation, originalBinding)
 			},
 			shouldFinishPolling: false,
 			expectedEvents:      []string{corev1.EventTypeNormal + " " + asyncUnbindingReason + " " + "The binding is being deleted asynchronously (testdescr)"},
@@ -3854,7 +3854,7 @@ func TestPollServiceBinding(t *testing.T) {
 				},
 			},
 			validateBrokerActionsFunc: validatePollBindingLastOperationAction,
-			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1beta1.ServiceBinding) {
+			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1.ServiceBinding) {
 				assertNumberOfActions(t, actions, 1)
 				updatedBinding := assertUpdateStatus(t, actions[0], originalBinding)
 
@@ -3888,7 +3888,7 @@ func TestPollServiceBinding(t *testing.T) {
 				},
 			},
 			validateBrokerActionsFunc: validatePollBindingLastOperationAction,
-			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1beta1.ServiceBinding) {
+			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1.ServiceBinding) {
 				assertNumberOfActions(t, actions, 1)
 				updatedBinding := assertUpdateStatus(t, actions[0], originalBinding)
 
@@ -3910,7 +3910,7 @@ func TestPollServiceBinding(t *testing.T) {
 				},
 			},
 			validateBrokerActionsFunc: validatePollBindingLastOperationAction,
-			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1beta1.ServiceBinding) {
+			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1.ServiceBinding) {
 				assertNumberOfActions(t, actions, 1)
 				updatedBinding := assertUpdateStatus(t, actions[0], originalBinding)
 
@@ -3932,7 +3932,7 @@ func TestPollServiceBinding(t *testing.T) {
 				},
 			},
 			validateBrokerActionsFunc: validatePollBindingLastOperationAction,
-			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1beta1.ServiceBinding) {
+			assertPerformedActionsFunc: func(t *testing.T, actions []clientgotesting.Action, originalBinding *v1.ServiceBinding) {
 				assertNumberOfActions(t, actions, 1)
 				updatedBinding := assertUpdateStatus(t, actions[0], originalBinding)
 
@@ -3960,7 +3960,7 @@ func TestPollServiceBinding(t *testing.T) {
 				sharedInformers.ClusterServiceBrokers().Informer().GetStore().Add(getTestClusterServiceBroker())
 				sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(getTestBindingRetrievableClusterServiceClass())
 				sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
-				sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1beta1.ConditionTrue))
+				sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithStatus(v1.ConditionTrue))
 			}
 
 			bindingKey := tc.binding.Namespace + "/" + tc.binding.Name
@@ -4020,16 +4020,16 @@ func TestPollServiceBinding(t *testing.T) {
 func TestTransformSecretData(t *testing.T) {
 	cases := []struct {
 		name                   string
-		transforms             []v1beta1.SecretTransform
+		transforms             []v1.SecretTransform
 		credentials            map[string]interface{}
 		transformedCredentials map[string]interface{}
 		otherSecret            *corev1.Secret
 	}{
 		{
 			name: "RenameKeyTransform",
-			transforms: []v1beta1.SecretTransform{
+			transforms: []v1.SecretTransform{
 				{
-					RenameKey: &v1beta1.RenameKeyTransform{
+					RenameKey: &v1.RenameKeyTransform{
 						From: "foo",
 						To:   "bar",
 					},
@@ -4044,9 +4044,9 @@ func TestTransformSecretData(t *testing.T) {
 		},
 		{
 			name: "AddKeyTransform with value",
-			transforms: []v1beta1.SecretTransform{
+			transforms: []v1.SecretTransform{
 				{
-					AddKey: &v1beta1.AddKeyTransform{
+					AddKey: &v1.AddKeyTransform{
 						Key:   "bar",
 						Value: []byte("456"),
 					},
@@ -4062,9 +4062,9 @@ func TestTransformSecretData(t *testing.T) {
 		},
 		{
 			name: "AddKeyTransform with stringValue",
-			transforms: []v1beta1.SecretTransform{
+			transforms: []v1.SecretTransform{
 				{
-					AddKey: &v1beta1.AddKeyTransform{
+					AddKey: &v1.AddKeyTransform{
 						Key:         "bar",
 						StringValue: strPtr("456"),
 					},
@@ -4080,9 +4080,9 @@ func TestTransformSecretData(t *testing.T) {
 		},
 		{
 			name: "AddKeyTransform with JSONPathExpression",
-			transforms: []v1beta1.SecretTransform{
+			transforms: []v1.SecretTransform{
 				{
-					AddKey: &v1beta1.AddKeyTransform{
+					AddKey: &v1.AddKeyTransform{
 						Key:                "bar",
 						JSONPathExpression: strPtr("{.foo}"),
 					},
@@ -4098,9 +4098,9 @@ func TestTransformSecretData(t *testing.T) {
 		},
 		{
 			name: "AddKeyTransform with JSONPathExpression on non-flat credentials",
-			transforms: []v1beta1.SecretTransform{
+			transforms: []v1.SecretTransform{
 				{
-					AddKey: &v1beta1.AddKeyTransform{
+					AddKey: &v1.AddKeyTransform{
 						Key:                "child-of-foo",
 						JSONPathExpression: strPtr("{.foo.child}"),
 					},
@@ -4120,9 +4120,9 @@ func TestTransformSecretData(t *testing.T) {
 		},
 		{
 			name: "AddKeyTransform stringValue precedence over value",
-			transforms: []v1beta1.SecretTransform{
+			transforms: []v1.SecretTransform{
 				{
-					AddKey: &v1beta1.AddKeyTransform{
+					AddKey: &v1.AddKeyTransform{
 						Key:         "bar",
 						Value:       []byte("456"),
 						StringValue: strPtr("789"),
@@ -4139,10 +4139,10 @@ func TestTransformSecretData(t *testing.T) {
 		},
 		{
 			name: "MergeSecretTransform",
-			transforms: []v1beta1.SecretTransform{
+			transforms: []v1.SecretTransform{
 				{
-					AddKeysFrom: &v1beta1.AddKeysFromTransform{
-						SecretRef: &v1beta1.ObjectReference{
+					AddKeysFrom: &v1.AddKeysFromTransform{
+						SecretRef: &v1.ObjectReference{
 							Namespace: "ns",
 							Name:      "other-secret",
 						},
@@ -4168,9 +4168,9 @@ func TestTransformSecretData(t *testing.T) {
 		},
 		{
 			name: "RemoveKeyTransform",
-			transforms: []v1beta1.SecretTransform{
+			transforms: []v1.SecretTransform{
 				{
-					RemoveKey: &v1beta1.RemoveKeyTransform{
+					RemoveKey: &v1.RemoveKeyTransform{
 						Key: "bar",
 					},
 				},
@@ -4202,25 +4202,25 @@ func TestTransformSecretData(t *testing.T) {
 	}
 }
 
-func assertServiceBindingBindInProgressIsTheOnlyCatalogAction(t *testing.T, fakeCatalogClient *fake.Clientset, binding *v1beta1.ServiceBinding) *v1beta1.ServiceBinding {
-	return assertServiceBindingOperationInProgressIsTheOnlyCatalogAction(t, fakeCatalogClient, binding, v1beta1.ServiceBindingOperationBind)
+func assertServiceBindingBindInProgressIsTheOnlyCatalogAction(t *testing.T, fakeCatalogClient *fake.Clientset, binding *v1.ServiceBinding) *v1.ServiceBinding {
+	return assertServiceBindingOperationInProgressIsTheOnlyCatalogAction(t, fakeCatalogClient, binding, v1.ServiceBindingOperationBind)
 }
 
-func assertServiceBindingUnbindInProgressIsTheOnlyCatalogAction(t *testing.T, fakeCatalogClient *fake.Clientset, binding *v1beta1.ServiceBinding) *v1beta1.ServiceBinding {
-	return assertServiceBindingOperationInProgressIsTheOnlyCatalogAction(t, fakeCatalogClient, binding, v1beta1.ServiceBindingOperationUnbind)
+func assertServiceBindingUnbindInProgressIsTheOnlyCatalogAction(t *testing.T, fakeCatalogClient *fake.Clientset, binding *v1.ServiceBinding) *v1.ServiceBinding {
+	return assertServiceBindingOperationInProgressIsTheOnlyCatalogAction(t, fakeCatalogClient, binding, v1.ServiceBindingOperationUnbind)
 }
 
-func assertServiceBindingOperationInProgressIsTheOnlyCatalogAction(t *testing.T, fakeCatalogClient *fake.Clientset, binding *v1beta1.ServiceBinding, operation v1beta1.ServiceBindingOperation) *v1beta1.ServiceBinding {
+func assertServiceBindingOperationInProgressIsTheOnlyCatalogAction(t *testing.T, fakeCatalogClient *fake.Clientset, binding *v1.ServiceBinding, operation v1.ServiceBindingOperation) *v1.ServiceBinding {
 	return assertServiceBindingOperationInProgressWithParametersIsTheOnlyCatalogAction(t, fakeCatalogClient, binding, operation, nil, "")
 }
 
-func assertServiceBindingOperationInProgressWithParametersIsTheOnlyCatalogAction(t *testing.T, fakeCatalogClient *fake.Clientset, binding *v1beta1.ServiceBinding, operation v1beta1.ServiceBindingOperation, parameters map[string]interface{}, parametersChecksum string) *v1beta1.ServiceBinding {
+func assertServiceBindingOperationInProgressWithParametersIsTheOnlyCatalogAction(t *testing.T, fakeCatalogClient *fake.Clientset, binding *v1.ServiceBinding, operation v1.ServiceBindingOperation, parameters map[string]interface{}, parametersChecksum string) *v1.ServiceBinding {
 	actions := fakeCatalogClient.Actions()
 	assertNumberOfActions(t, actions, 1)
 	updateObject := assertUpdateStatus(t, actions[0], binding)
 	assertServiceBindingOperationInProgressWithParameters(t, updateObject, operation, parameters, parametersChecksum, binding)
 	assertServiceBindingOrphanMitigationSet(t, updateObject, false)
-	return updateObject.(*v1beta1.ServiceBinding)
+	return updateObject.(*v1.ServiceBinding)
 }
 
 func assertGetNamespaceAction(t *testing.T, kubeActions []clientgotesting.Action) {
@@ -4247,7 +4247,7 @@ func assertActionEquals(t *testing.T, action clientgotesting.Action, expectedVer
 	}
 }
 
-func reconcileServiceBinding(t *testing.T, testController *controller, binding *v1beta1.ServiceBinding) error {
+func reconcileServiceBinding(t *testing.T, testController *controller, binding *v1.ServiceBinding) error {
 	clone := binding.DeepCopy()
 	err := testController.reconcileServiceBinding(binding)
 	if !reflect.DeepEqual(binding, clone) {

@@ -23,7 +23,7 @@ import (
 	"math"
 	"time"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/pkg/errors"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -47,10 +47,10 @@ type Broker interface {
 	GetURL() string
 
 	// GetSpec returns the broker's spec.
-	GetSpec() v1beta1.CommonServiceBrokerSpec
+	GetSpec() v1.CommonServiceBrokerSpec
 
 	// GetStatus returns the broker's status.
-	GetStatus() v1beta1.CommonServiceBrokerStatus
+	GetStatus() v1.CommonServiceBrokerStatus
 }
 
 // Deregister deletes a broker
@@ -104,7 +104,7 @@ func (sdk *SDK) RetrieveBrokers(opts ScopeOptions) ([]Broker, error) {
 	return brokers, nil
 }
 
-func (sdk *SDK) retrieveBroker(name string) (*v1beta1.ClusterServiceBroker, error) {
+func (sdk *SDK) retrieveBroker(name string) (*v1.ClusterServiceBroker, error) {
 	broker, err := sdk.ServiceCatalog().ClusterServiceBrokers().Get(context.Background(), name, v1.GetOptions{})
 	if err != nil {
 		return nil, errors.Wrapf(err, "unable to get broker '%s'", name)
@@ -115,8 +115,8 @@ func (sdk *SDK) retrieveBroker(name string) (*v1beta1.ClusterServiceBroker, erro
 
 // RetrieveBrokerByID gets a broker by its k8s name
 func (sdk *SDK) RetrieveBrokerByID(kubeName string, opts ScopeOptions) (Broker, error) {
-	var csb *v1beta1.ClusterServiceBroker
-	var sb *v1beta1.ServiceBroker
+	var csb *v1.ClusterServiceBroker
+	var sb *v1.ServiceBroker
 	var err error
 	if opts.Scope.Matches(ClusterScope) {
 		csb, err = sdk.ServiceCatalog().ClusterServiceBrokers().Get(context.Background(), kubeName, v1.GetOptions{})
@@ -154,7 +154,7 @@ func (sdk *SDK) RetrieveBrokerByID(kubeName string, opts ScopeOptions) (Broker, 
 }
 
 // retrieveNamespacedBroker gets a broker by its name & namespace.
-func (sdk *SDK) retrieveNamespacedBroker(namespace string, name string) (*v1beta1.ServiceBroker, error) {
+func (sdk *SDK) retrieveNamespacedBroker(namespace string, name string) (*v1.ServiceBroker, error) {
 	broker, err := sdk.ServiceCatalog().ServiceBrokers(namespace).Get(context.Background(), name, v1.GetOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("unable to get broker '%s' (%s)", name, err)
@@ -164,8 +164,8 @@ func (sdk *SDK) retrieveNamespacedBroker(namespace string, name string) (*v1beta
 }
 
 // RetrieveBrokerByClass gets the parent broker of a class.
-func (sdk *SDK) RetrieveBrokerByClass(class *v1beta1.ClusterServiceClass,
-) (*v1beta1.ClusterServiceBroker, error) {
+func (sdk *SDK) RetrieveBrokerByClass(class *v1.ClusterServiceClass,
+) (*v1.ClusterServiceBroker, error) {
 	brokerName := class.Spec.ClusterServiceBrokerName
 	broker, err := sdk.ServiceCatalog().ClusterServiceBrokers().Get(context.Background(), brokerName, v1.GetOptions{})
 	if err != nil {
@@ -186,36 +186,36 @@ func (sdk *SDK) Register(brokerName string, url string, opts *RegisterOptions, s
 
 	}
 	objectMeta := v1.ObjectMeta{Name: brokerName}
-	commonServiceBrokerSpec := v1beta1.CommonServiceBrokerSpec{
+	commonServiceBrokerSpec := v1.CommonServiceBrokerSpec{
 		CABundle:              caBytes,
 		InsecureSkipTLSVerify: opts.SkipTLS,
 		RelistBehavior:        opts.RelistBehavior,
 		RelistDuration:        opts.RelistDuration,
 		URL:                   url,
-		CatalogRestrictions: &v1beta1.CatalogRestrictions{
+		CatalogRestrictions: &v1.CatalogRestrictions{
 			ServiceClass: opts.ClassRestrictions,
 			ServicePlan:  opts.PlanRestrictions,
 		},
 	}
 	if scopeOpts.Scope.Matches(ClusterScope) {
-		request := &v1beta1.ClusterServiceBroker{
+		request := &v1.ClusterServiceBroker{
 			ObjectMeta: objectMeta,
-			Spec: v1beta1.ClusterServiceBrokerSpec{
+			Spec: v1.ClusterServiceBrokerSpec{
 				CommonServiceBrokerSpec: commonServiceBrokerSpec,
 			},
 		}
 		if opts.BasicSecret != "" {
-			request.Spec.AuthInfo = &v1beta1.ClusterServiceBrokerAuthInfo{}
-			request.Spec.AuthInfo.Basic = &v1beta1.ClusterBasicAuthConfig{
-				SecretRef: &v1beta1.ObjectReference{
+			request.Spec.AuthInfo = &v1.ClusterServiceBrokerAuthInfo{}
+			request.Spec.AuthInfo.Basic = &v1.ClusterBasicAuthConfig{
+				SecretRef: &v1.ObjectReference{
 					Name:      opts.BasicSecret,
 					Namespace: opts.Namespace,
 				},
 			}
 		} else if opts.BearerSecret != "" {
-			request.Spec.AuthInfo = &v1beta1.ClusterServiceBrokerAuthInfo{}
-			request.Spec.AuthInfo.Bearer = &v1beta1.ClusterBearerTokenAuthConfig{
-				SecretRef: &v1beta1.ObjectReference{
+			request.Spec.AuthInfo = &v1.ClusterServiceBrokerAuthInfo{}
+			request.Spec.AuthInfo.Bearer = &v1.ClusterBearerTokenAuthConfig{
+				SecretRef: &v1.ObjectReference{
 					Name:      opts.BearerSecret,
 					Namespace: opts.Namespace,
 				},
@@ -229,24 +229,24 @@ func (sdk *SDK) Register(brokerName string, url string, opts *RegisterOptions, s
 
 		return result, nil
 	} //else matches NamespaceScope
-	request := &v1beta1.ServiceBroker{
+	request := &v1.ServiceBroker{
 		ObjectMeta: objectMeta,
-		Spec: v1beta1.ServiceBrokerSpec{
+		Spec: v1.ServiceBrokerSpec{
 			CommonServiceBrokerSpec: commonServiceBrokerSpec,
 		},
 	}
 	if opts.BasicSecret != "" {
-		request.Spec.AuthInfo = &v1beta1.ServiceBrokerAuthInfo{
-			Basic: &v1beta1.BasicAuthConfig{
-				SecretRef: &v1beta1.LocalObjectReference{
+		request.Spec.AuthInfo = &v1.ServiceBrokerAuthInfo{
+			Basic: &v1.BasicAuthConfig{
+				SecretRef: &v1.LocalObjectReference{
 					Name: opts.BasicSecret,
 				},
 			},
 		}
 	} else if opts.BearerSecret != "" {
-		request.Spec.AuthInfo = &v1beta1.ServiceBrokerAuthInfo{
-			Bearer: &v1beta1.BearerTokenAuthConfig{
-				SecretRef: &v1beta1.LocalObjectReference{
+		request.Spec.AuthInfo = &v1.ServiceBrokerAuthInfo{
+			Bearer: &v1.BearerTokenAuthConfig{
+				SecretRef: &v1.LocalObjectReference{
 					Name: opts.BearerSecret,
 				},
 			},
@@ -283,7 +283,7 @@ func (sdk *SDK) Sync(name string, scopeOpts ScopeOptions, retries int) error {
 		}
 
 		if scopeOpts.Scope.Matches(ClusterScope) {
-			var broker *v1beta1.ClusterServiceBroker
+			var broker *v1.ClusterServiceBroker
 			broker, err = sdk.retrieveBroker(name)
 			if err == nil {
 				broker.Spec.RelistRequests = broker.Spec.RelistRequests + 1
@@ -334,19 +334,19 @@ func (sdk *SDK) WaitForBroker(name string, opts *ScopeOptions, interval time.Dur
 
 // IsBrokerReady returns if the broker is in the Ready status.
 func (sdk *SDK) IsBrokerReady(broker Broker) bool {
-	return sdk.BrokerHasStatus(broker, v1beta1.ServiceBrokerConditionReady)
+	return sdk.BrokerHasStatus(broker, v1.ServiceBrokerConditionReady)
 }
 
 // IsBrokerFailed returns if the broker is in the Failed status.
 func (sdk *SDK) IsBrokerFailed(broker Broker) bool {
-	return sdk.BrokerHasStatus(broker, v1beta1.ServiceBrokerConditionFailed)
+	return sdk.BrokerHasStatus(broker, v1.ServiceBrokerConditionFailed)
 }
 
 // BrokerHasStatus returns if the broker is in the specified status.
-func (sdk *SDK) BrokerHasStatus(broker Broker, status v1beta1.ServiceBrokerConditionType) bool {
+func (sdk *SDK) BrokerHasStatus(broker Broker, status v1.ServiceBrokerConditionType) bool {
 	for _, cond := range broker.GetStatus().Conditions {
 		if cond.Type == status &&
-			cond.Status == v1beta1.ConditionTrue {
+			cond.Status == v1.ConditionTrue {
 			return true
 		}
 	}

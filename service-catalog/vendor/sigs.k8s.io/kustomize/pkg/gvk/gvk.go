@@ -121,7 +121,7 @@ func (x Gvk) IsLessThan(o Gvk) bool {
 // anything in the corresponding fields, e.g.
 //
 // this item:
-//       <Group: "extensions", Version: "v1beta1", Kind: "Deployment">
+//       <Group: "extensions", Version: "v1", Kind: "Deployment">
 //
 // is selected by
 //       <Group: "",           Version: "",        Kind: "Deployment">

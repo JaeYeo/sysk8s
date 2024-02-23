@@ -19,34 +19,34 @@ limitations under the License.
 package fake
 
 import (
-	v1beta1 "k8s.io/client-go/kubernetes/typed/authorization/v1beta1"
+	v1 "k8s.io/client-go/kubernetes/typed/authorization/v1"
 	rest "k8s.io/client-go/rest"
 	testing "k8s.io/client-go/testing"
 )
 
-type FakeAuthorizationV1beta1 struct {
+type FakeAuthorizationv1 struct {
 	*testing.Fake
 }
 
-func (c *FakeAuthorizationV1beta1) LocalSubjectAccessReviews(namespace string) v1beta1.LocalSubjectAccessReviewInterface {
+func (c *FakeAuthorizationv1) LocalSubjectAccessReviews(namespace string) v1.LocalSubjectAccessReviewInterface {
 	return &FakeLocalSubjectAccessReviews{c, namespace}
 }
 
-func (c *FakeAuthorizationV1beta1) SelfSubjectAccessReviews() v1beta1.SelfSubjectAccessReviewInterface {
+func (c *FakeAuthorizationv1) SelfSubjectAccessReviews() v1.SelfSubjectAccessReviewInterface {
 	return &FakeSelfSubjectAccessReviews{c}
 }
 
-func (c *FakeAuthorizationV1beta1) SelfSubjectRulesReviews() v1beta1.SelfSubjectRulesReviewInterface {
+func (c *FakeAuthorizationv1) SelfSubjectRulesReviews() v1.SelfSubjectRulesReviewInterface {
 	return &FakeSelfSubjectRulesReviews{c}
 }
 
-func (c *FakeAuthorizationV1beta1) SubjectAccessReviews() v1beta1.SubjectAccessReviewInterface {
+func (c *FakeAuthorizationv1) SubjectAccessReviews() v1.SubjectAccessReviewInterface {
 	return &FakeSubjectAccessReviews{c}
 }
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
-func (c *FakeAuthorizationV1beta1) RESTClient() rest.Interface {
+func (c *FakeAuthorizationv1) RESTClient() rest.Interface {
 	var ret *rest.RESTClient
 	return ret
 }

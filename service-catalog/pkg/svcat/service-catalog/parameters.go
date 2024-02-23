@@ -20,7 +20,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -39,12 +39,12 @@ func BuildParameters(params interface{}) *runtime.RawExtension {
 
 // BuildParametersFrom converts a map of secrets names to secret keys to the
 // type consumed by the ServiceCatalog API.
-func BuildParametersFrom(secrets map[string]string) []v1beta1.ParametersFromSource {
-	params := make([]v1beta1.ParametersFromSource, 0, len(secrets))
+func BuildParametersFrom(secrets map[string]string) []v1.ParametersFromSource {
+	params := make([]v1.ParametersFromSource, 0, len(secrets))
 
 	for secret, key := range secrets {
-		param := v1beta1.ParametersFromSource{
-			SecretKeyRef: &v1beta1.SecretKeyReference{
+		param := v1.ParametersFromSource{
+			SecretKeyRef: &v1.SecretKeyReference{
 				Name: secret,
 				Key:  key,
 			},

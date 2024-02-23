@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package v1beta1
+package v1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -22,8 +22,8 @@ import (
 	"k8s.io/apiserver/pkg/apis/audit"
 )
 
-func Convert_v1beta1_Event_To_audit_Event(in *Event, out *audit.Event, s conversion.Scope) error {
-	if err := autoConvert_v1beta1_Event_To_audit_Event(in, out, s); err != nil {
+func Convert_v1_Event_To_audit_Event(in *Event, out *audit.Event, s conversion.Scope) error {
+	if err := autoConvert_v1_Event_To_audit_Event(in, out, s); err != nil {
 		return err
 	}
 	if out.StageTimestamp.IsZero() {
@@ -35,8 +35,8 @@ func Convert_v1beta1_Event_To_audit_Event(in *Event, out *audit.Event, s convers
 	return nil
 }
 
-func Convert_audit_Event_To_v1beta1_Event(in *audit.Event, out *Event, s conversion.Scope) error {
-	if err := autoConvert_audit_Event_To_v1beta1_Event(in, out, s); err != nil {
+func Convert_audit_Event_To_v1_Event(in *audit.Event, out *Event, s conversion.Scope) error {
+	if err := autoConvert_audit_Event_To_v1_Event(in, out, s); err != nil {
 		return err
 	}
 	out.CreationTimestamp = metav1.NewTime(in.StageTimestamp.Time)

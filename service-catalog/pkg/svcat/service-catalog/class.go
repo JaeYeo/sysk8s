@@ -23,7 +23,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/labels"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/util"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -59,7 +59,7 @@ type Class interface {
 	GetDescription() string
 
 	// GetSpec returns the spec.
-	GetSpec() v1beta1.CommonServiceClassSpec
+	GetSpec() v1.CommonServiceClassSpec
 
 	// GetServiceBrokerName returns the name of the service
 	// broker for the class.
@@ -116,7 +116,7 @@ func (sdk *SDK) RetrieveClassByName(name string, opts ScopeOptions) (Class, erro
 
 	lopts := metav1.ListOptions{
 		LabelSelector: labels.SelectorFromSet(labels.Set{
-			v1beta1.GroupName + "/" + v1beta1.FilterSpecExternalName: util.GenerateSHA(name),
+			v1.GroupName + "/" + v1.FilterSpecExternalName: util.GenerateSHA(name),
 		}).String(),
 	}
 
@@ -137,7 +137,7 @@ func (sdk *SDK) RetrieveClassByName(name string, opts ScopeOptions) (Class, erro
 		if err != nil {
 			// Gracefully handle when the feature-flag for namespaced broker resources isn't enabled on the server.
 			if apierrors.IsNotFound(err) {
-				sc = &v1beta1.ServiceClassList{}
+				sc = &v1.ServiceClassList{}
 			} else {
 				return nil, fmt.Errorf("unable to search classes by name (%s)", err)
 			}
@@ -169,8 +169,8 @@ func (sdk *SDK) RetrieveClassByName(name string, opts ScopeOptions) (Class, erro
 
 // RetrieveClassByID gets a class by its Kubernetes name.
 func (sdk *SDK) RetrieveClassByID(kubeName string, opts ScopeOptions) (Class, error) {
-	var csc *v1beta1.ClusterServiceClass
-	var sc *v1beta1.ServiceClass
+	var csc *v1.ClusterServiceClass
+	var sc *v1.ServiceClass
 	var err error
 	if opts.Scope.Matches(ClusterScope) {
 		csc, err = sdk.ServiceCatalog().ClusterServiceClasses().Get(context.Background(), kubeName, metav1.GetOptions{})
@@ -234,16 +234,16 @@ func (sdk *SDK) CreateClassFrom(opts CreateClassFromOptions) (Class, error) {
 	}
 
 	if opts.Scope.Matches(ClusterScope) {
-		csc := fromClass.(*v1beta1.ClusterServiceClass)
+		csc := fromClass.(*v1.ClusterServiceClass)
 		return sdk.createClusterServiceClass(csc, opts.Name)
 	}
 
-	sc := fromClass.(*v1beta1.ServiceClass)
+	sc := fromClass.(*v1.ServiceClass)
 	return sdk.createServiceClass(sc, opts.Name, opts.Namespace)
 }
 
-func (sdk *SDK) createClusterServiceClass(from *v1beta1.ClusterServiceClass, name string) (*v1beta1.ClusterServiceClass, error) {
-	var class = &v1beta1.ClusterServiceClass{
+func (sdk *SDK) createClusterServiceClass(from *v1.ClusterServiceClass, name string) (*v1.ClusterServiceClass, error) {
+	var class = &v1.ClusterServiceClass{
 		ObjectMeta: metav1.ObjectMeta{Name: name},
 		Spec:       from.Spec,
 	}
@@ -257,8 +257,8 @@ func (sdk *SDK) createClusterServiceClass(from *v1beta1.ClusterServiceClass, nam
 	return created, nil
 }
 
-func (sdk *SDK) createServiceClass(from *v1beta1.ServiceClass, name, namespace string) (*v1beta1.ServiceClass, error) {
-	var class = &v1beta1.ServiceClass{
+func (sdk *SDK) createServiceClass(from *v1.ServiceClass, name, namespace string) (*v1.ServiceClass, error) {
+	var class = &v1.ServiceClass{
 		ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: namespace},
 		Spec:       from.Spec,
 	}

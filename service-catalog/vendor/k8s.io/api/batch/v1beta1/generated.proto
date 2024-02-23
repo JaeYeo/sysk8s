@@ -19,7 +19,7 @@ limitations under the License.
 
 syntax = 'proto2';
 
-package k8s.io.api.batch.v1beta1;
+package k8s.io.api.batch.v1;
 
 import "k8s.io/api/batch/v1/generated.proto";
 import "k8s.io/api/core/v1/generated.proto";
@@ -28,7 +28,7 @@ import "k8s.io/apimachinery/pkg/runtime/generated.proto";
 import "k8s.io/apimachinery/pkg/runtime/schema/generated.proto";
 
 // Package-wide variables from generator "generated".
-option go_package = "v1beta1";
+option go_package = "v1";
 
 // CronJob represents the configuration of a single cron job.
 message CronJob {

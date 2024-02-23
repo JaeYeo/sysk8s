@@ -22,7 +22,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/yaml"
 )
@@ -61,7 +61,7 @@ func writeParameters(w io.Writer, parameters *runtime.RawExtension) {
 	}
 }
 
-func writeParametersFrom(w io.Writer, parametersFrom []v1beta1.ParametersFromSource) {
+func writeParametersFrom(w io.Writer, parametersFrom []v1.ParametersFromSource) {
 	if len(parametersFrom) == 0 {
 		return
 	}

@@ -19,7 +19,7 @@ package controller
 import (
 	"context"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/pretty"
 	"github.com/kubernetes-sigs/service-catalog/pkg/util"
 
@@ -44,7 +44,7 @@ func (c *controller) serviceClassUpdate(oldObj, newObj interface{}) {
 }
 
 func (c *controller) serviceClassDelete(obj interface{}) {
-	serviceClass, ok := obj.(*v1beta1.ServiceClass)
+	serviceClass, ok := obj.(*v1.ServiceClass)
 	if serviceClass == nil || !ok {
 		return
 	}
@@ -75,7 +75,7 @@ func (c *controller) reconcileServiceClassKey(key string) error {
 	return c.reconcileServiceClass(class)
 }
 
-func (c *controller) reconcileServiceClass(serviceClass *v1beta1.ServiceClass) error {
+func (c *controller) reconcileServiceClass(serviceClass *v1.ServiceClass) error {
 	pcb := pretty.NewContextBuilder(pretty.ServiceClass, serviceClass.Namespace, serviceClass.Name, "")
 	klog.Info(pcb.Message("Processing"))
 
@@ -99,9 +99,9 @@ func (c *controller) reconcileServiceClass(serviceClass *v1beta1.ServiceClass) e
 	return c.serviceCatalogClient.ServiceClasses(serviceClass.Namespace).Delete(context.Background(), serviceClass.Name, metav1.DeleteOptions{})
 }
 
-func (c *controller) findServiceInstancesOnServiceClass(serviceClass *v1beta1.ServiceClass) (*v1beta1.ServiceInstanceList, error) {
+func (c *controller) findServiceInstancesOnServiceClass(serviceClass *v1.ServiceClass) (*v1.ServiceInstanceList, error) {
 	labelSelector := labels.SelectorFromSet(labels.Set{
-		v1beta1.GroupName + "/" + v1beta1.FilterSpecServiceClassRefName: util.GenerateSHA(serviceClass.Name),
+		v1.GroupName + "/" + v1.FilterSpecServiceClassRefName: util.GenerateSHA(serviceClass.Name),
 	}).String()
 
 	listOpts := metav1.ListOptions{

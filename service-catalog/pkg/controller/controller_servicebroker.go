@@ -30,7 +30,7 @@ import (
 	"k8s.io/klog"
 
 	osb "github.com/kubernetes-sigs/go-open-service-broker-client/v2"
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/metrics"
 	"github.com/kubernetes-sigs/service-catalog/pkg/pretty"
 	"github.com/kubernetes-sigs/service-catalog/pkg/util"
@@ -72,7 +72,7 @@ func (c *controller) serviceBrokerUpdate(oldObj, newObj interface{}) {
 }
 
 func (c *controller) serviceBrokerDelete(obj interface{}) {
-	broker, ok := obj.(*v1beta1.ServiceBroker)
+	broker, ok := obj.(*v1.ServiceBroker)
 	if broker == nil || !ok {
 		return
 	}
@@ -84,7 +84,7 @@ func (c *controller) serviceBrokerDelete(obj interface{}) {
 // returns true unless the broker has a ready condition with status true and
 // the controller's broker relist interval has not elapsed since the broker's
 // ready condition became true, or if the broker's RelistBehavior is set to Manual.
-func shouldReconcileServiceBroker(broker *v1beta1.ServiceBroker, now time.Time, defaultRelistInterval time.Duration) bool {
+func shouldReconcileServiceBroker(broker *v1.ServiceBroker, now time.Time, defaultRelistInterval time.Duration) bool {
 	return shouldReconcileServiceBrokerCommon(
 		pretty.NewServiceBrokerContextBuilder(broker),
 		&broker.ObjectMeta,
@@ -115,14 +115,14 @@ func (c *controller) reconcileServiceBrokerKey(key string) error {
 	return c.reconcileServiceBroker(broker)
 }
 
-func (c *controller) serviceBrokerClient(broker *v1beta1.ServiceBroker) (osb.Client, error) {
+func (c *controller) serviceBrokerClient(broker *v1.ServiceBroker) (osb.Client, error) {
 	pcb := pretty.NewServiceBrokerContextBuilder(broker)
 	authConfig, err := c.getAuthCredentialsFromServiceBroker(broker)
 	if err != nil {
 		s := fmt.Sprintf("Error getting broker auth credentials: %s", err)
 		klog.Info(pcb.Message(s))
 		c.recorder.Event(broker, corev1.EventTypeWarning, errorAuthCredentialsReason, s)
-		if err := c.updateServiceBrokerCondition(broker, v1beta1.ServiceBrokerConditionReady, v1beta1.ConditionFalse, errorFetchingCatalogReason, errorFetchingCatalogMessage+s); err != nil {
+		if err := c.updateServiceBrokerCondition(broker, v1.ServiceBrokerConditionReady, v1.ConditionFalse, errorFetchingCatalogReason, errorFetchingCatalogMessage+s); err != nil {
 			return nil, err
 		}
 		return nil, err
@@ -135,7 +135,7 @@ func (c *controller) serviceBrokerClient(broker *v1beta1.ServiceBroker) (osb.Cli
 		s := fmt.Sprintf("Error creating client for broker %q: %s", broker.Name, err)
 		klog.Info(pcb.Message(s))
 		c.recorder.Event(broker, corev1.EventTypeWarning, errorAuthCredentialsReason, s)
-		if err := c.updateServiceBrokerCondition(broker, v1beta1.ServiceBrokerConditionReady, v1beta1.ConditionFalse, errorFetchingCatalogReason, errorFetchingCatalogMessage+s); err != nil {
+		if err := c.updateServiceBrokerCondition(broker, v1.ServiceBrokerConditionReady, v1.ConditionFalse, errorFetchingCatalogReason, errorFetchingCatalogMessage+s); err != nil {
 			return nil, err
 		}
 		return nil, err
@@ -147,7 +147,7 @@ func (c *controller) serviceBrokerClient(broker *v1beta1.ServiceBroker) (osb.Cli
 // reconcileServiceBroker is the control-loop that reconciles a ServiceBroker. An
 // error is returned to indicate that the binding has not been fully
 // processed and should be resubmitted at a later time.
-func (c *controller) reconcileServiceBroker(broker *v1beta1.ServiceBroker) error {
+func (c *controller) reconcileServiceBroker(broker *v1.ServiceBroker) error {
 	pcb := pretty.NewServiceBrokerContextBuilder(broker)
 	klog.V(4).Infof(pcb.Message("Processing"))
 
@@ -174,7 +174,7 @@ func (c *controller) reconcileServiceBroker(broker *v1beta1.ServiceBroker) error
 			s := fmt.Sprintf("Error getting broker catalog: %s", err)
 			klog.Warning(pcb.Message(s))
 			c.recorder.Eventf(broker, corev1.EventTypeWarning, errorFetchingCatalogReason, s)
-			if err := c.updateServiceBrokerCondition(broker, v1beta1.ServiceBrokerConditionReady, v1beta1.ConditionFalse, errorFetchingCatalogReason, errorFetchingCatalogMessage+s); err != nil {
+			if err := c.updateServiceBrokerCondition(broker, v1.ServiceBrokerConditionReady, v1.ConditionFalse, errorFetchingCatalogReason, errorFetchingCatalogMessage+s); err != nil {
 				return err
 			}
 			if broker.Status.OperationStartTime == nil {
@@ -194,8 +194,8 @@ func (c *controller) reconcileServiceBroker(broker *v1beta1.ServiceBroker) error
 				toUpdate.Status.OperationStartTime = nil
 				toUpdate.Status.ReconciledGeneration = toUpdate.Generation
 				return c.updateServiceBrokerCondition(toUpdate,
-					v1beta1.ServiceBrokerConditionFailed,
-					v1beta1.ConditionTrue,
+					v1.ServiceBrokerConditionFailed,
+					v1.ConditionTrue,
 					errorReconciliationRetryTimeoutReason,
 					s)
 			}
@@ -233,7 +233,7 @@ func (c *controller) reconcileServiceBroker(broker *v1beta1.ServiceBroker) error
 			s := fmt.Sprintf("Error converting catalog payload for broker %q to service-catalog API: %s", broker.Name, err)
 			klog.Warning(pcb.Message(s))
 			c.recorder.Eventf(broker, corev1.EventTypeWarning, errorSyncingCatalogReason, s)
-			if err := c.updateServiceBrokerCondition(broker, v1beta1.ServiceBrokerConditionReady, v1beta1.ConditionFalse, errorSyncingCatalogReason, errorSyncingCatalogMessage+s); err != nil {
+			if err := c.updateServiceBrokerCondition(broker, v1.ServiceBrokerConditionReady, v1.ConditionFalse, errorSyncingCatalogReason, errorSyncingCatalogMessage+s); err != nil {
 				return err
 			}
 			return err
@@ -259,7 +259,7 @@ func (c *controller) reconcileServiceBroker(broker *v1beta1.ServiceBroker) error
 				)
 				klog.Warning(pcb.Message(s))
 				c.recorder.Eventf(broker, corev1.EventTypeWarning, errorSyncingCatalogReason, s)
-				if err := c.updateServiceBrokerCondition(broker, v1beta1.ServiceBrokerConditionReady, v1beta1.ConditionFalse, errorSyncingCatalogReason,
+				if err := c.updateServiceBrokerCondition(broker, v1.ServiceBrokerConditionReady, v1.ConditionFalse, errorSyncingCatalogReason,
 					errorSyncingCatalogMessage+s); err != nil {
 					return err
 				}
@@ -286,7 +286,7 @@ func (c *controller) reconcileServiceBroker(broker *v1beta1.ServiceBroker) error
 				)
 				klog.Warning(pcb.Message(s))
 				c.recorder.Eventf(broker, corev1.EventTypeWarning, errorSyncingCatalogReason, s)
-				if err := c.updateServiceBrokerCondition(broker, v1beta1.ServiceBrokerConditionReady, v1beta1.ConditionFalse, errorSyncingCatalogReason,
+				if err := c.updateServiceBrokerCondition(broker, v1.ServiceBrokerConditionReady, v1.ConditionFalse, errorSyncingCatalogReason,
 					errorSyncingCatalogMessage+s); err != nil {
 					return err
 				}
@@ -314,7 +314,7 @@ func (c *controller) reconcileServiceBroker(broker *v1beta1.ServiceBroker) error
 				)
 				klog.Warning(pcb.Message(s))
 				c.recorder.Eventf(broker, corev1.EventTypeWarning, errorSyncingCatalogReason, s)
-				c.updateServiceBrokerCondition(broker, v1beta1.ServiceBrokerConditionReady, v1beta1.ConditionFalse, errorSyncingCatalogReason,
+				c.updateServiceBrokerCondition(broker, v1.ServiceBrokerConditionReady, v1.ConditionFalse, errorSyncingCatalogReason,
 					errorSyncingCatalogMessage+s)
 				return err
 			}
@@ -339,7 +339,7 @@ func (c *controller) reconcileServiceBroker(broker *v1beta1.ServiceBroker) error
 				)
 				klog.Warning(pcb.Message(s))
 				c.recorder.Eventf(broker, corev1.EventTypeWarning, errorSyncingCatalogReason, s)
-				if err := c.updateServiceBrokerCondition(broker, v1beta1.ServiceBrokerConditionReady, v1beta1.ConditionFalse, errorSyncingCatalogReason,
+				if err := c.updateServiceBrokerCondition(broker, v1.ServiceBrokerConditionReady, v1.ConditionFalse, errorSyncingCatalogReason,
 					errorSyncingCatalogMessage+s); err != nil {
 					return err
 				}
@@ -349,15 +349,15 @@ func (c *controller) reconcileServiceBroker(broker *v1beta1.ServiceBroker) error
 
 		// everything worked correctly; update the broker's ready condition to
 		// status true
-		if err := c.updateServiceBrokerCondition(broker, v1beta1.ServiceBrokerConditionReady, v1beta1.ConditionTrue, successFetchedCatalogReason, successFetchedCatalogMessage); err != nil {
+		if err := c.updateServiceBrokerCondition(broker, v1.ServiceBrokerConditionReady, v1.ConditionTrue, successFetchedCatalogReason, successFetchedCatalogMessage); err != nil {
 			return err
 		}
 
 		c.recorder.Event(broker, corev1.EventTypeNormal, successFetchedCatalogReason, successFetchedCatalogMessage)
 
 		// Update metrics with the number of serviceclass and serviceplans from this broker
-		metrics.BrokerServiceClassCount.WithLabelValues(broker.Name).Set(float64(len(payloadServiceClasses)))
-		metrics.BrokerServicePlanCount.WithLabelValues(broker.Name).Set(float64(len(payloadServicePlans)))
+		metrics.BrokerServiceClassCount.WithLabelValues(broker.Name, broker.Namespace).Set(float64(len(payloadServiceClasses)))
+		metrics.BrokerServicePlanCount.WithLabelValues(broker.Name, broker.Namespace).Set(float64(len(payloadServicePlans)))
 
 		return nil
 	}
@@ -365,7 +365,7 @@ func (c *controller) reconcileServiceBroker(broker *v1beta1.ServiceBroker) error
 	// All updates not having a DeletingTimestamp will have been handled above
 	// and returned early. If we reach this point, we're dealing with an update
 	// that's actually a soft delete-- i.e. we have some finalization to do.
-	if finalizers := sets.NewString(broker.Finalizers...); finalizers.Has(v1beta1.FinalizerServiceCatalog) {
+	if finalizers := sets.NewString(broker.Finalizers...); finalizers.Has(v1.FinalizerServiceCatalog) {
 		klog.V(4).Info(pcb.Message("Finalizing"))
 
 		existingServiceClasses, existingServicePlans, err := c.getCurrentServiceClassesAndPlansForNamespacedBroker(broker)
@@ -383,8 +383,8 @@ func (c *controller) reconcileServiceBroker(broker *v1beta1.ServiceBroker) error
 				klog.Warning(pcb.Message(s))
 				c.updateServiceBrokerCondition(
 					broker,
-					v1beta1.ServiceBrokerConditionReady,
-					v1beta1.ConditionUnknown,
+					v1.ServiceBrokerConditionReady,
+					v1.ConditionUnknown,
 					errorDeletingServicePlanMessage,
 					errorDeletingServicePlanReason+s,
 				)
@@ -402,8 +402,8 @@ func (c *controller) reconcileServiceBroker(broker *v1beta1.ServiceBroker) error
 				c.recorder.Eventf(broker, corev1.EventTypeWarning, errorDeletingServiceClassReason, "%v %v", errorDeletingServiceClassMessage, s)
 				if err := c.updateServiceBrokerCondition(
 					broker,
-					v1beta1.ServiceBrokerConditionReady,
-					v1beta1.ConditionUnknown,
+					v1.ServiceBrokerConditionReady,
+					v1.ConditionUnknown,
 					errorDeletingServiceClassMessage,
 					errorDeletingServiceClassReason+s,
 				); err != nil {
@@ -415,23 +415,23 @@ func (c *controller) reconcileServiceBroker(broker *v1beta1.ServiceBroker) error
 
 		if err := c.updateServiceBrokerCondition(
 			broker,
-			v1beta1.ServiceBrokerConditionReady,
-			v1beta1.ConditionFalse,
+			v1.ServiceBrokerConditionReady,
+			v1.ConditionFalse,
 			successServiceBrokerDeletedReason,
 			"The broker was deleted successfully",
 		); err != nil {
 			return err
 		}
 		// Clear the finalizer
-		finalizers.Delete(v1beta1.FinalizerServiceCatalog)
+		finalizers.Delete(v1.FinalizerServiceCatalog)
 		c.updateServiceBrokerFinalizers(broker, finalizers.List())
 
 		c.recorder.Eventf(broker, corev1.EventTypeNormal, successServiceBrokerDeletedReason, successServiceBrokerDeletedMessage, broker.Name)
 		klog.V(5).Info(pcb.Message("Successfully deleted"))
 
 		// delete the metrics associated with this broker
-		metrics.BrokerServiceClassCount.DeleteLabelValues(broker.Name)
-		metrics.BrokerServicePlanCount.DeleteLabelValues(broker.Name)
+		metrics.BrokerServiceClassCount.DeleteLabelValues(broker.Name, broker.Namespace)
+		metrics.BrokerServicePlanCount.DeleteLabelValues(broker.Name, broker.Namespace)
 		return nil
 	}
 
@@ -443,7 +443,7 @@ func (c *controller) reconcileServiceBroker(broker *v1beta1.ServiceBroker) error
 // listed. The serviceClass parameter is the serviceClass from the broker's
 // catalog payload. The existingServiceClass parameter is the serviceClass
 // that already exists for the given broker with this serviceClass' k8s name.
-func (c *controller) reconcileServiceClassFromServiceBrokerCatalog(broker *v1beta1.ServiceBroker, serviceClass, existingServiceClass *v1beta1.ServiceClass) error {
+func (c *controller) reconcileServiceClassFromServiceBrokerCatalog(broker *v1.ServiceBroker, serviceClass, existingServiceClass *v1.ServiceClass) error {
 	pcb := pretty.NewServiceBrokerContextBuilder(broker)
 	serviceClass.Spec.ServiceBrokerName = broker.Name
 
@@ -514,7 +514,7 @@ func (c *controller) reconcileServiceClassFromServiceBrokerCatalog(broker *v1bet
 			s := fmt.Sprintf("Error updating status of %s: %v", pretty.ServiceClassName(updatedServiceClass), err)
 			klog.Warning(pcb.Message(s))
 			c.recorder.Eventf(broker, corev1.EventTypeWarning, errorSyncingCatalogReason, s)
-			if err := c.updateServiceBrokerCondition(broker, v1beta1.ServiceBrokerConditionReady, v1beta1.ConditionFalse, errorSyncingCatalogReason, errorSyncingCatalogMessage+s); err != nil {
+			if err := c.updateServiceBrokerCondition(broker, v1.ServiceBrokerConditionReady, v1.ConditionFalse, errorSyncingCatalogReason, errorSyncingCatalogMessage+s); err != nil {
 				return err
 			}
 			return err
@@ -526,7 +526,7 @@ func (c *controller) reconcileServiceClassFromServiceBrokerCatalog(broker *v1bet
 
 // reconcileServicePlanFromServiceBrokerCatalog reconciles a
 // ServicePlan after the ServiceClass's catalog has been re-listed.
-func (c *controller) reconcileServicePlanFromServiceBrokerCatalog(broker *v1beta1.ServiceBroker, servicePlan, existingServicePlan *v1beta1.ServicePlan) error {
+func (c *controller) reconcileServicePlanFromServiceBrokerCatalog(broker *v1.ServiceBroker, servicePlan, existingServicePlan *v1.ServicePlan) error {
 	pcb := pretty.NewServiceBrokerContextBuilder(broker)
 	servicePlan.Spec.ServiceBrokerName = broker.Name
 
@@ -600,7 +600,7 @@ func (c *controller) reconcileServicePlanFromServiceBrokerCatalog(broker *v1beta
 			s := fmt.Sprintf("Error updating status of %s: %v", pretty.ServicePlanName(updatedPlan), err)
 			klog.Error(pcb.Message(s))
 			c.recorder.Eventf(broker, corev1.EventTypeWarning, errorSyncingCatalogReason, s)
-			if err := c.updateServiceBrokerCondition(broker, v1beta1.ServiceBrokerConditionReady, v1beta1.ConditionFalse, errorSyncingCatalogReason, errorSyncingCatalogMessage+s); err != nil {
+			if err := c.updateServiceBrokerCondition(broker, v1.ServiceBrokerConditionReady, v1.ConditionFalse, errorSyncingCatalogReason, errorSyncingCatalogMessage+s); err != nil {
 				return err
 			}
 			return err
@@ -612,8 +612,8 @@ func (c *controller) reconcileServicePlanFromServiceBrokerCatalog(broker *v1beta
 
 // updateCommonStatusCondition updates the common ready condition for the given CommonServiceBrokerStatus
 // with the given status, reason, and message.
-func updateCommonStatusCondition(pcb *pretty.ContextBuilder, meta metav1.ObjectMeta, commonStatus *v1beta1.CommonServiceBrokerStatus, conditionType v1beta1.ServiceBrokerConditionType, status v1beta1.ConditionStatus, reason, message string) {
-	newCondition := v1beta1.ServiceBrokerCondition{
+func updateCommonStatusCondition(pcb *pretty.ContextBuilder, meta metav1.ObjectMeta, commonStatus *v1.CommonServiceBrokerStatus, conditionType v1.ServiceBrokerConditionType, status v1.ConditionStatus, reason, message string) {
+	newCondition := v1.ServiceBrokerCondition{
 		Type:    conditionType,
 		Status:  status,
 		Reason:  reason,
@@ -625,7 +625,7 @@ func updateCommonStatusCondition(pcb *pretty.ContextBuilder, meta metav1.ObjectM
 	if len(commonStatus.Conditions) == 0 {
 		klog.Info(pcb.Messagef("Setting lastTransitionTime for condition %q to %v", conditionType, t))
 		newCondition.LastTransitionTime = metav1.NewTime(t)
-		commonStatus.Conditions = []v1beta1.ServiceBrokerCondition{newCondition}
+		commonStatus.Conditions = []v1.ServiceBrokerCondition{newCondition}
 	} else {
 		for i, cond := range commonStatus.Conditions {
 			if cond.Type == conditionType {
@@ -646,7 +646,7 @@ func updateCommonStatusCondition(pcb *pretty.ContextBuilder, meta metav1.ObjectM
 	}
 
 	// Set status.ReconciledGeneration && status.LastCatalogRetrievalTime if updating ready condition to true
-	if conditionType == v1beta1.ServiceBrokerConditionReady && status == v1beta1.ConditionTrue {
+	if conditionType == v1.ServiceBrokerConditionReady && status == v1.ConditionTrue {
 		commonStatus.ReconciledGeneration = meta.Generation
 		now := metav1.NewTime(t)
 		commonStatus.LastCatalogRetrievalTime = &now
@@ -655,7 +655,7 @@ func updateCommonStatusCondition(pcb *pretty.ContextBuilder, meta metav1.ObjectM
 
 // updateServiceBrokerCondition updates the ready condition for the given ServiceBroker
 // with the given status, reason, and message.
-func (c *controller) updateServiceBrokerCondition(broker *v1beta1.ServiceBroker, conditionType v1beta1.ServiceBrokerConditionType, status v1beta1.ConditionStatus, reason, message string) error {
+func (c *controller) updateServiceBrokerCondition(broker *v1.ServiceBroker, conditionType v1.ServiceBrokerConditionType, status v1.ConditionStatus, reason, message string) error {
 	toUpdate := broker.DeepCopy()
 
 	pcb := pretty.NewServiceBrokerContextBuilder(toUpdate)
@@ -676,7 +676,7 @@ func (c *controller) updateServiceBrokerCondition(broker *v1beta1.ServiceBroker,
 
 // updateServiceBrokerFinalizers updates the given finalizers for the given Broker.
 func (c *controller) updateServiceBrokerFinalizers(
-	broker *v1beta1.ServiceBroker,
+	broker *v1.ServiceBroker,
 	finalizers []string) error {
 	pcb := pretty.NewServiceBrokerContextBuilder(broker)
 
@@ -701,10 +701,10 @@ func (c *controller) updateServiceBrokerFinalizers(
 	return err
 }
 
-func (c *controller) getCurrentServiceClassesAndPlansForNamespacedBroker(broker *v1beta1.ServiceBroker) ([]v1beta1.ServiceClass, []v1beta1.ServicePlan, error) {
+func (c *controller) getCurrentServiceClassesAndPlansForNamespacedBroker(broker *v1.ServiceBroker) ([]v1.ServiceClass, []v1.ServicePlan, error) {
 	pcb := pretty.NewServiceBrokerContextBuilder(broker)
 	labelSelector := labels.SelectorFromSet(labels.Set{
-		v1beta1.GroupName + "/" + v1beta1.FilterSpecServiceBrokerName: util.GenerateSHA(broker.Name),
+		v1.GroupName + "/" + v1.FilterSpecServiceBrokerName: util.GenerateSHA(broker.Name),
 	}).String()
 
 	listOpts := metav1.ListOptions{
@@ -715,8 +715,8 @@ func (c *controller) getCurrentServiceClassesAndPlansForNamespacedBroker(broker 
 		c.recorder.Eventf(broker, corev1.EventTypeWarning, errorListingServiceClassesReason, "%v %v", errorListingServiceClassesMessage, err)
 		if err := c.updateServiceBrokerCondition(
 			broker,
-			v1beta1.ServiceBrokerConditionReady,
-			v1beta1.ConditionUnknown,
+			v1.ServiceBrokerConditionReady,
+			v1.ConditionUnknown,
 			errorListingServiceClassesReason,
 			errorListingServiceClassesMessage,
 		); err != nil {
@@ -732,8 +732,8 @@ func (c *controller) getCurrentServiceClassesAndPlansForNamespacedBroker(broker 
 		c.recorder.Eventf(broker, corev1.EventTypeWarning, errorListingServicePlansReason, "%v %v", errorListingServicePlansMessage, err)
 		if err := c.updateServiceBrokerCondition(
 			broker,
-			v1beta1.ServiceBrokerConditionReady,
-			v1beta1.ConditionUnknown,
+			v1.ServiceBrokerConditionReady,
+			v1.ConditionUnknown,
 			errorListingServicePlansReason,
 			errorListingServicePlansMessage,
 		); err != nil {
@@ -747,8 +747,8 @@ func (c *controller) getCurrentServiceClassesAndPlansForNamespacedBroker(broker 
 	return existingServiceClasses.Items, existingServicePlans.Items, nil
 }
 
-func convertServiceClassListToMap(list []v1beta1.ServiceClass) map[string]*v1beta1.ServiceClass {
-	ret := make(map[string]*v1beta1.ServiceClass, len(list))
+func convertServiceClassListToMap(list []v1.ServiceClass) map[string]*v1.ServiceClass {
+	ret := make(map[string]*v1.ServiceClass, len(list))
 
 	for i := range list {
 		ret[list[i].Name] = &list[i]
@@ -757,8 +757,8 @@ func convertServiceClassListToMap(list []v1beta1.ServiceClass) map[string]*v1bet
 	return ret
 }
 
-func convertServicePlanListToMap(list []v1beta1.ServicePlan) map[string]*v1beta1.ServicePlan {
-	ret := make(map[string]*v1beta1.ServicePlan, len(list))
+func convertServicePlanListToMap(list []v1.ServicePlan) map[string]*v1.ServicePlan {
+	ret := make(map[string]*v1.ServicePlan, len(list))
 
 	for i := range list {
 		ret[list[i].Name] = &list[i]
@@ -767,10 +767,10 @@ func convertServicePlanListToMap(list []v1beta1.ServicePlan) map[string]*v1beta1
 	return ret
 }
 
-func getServiceBrokerLastConditionState(status v1beta1.CommonServiceBrokerStatus) string {
+func getServiceBrokerLastConditionState(status v1.CommonServiceBrokerStatus) string {
 	if len(status.Conditions) > 0 {
 		condition := status.Conditions[len(status.Conditions)-1]
-		if condition.Status == v1beta1.ConditionTrue {
+		if condition.Status == v1.ConditionTrue {
 			return string(condition.Type)
 		}
 		return condition.Reason

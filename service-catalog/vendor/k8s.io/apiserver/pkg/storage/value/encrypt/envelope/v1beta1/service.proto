@@ -17,7 +17,7 @@ limitations under the License.
 // To regenerate service.pb.go run hack/update-generated-kms.sh
 syntax = "proto3";
 
-package v1beta1;
+package v1;
 
 // This service defines the public APIs for remote KMS provider.
 service KeyManagementService {

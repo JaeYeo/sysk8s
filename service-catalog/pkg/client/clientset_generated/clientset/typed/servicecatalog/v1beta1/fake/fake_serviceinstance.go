@@ -1,5 +1,5 @@
 /*
-Copyright 2020 The Kubernetes Authors.
+Copyright 2021 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ package fake
 import (
 	"context"
 
-	v1beta1 "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	v1 "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
@@ -32,29 +32,29 @@ import (
 
 // FakeServiceInstances implements ServiceInstanceInterface
 type FakeServiceInstances struct {
-	Fake *FakeServicecatalogV1beta1
+	Fake *FakeServicecatalogv1
 	ns   string
 }
 
-var serviceinstancesResource = schema.GroupVersionResource{Group: "servicecatalog.k8s.io", Version: "v1beta1", Resource: "serviceinstances"}
+var serviceinstancesResource = schema.GroupVersionResource{Group: "servicecatalog.k8s.io", Version: "v1", Resource: "serviceinstances"}
 
-var serviceinstancesKind = schema.GroupVersionKind{Group: "servicecatalog.k8s.io", Version: "v1beta1", Kind: "ServiceInstance"}
+var serviceinstancesKind = schema.GroupVersionKind{Group: "servicecatalog.k8s.io", Version: "v1", Kind: "ServiceInstance"}
 
 // Get takes name of the serviceInstance, and returns the corresponding serviceInstance object, and an error if there is any.
-func (c *FakeServiceInstances) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1beta1.ServiceInstance, err error) {
+func (c *FakeServiceInstances) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1.ServiceInstance, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(serviceinstancesResource, c.ns, name), &v1beta1.ServiceInstance{})
+		Invokes(testing.NewGetAction(serviceinstancesResource, c.ns, name), &v1.ServiceInstance{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta1.ServiceInstance), err
+	return obj.(*v1.ServiceInstance), err
 }
 
 // List takes label and field selectors, and returns the list of ServiceInstances that match those selectors.
-func (c *FakeServiceInstances) List(ctx context.Context, opts v1.ListOptions) (result *v1beta1.ServiceInstanceList, err error) {
+func (c *FakeServiceInstances) List(ctx context.Context, opts v1.ListOptions) (result *v1.ServiceInstanceList, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewListAction(serviceinstancesResource, serviceinstancesKind, c.ns, opts), &v1beta1.ServiceInstanceList{})
+		Invokes(testing.NewListAction(serviceinstancesResource, serviceinstancesKind, c.ns, opts), &v1.ServiceInstanceList{})
 
 	if obj == nil {
 		return nil, err
@@ -64,8 +64,8 @@ func (c *FakeServiceInstances) List(ctx context.Context, opts v1.ListOptions) (r
 	if label == nil {
 		label = labels.Everything()
 	}
-	list := &v1beta1.ServiceInstanceList{ListMeta: obj.(*v1beta1.ServiceInstanceList).ListMeta}
-	for _, item := range obj.(*v1beta1.ServiceInstanceList).Items {
+	list := &v1.ServiceInstanceList{ListMeta: obj.(*v1.ServiceInstanceList).ListMeta}
+	for _, item := range obj.(*v1.ServiceInstanceList).Items {
 		if label.Matches(labels.Set(item.Labels)) {
 			list.Items = append(list.Items, item)
 		}
@@ -81,43 +81,43 @@ func (c *FakeServiceInstances) Watch(ctx context.Context, opts v1.ListOptions) (
 }
 
 // Create takes the representation of a serviceInstance and creates it.  Returns the server's representation of the serviceInstance, and an error, if there is any.
-func (c *FakeServiceInstances) Create(ctx context.Context, serviceInstance *v1beta1.ServiceInstance, opts v1.CreateOptions) (result *v1beta1.ServiceInstance, err error) {
+func (c *FakeServiceInstances) Create(ctx context.Context, serviceInstance *v1.ServiceInstance, opts v1.CreateOptions) (result *v1.ServiceInstance, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(serviceinstancesResource, c.ns, serviceInstance), &v1beta1.ServiceInstance{})
+		Invokes(testing.NewCreateAction(serviceinstancesResource, c.ns, serviceInstance), &v1.ServiceInstance{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta1.ServiceInstance), err
+	return obj.(*v1.ServiceInstance), err
 }
 
 // Update takes the representation of a serviceInstance and updates it. Returns the server's representation of the serviceInstance, and an error, if there is any.
-func (c *FakeServiceInstances) Update(ctx context.Context, serviceInstance *v1beta1.ServiceInstance, opts v1.UpdateOptions) (result *v1beta1.ServiceInstance, err error) {
+func (c *FakeServiceInstances) Update(ctx context.Context, serviceInstance *v1.ServiceInstance, opts v1.UpdateOptions) (result *v1.ServiceInstance, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(serviceinstancesResource, c.ns, serviceInstance), &v1beta1.ServiceInstance{})
+		Invokes(testing.NewUpdateAction(serviceinstancesResource, c.ns, serviceInstance), &v1.ServiceInstance{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta1.ServiceInstance), err
+	return obj.(*v1.ServiceInstance), err
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeServiceInstances) UpdateStatus(ctx context.Context, serviceInstance *v1beta1.ServiceInstance, opts v1.UpdateOptions) (*v1beta1.ServiceInstance, error) {
+func (c *FakeServiceInstances) UpdateStatus(ctx context.Context, serviceInstance *v1.ServiceInstance, opts v1.UpdateOptions) (*v1.ServiceInstance, error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateSubresourceAction(serviceinstancesResource, "status", c.ns, serviceInstance), &v1beta1.ServiceInstance{})
+		Invokes(testing.NewUpdateSubresourceAction(serviceinstancesResource, "status", c.ns, serviceInstance), &v1.ServiceInstance{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta1.ServiceInstance), err
+	return obj.(*v1.ServiceInstance), err
 }
 
 // Delete takes name of the serviceInstance and deletes it. Returns an error if one occurs.
 func (c *FakeServiceInstances) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(serviceinstancesResource, c.ns, name), &v1beta1.ServiceInstance{})
+		Invokes(testing.NewDeleteAction(serviceinstancesResource, c.ns, name), &v1.ServiceInstance{})
 
 	return err
 }
@@ -126,17 +126,17 @@ func (c *FakeServiceInstances) Delete(ctx context.Context, name string, opts v1.
 func (c *FakeServiceInstances) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
 	action := testing.NewDeleteCollectionAction(serviceinstancesResource, c.ns, listOpts)
 
-	_, err := c.Fake.Invokes(action, &v1beta1.ServiceInstanceList{})
+	_, err := c.Fake.Invokes(action, &v1.ServiceInstanceList{})
 	return err
 }
 
 // Patch applies the patch and returns the patched serviceInstance.
-func (c *FakeServiceInstances) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta1.ServiceInstance, err error) {
+func (c *FakeServiceInstances) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1.ServiceInstance, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(serviceinstancesResource, c.ns, name, pt, data, subresources...), &v1beta1.ServiceInstance{})
+		Invokes(testing.NewPatchSubresourceAction(serviceinstancesResource, c.ns, name, pt, data, subresources...), &v1.ServiceInstance{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta1.ServiceInstance), err
+	return obj.(*v1.ServiceInstance), err
 }

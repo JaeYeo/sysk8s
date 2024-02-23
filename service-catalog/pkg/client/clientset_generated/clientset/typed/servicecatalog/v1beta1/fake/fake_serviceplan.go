@@ -1,5 +1,5 @@
 /*
-Copyright 2020 The Kubernetes Authors.
+Copyright 2021 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ package fake
 import (
 	"context"
 
-	v1beta1 "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	v1 "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
@@ -32,29 +32,29 @@ import (
 
 // FakeServicePlans implements ServicePlanInterface
 type FakeServicePlans struct {
-	Fake *FakeServicecatalogV1beta1
+	Fake *FakeServicecatalogv1
 	ns   string
 }
 
-var serviceplansResource = schema.GroupVersionResource{Group: "servicecatalog.k8s.io", Version: "v1beta1", Resource: "serviceplans"}
+var serviceplansResource = schema.GroupVersionResource{Group: "servicecatalog.k8s.io", Version: "v1", Resource: "serviceplans"}
 
-var serviceplansKind = schema.GroupVersionKind{Group: "servicecatalog.k8s.io", Version: "v1beta1", Kind: "ServicePlan"}
+var serviceplansKind = schema.GroupVersionKind{Group: "servicecatalog.k8s.io", Version: "v1", Kind: "ServicePlan"}
 
 // Get takes name of the servicePlan, and returns the corresponding servicePlan object, and an error if there is any.
-func (c *FakeServicePlans) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1beta1.ServicePlan, err error) {
+func (c *FakeServicePlans) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1.ServicePlan, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(serviceplansResource, c.ns, name), &v1beta1.ServicePlan{})
+		Invokes(testing.NewGetAction(serviceplansResource, c.ns, name), &v1.ServicePlan{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta1.ServicePlan), err
+	return obj.(*v1.ServicePlan), err
 }
 
 // List takes label and field selectors, and returns the list of ServicePlans that match those selectors.
-func (c *FakeServicePlans) List(ctx context.Context, opts v1.ListOptions) (result *v1beta1.ServicePlanList, err error) {
+func (c *FakeServicePlans) List(ctx context.Context, opts v1.ListOptions) (result *v1.ServicePlanList, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewListAction(serviceplansResource, serviceplansKind, c.ns, opts), &v1beta1.ServicePlanList{})
+		Invokes(testing.NewListAction(serviceplansResource, serviceplansKind, c.ns, opts), &v1.ServicePlanList{})
 
 	if obj == nil {
 		return nil, err
@@ -64,8 +64,8 @@ func (c *FakeServicePlans) List(ctx context.Context, opts v1.ListOptions) (resul
 	if label == nil {
 		label = labels.Everything()
 	}
-	list := &v1beta1.ServicePlanList{ListMeta: obj.(*v1beta1.ServicePlanList).ListMeta}
-	for _, item := range obj.(*v1beta1.ServicePlanList).Items {
+	list := &v1.ServicePlanList{ListMeta: obj.(*v1.ServicePlanList).ListMeta}
+	for _, item := range obj.(*v1.ServicePlanList).Items {
 		if label.Matches(labels.Set(item.Labels)) {
 			list.Items = append(list.Items, item)
 		}
@@ -81,43 +81,43 @@ func (c *FakeServicePlans) Watch(ctx context.Context, opts v1.ListOptions) (watc
 }
 
 // Create takes the representation of a servicePlan and creates it.  Returns the server's representation of the servicePlan, and an error, if there is any.
-func (c *FakeServicePlans) Create(ctx context.Context, servicePlan *v1beta1.ServicePlan, opts v1.CreateOptions) (result *v1beta1.ServicePlan, err error) {
+func (c *FakeServicePlans) Create(ctx context.Context, servicePlan *v1.ServicePlan, opts v1.CreateOptions) (result *v1.ServicePlan, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(serviceplansResource, c.ns, servicePlan), &v1beta1.ServicePlan{})
+		Invokes(testing.NewCreateAction(serviceplansResource, c.ns, servicePlan), &v1.ServicePlan{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta1.ServicePlan), err
+	return obj.(*v1.ServicePlan), err
 }
 
 // Update takes the representation of a servicePlan and updates it. Returns the server's representation of the servicePlan, and an error, if there is any.
-func (c *FakeServicePlans) Update(ctx context.Context, servicePlan *v1beta1.ServicePlan, opts v1.UpdateOptions) (result *v1beta1.ServicePlan, err error) {
+func (c *FakeServicePlans) Update(ctx context.Context, servicePlan *v1.ServicePlan, opts v1.UpdateOptions) (result *v1.ServicePlan, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(serviceplansResource, c.ns, servicePlan), &v1beta1.ServicePlan{})
+		Invokes(testing.NewUpdateAction(serviceplansResource, c.ns, servicePlan), &v1.ServicePlan{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta1.ServicePlan), err
+	return obj.(*v1.ServicePlan), err
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeServicePlans) UpdateStatus(ctx context.Context, servicePlan *v1beta1.ServicePlan, opts v1.UpdateOptions) (*v1beta1.ServicePlan, error) {
+func (c *FakeServicePlans) UpdateStatus(ctx context.Context, servicePlan *v1.ServicePlan, opts v1.UpdateOptions) (*v1.ServicePlan, error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateSubresourceAction(serviceplansResource, "status", c.ns, servicePlan), &v1beta1.ServicePlan{})
+		Invokes(testing.NewUpdateSubresourceAction(serviceplansResource, "status", c.ns, servicePlan), &v1.ServicePlan{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta1.ServicePlan), err
+	return obj.(*v1.ServicePlan), err
 }
 
 // Delete takes name of the servicePlan and deletes it. Returns an error if one occurs.
 func (c *FakeServicePlans) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(serviceplansResource, c.ns, name), &v1beta1.ServicePlan{})
+		Invokes(testing.NewDeleteAction(serviceplansResource, c.ns, name), &v1.ServicePlan{})
 
 	return err
 }
@@ -126,17 +126,17 @@ func (c *FakeServicePlans) Delete(ctx context.Context, name string, opts v1.Dele
 func (c *FakeServicePlans) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
 	action := testing.NewDeleteCollectionAction(serviceplansResource, c.ns, listOpts)
 
-	_, err := c.Fake.Invokes(action, &v1beta1.ServicePlanList{})
+	_, err := c.Fake.Invokes(action, &v1.ServicePlanList{})
 	return err
 }
 
 // Patch applies the patch and returns the patched servicePlan.
-func (c *FakeServicePlans) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta1.ServicePlan, err error) {
+func (c *FakeServicePlans) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1.ServicePlan, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(serviceplansResource, c.ns, name, pt, data, subresources...), &v1beta1.ServicePlan{})
+		Invokes(testing.NewPatchSubresourceAction(serviceplansResource, c.ns, name, pt, data, subresources...), &v1.ServicePlan{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta1.ServicePlan), err
+	return obj.(*v1.ServicePlan), err
 }

@@ -20,7 +20,7 @@ import (
 	"bytes"
 	"context"
 
-	v1beta1 "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	v1 "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/test/e2e/framework"
 	"github.com/kubernetes-sigs/service-catalog/test/util"
 	"k8s.io/api/core/v1"
@@ -94,46 +94,46 @@ var _ = framework.ServiceCatalogDescribe("walkthrough", func() {
 	It("Runs through the walkthrough with cluster resources", func() {
 		// Broker and ClusterServiceClass should become ready
 		By("Make sure the named ClusterServiceBroker does not exist before create")
-		if _, err := f.ServiceCatalogClientSet.ServicecatalogV1beta1().ClusterServiceBrokers().Get(context.Background(), brokerName, metav1.GetOptions{}); err == nil {
-			err = f.ServiceCatalogClientSet.ServicecatalogV1beta1().ClusterServiceBrokers().Delete(context.Background(), brokerName, metav1.DeleteOptions{})
+		if _, err := f.ServiceCatalogClientSet.Servicecatalogv1().ClusterServiceBrokers().Get(context.Background(), brokerName, metav1.GetOptions{}); err == nil {
+			err = f.ServiceCatalogClientSet.Servicecatalogv1().ClusterServiceBrokers().Delete(context.Background(), brokerName, metav1.DeleteOptions{})
 			Expect(err).NotTo(HaveOccurred(), "failed to delete the broker")
 
 			By("Waiting for ClusterServiceBroker to not exist")
-			err = util.WaitForBrokerToNotExist(f.ServiceCatalogClientSet.ServicecatalogV1beta1(), brokerName)
+			err = util.WaitForBrokerToNotExist(f.ServiceCatalogClientSet.Servicecatalogv1(), brokerName)
 			Expect(err).NotTo(HaveOccurred())
 		}
 
 		By("Creating a ClusterServiceBroker")
 		url := "http://" + upsbrokername + "." + f.Namespace.Name + ".svc.cluster.local"
-		broker := &v1beta1.ClusterServiceBroker{
+		broker := &v1.ClusterServiceBroker{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: brokerName,
 			},
-			Spec: v1beta1.ClusterServiceBrokerSpec{
-				CommonServiceBrokerSpec: v1beta1.CommonServiceBrokerSpec{
+			Spec: v1.ClusterServiceBrokerSpec{
+				CommonServiceBrokerSpec: v1.CommonServiceBrokerSpec{
 					URL: url,
 				},
 			},
 		}
-		broker, err := f.ServiceCatalogClientSet.ServicecatalogV1beta1().ClusterServiceBrokers().Create(context.Background(), broker, metav1.CreateOptions{})
+		broker, err := f.ServiceCatalogClientSet.Servicecatalogv1().ClusterServiceBrokers().Create(context.Background(), broker, metav1.CreateOptions{})
 		Expect(err).NotTo(HaveOccurred(), "failed to create ClusterServiceBroker")
 
 		By("Waiting for ClusterServiceBroker to be ready")
-		err = util.WaitForBrokerCondition(f.ServiceCatalogClientSet.ServicecatalogV1beta1(),
+		err = util.WaitForBrokerCondition(f.ServiceCatalogClientSet.Servicecatalogv1(),
 			broker.Name,
-			v1beta1.ServiceBrokerCondition{
-				Type:   v1beta1.ServiceBrokerConditionReady,
-				Status: v1beta1.ConditionTrue,
+			v1.ServiceBrokerCondition{
+				Type:   v1.ServiceBrokerConditionReady,
+				Status: v1.ConditionTrue,
 			},
 		)
 		Expect(err).NotTo(HaveOccurred(), "failed to wait for ClusterServiceBroker to be ready")
 
 		By("Waiting for ClusterServiceClass to be ready")
-		err = util.WaitForServiceClassToExist(f.ServiceCatalogClientSet.ServicecatalogV1beta1(), serviceclassID)
+		err = util.WaitForServiceClassToExist(f.ServiceCatalogClientSet.Servicecatalogv1(), serviceclassID)
 		Expect(err).NotTo(HaveOccurred(), "failed to wait for ClusterServiceclass to be ready")
 
 		By("Waiting for ClusterServicePlan to be ready")
-		err = util.WaitForServicePlanToExist(f.ServiceCatalogClientSet.ServicecatalogV1beta1(), serviceplanID)
+		err = util.WaitForServicePlanToExist(f.ServiceCatalogClientSet.Servicecatalogv1(), serviceplanID)
 		Ω(err).ShouldNot(HaveOccurred(), "serviceplan never became ready")
 
 		// Provisioning a ServiceInstance and binding to it
@@ -142,36 +142,36 @@ var _ = framework.ServiceCatalogDescribe("walkthrough", func() {
 		Expect(err).NotTo(HaveOccurred(), "failed to create kube namespace")
 
 		By("Creating a ServiceInstance")
-		instance := &v1beta1.ServiceInstance{
+		instance := &v1.ServiceInstance{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      instanceName,
 				Namespace: testnamespace.Name,
 			},
-			Spec: v1beta1.ServiceInstanceSpec{
-				PlanReference: v1beta1.PlanReference{
+			Spec: v1.ServiceInstanceSpec{
+				PlanReference: v1.PlanReference{
 					ClusterServiceClassExternalName: serviceclassName,
 					ClusterServicePlanExternalName:  "default",
 				},
 			},
 		}
-		instance, err = f.ServiceCatalogClientSet.ServicecatalogV1beta1().ServiceInstances(testnamespace.Name).Create(context.Background(), instance, metav1.CreateOptions{})
+		instance, err = f.ServiceCatalogClientSet.Servicecatalogv1().ServiceInstances(testnamespace.Name).Create(context.Background(), instance, metav1.CreateOptions{})
 		Expect(err).NotTo(HaveOccurred(), "failed to create instance")
 		Expect(instance).NotTo(BeNil())
 
 		By("Waiting for ServiceInstance to be ready")
-		err = util.WaitForInstanceCondition(f.ServiceCatalogClientSet.ServicecatalogV1beta1(),
+		err = util.WaitForInstanceCondition(f.ServiceCatalogClientSet.Servicecatalogv1(),
 			testnamespace.Name,
 			instanceName,
-			v1beta1.ServiceInstanceCondition{
-				Type:   v1beta1.ServiceInstanceConditionReady,
-				Status: v1beta1.ConditionTrue,
+			v1.ServiceInstanceCondition{
+				Type:   v1.ServiceInstanceConditionReady,
+				Status: v1.ConditionTrue,
 			},
 		)
 		Expect(err).NotTo(HaveOccurred(), "failed to wait for instance to be ready")
 
 		// Make sure references have been resolved
 		By("References should have been resolved before ServiceInstance is ready ")
-		sc, err := f.ServiceCatalogClientSet.ServicecatalogV1beta1().ServiceInstances(testnamespace.Name).Get(context.Background(), instanceName, metav1.GetOptions{})
+		sc, err := f.ServiceCatalogClientSet.Servicecatalogv1().ServiceInstances(testnamespace.Name).Get(context.Background(), instanceName, metav1.GetOptions{})
 		Expect(err).NotTo(HaveOccurred(), "failed to get ServiceInstance after binding")
 		Expect(sc.Spec.ClusterServiceClassRef).NotTo(BeNil())
 		Expect(sc.Spec.ClusterServicePlanRef).NotTo(BeNil())
@@ -180,29 +180,29 @@ var _ = framework.ServiceCatalogDescribe("walkthrough", func() {
 
 		// Binding to the ServiceInstance
 		By("Creating a ServiceBinding")
-		binding := &v1beta1.ServiceBinding{
+		binding := &v1.ServiceBinding{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      bindingName,
 				Namespace: testnamespace.Name,
 			},
-			Spec: v1beta1.ServiceBindingSpec{
-				InstanceRef: v1beta1.LocalObjectReference{
+			Spec: v1.ServiceBindingSpec{
+				InstanceRef: v1.LocalObjectReference{
 					Name: instanceName,
 				},
 				SecretName: "my-secret",
 			},
 		}
-		binding, err = f.ServiceCatalogClientSet.ServicecatalogV1beta1().ServiceBindings(testnamespace.Name).Create(context.Background(), binding, metav1.CreateOptions{})
+		binding, err = f.ServiceCatalogClientSet.Servicecatalogv1().ServiceBindings(testnamespace.Name).Create(context.Background(), binding, metav1.CreateOptions{})
 		Expect(err).NotTo(HaveOccurred(), "failed to create binding")
 		Expect(binding).NotTo(BeNil())
 
 		By("Waiting for ServiceBinding to be ready")
-		_, err = util.WaitForBindingCondition(f.ServiceCatalogClientSet.ServicecatalogV1beta1(),
+		_, err = util.WaitForBindingCondition(f.ServiceCatalogClientSet.Servicecatalogv1(),
 			testnamespace.Name,
 			bindingName,
-			v1beta1.ServiceBindingCondition{
-				Type:   v1beta1.ServiceBindingConditionReady,
-				Status: v1beta1.ConditionTrue,
+			v1.ServiceBindingCondition{
+				Type:   v1.ServiceBindingConditionReady,
+				Status: v1.ConditionTrue,
 			},
 		)
 		Expect(err).NotTo(HaveOccurred(), "failed to wait for binding to be ready")
@@ -213,11 +213,11 @@ var _ = framework.ServiceCatalogDescribe("walkthrough", func() {
 
 		// Unbinding from the ServiceInstance
 		By("Deleting the ServiceBinding")
-		err = f.ServiceCatalogClientSet.ServicecatalogV1beta1().ServiceBindings(testnamespace.Name).Delete(context.Background(), bindingName, metav1.DeleteOptions{})
+		err = f.ServiceCatalogClientSet.Servicecatalogv1().ServiceBindings(testnamespace.Name).Delete(context.Background(), bindingName, metav1.DeleteOptions{})
 		Expect(err).NotTo(HaveOccurred(), "failed to delete the binding")
 
 		By("Waiting for ServiceBinding to not exist")
-		err = util.WaitForBindingToNotExist(f.ServiceCatalogClientSet.ServicecatalogV1beta1(), testnamespace.Name, bindingName)
+		err = util.WaitForBindingToNotExist(f.ServiceCatalogClientSet.Servicecatalogv1(), testnamespace.Name, bindingName)
 		Expect(err).NotTo(HaveOccurred())
 
 		By("Secret should been deleted after delete the binding")
@@ -226,120 +226,120 @@ var _ = framework.ServiceCatalogDescribe("walkthrough", func() {
 
 		// Deprovisioning the ServiceInstance
 		By("Deleting the ServiceInstance")
-		err = f.ServiceCatalogClientSet.ServicecatalogV1beta1().ServiceInstances(testnamespace.Name).Delete(context.Background(), instanceName, metav1.DeleteOptions{})
+		err = f.ServiceCatalogClientSet.Servicecatalogv1().ServiceInstances(testnamespace.Name).Delete(context.Background(), instanceName, metav1.DeleteOptions{})
 		Expect(err).NotTo(HaveOccurred(), "failed to delete the instance")
 
 		By("Waiting for ServiceInstance to not exist")
-		err = util.WaitForInstanceToNotExist(f.ServiceCatalogClientSet.ServicecatalogV1beta1(), testnamespace.Name, instanceName)
+		err = util.WaitForInstanceToNotExist(f.ServiceCatalogClientSet.Servicecatalogv1(), testnamespace.Name, instanceName)
 		Expect(err).NotTo(HaveOccurred())
 
 		By("Creating a ServiceInstance using a default plan")
-		instanceDef := &v1beta1.ServiceInstance{
+		instanceDef := &v1.ServiceInstance{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      instanceNameDef,
 				Namespace: testnamespace.Name,
 			},
-			Spec: v1beta1.ServiceInstanceSpec{
-				PlanReference: v1beta1.PlanReference{
+			Spec: v1.ServiceInstanceSpec{
+				PlanReference: v1.PlanReference{
 					ClusterServiceClassExternalName: serviceclassNameWithSinglePlan,
 				},
 			},
 		}
-		instance, err = f.ServiceCatalogClientSet.ServicecatalogV1beta1().ServiceInstances(testnamespace.Name).Create(context.Background(), instanceDef, metav1.CreateOptions{})
+		instance, err = f.ServiceCatalogClientSet.Servicecatalogv1().ServiceInstances(testnamespace.Name).Create(context.Background(), instanceDef, metav1.CreateOptions{})
 		Expect(err).NotTo(HaveOccurred(), "failed to create instance with default plan")
 		Expect(instanceDef).NotTo(BeNil())
 
 		By("Waiting for ServiceInstance to be ready")
-		err = util.WaitForInstanceCondition(f.ServiceCatalogClientSet.ServicecatalogV1beta1(),
+		err = util.WaitForInstanceCondition(f.ServiceCatalogClientSet.Servicecatalogv1(),
 			testnamespace.Name,
 			instanceNameDef,
-			v1beta1.ServiceInstanceCondition{
-				Type:   v1beta1.ServiceInstanceConditionReady,
-				Status: v1beta1.ConditionTrue,
+			v1.ServiceInstanceCondition{
+				Type:   v1.ServiceInstanceConditionReady,
+				Status: v1.ConditionTrue,
 			},
 		)
 		Expect(err).NotTo(HaveOccurred(), "failed to wait for instance with default plan to be ready")
 
 		// Deprovisioning the ServiceInstance with default plan
 		By("Deleting the ServiceInstance with default plan")
-		err = f.ServiceCatalogClientSet.ServicecatalogV1beta1().ServiceInstances(testnamespace.Name).Delete(context.Background(), instanceNameDef, metav1.DeleteOptions{})
+		err = f.ServiceCatalogClientSet.Servicecatalogv1().ServiceInstances(testnamespace.Name).Delete(context.Background(), instanceNameDef, metav1.DeleteOptions{})
 		Expect(err).NotTo(HaveOccurred(), "failed to delete the instance with default plan")
 
 		By("Waiting for ServiceInstance with default plan to not exist")
-		err = util.WaitForInstanceToNotExist(f.ServiceCatalogClientSet.ServicecatalogV1beta1(), testnamespace.Name, instanceNameDef)
+		err = util.WaitForInstanceToNotExist(f.ServiceCatalogClientSet.Servicecatalogv1(), testnamespace.Name, instanceNameDef)
 		Expect(err).NotTo(HaveOccurred())
 
 		By("Creating a ServiceInstance using k8s names plan")
-		instanceK8SNames := &v1beta1.ServiceInstance{
+		instanceK8SNames := &v1.ServiceInstance{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      instanceNameK8sNames,
 				Namespace: testnamespace.Name,
 			},
-			Spec: v1beta1.ServiceInstanceSpec{
-				PlanReference: v1beta1.PlanReference{
+			Spec: v1.ServiceInstanceSpec{
+				PlanReference: v1.PlanReference{
 					ClusterServiceClassName: serviceclassID,
 					ClusterServicePlanName:  serviceplanID,
 				},
 			},
 		}
-		instance, err = f.ServiceCatalogClientSet.ServicecatalogV1beta1().ServiceInstances(testnamespace.Name).Create(context.Background(), instanceK8SNames, metav1.CreateOptions{})
+		instance, err = f.ServiceCatalogClientSet.Servicecatalogv1().ServiceInstances(testnamespace.Name).Create(context.Background(), instanceK8SNames, metav1.CreateOptions{})
 		Expect(err).NotTo(HaveOccurred(), "failed to create instance with K8S names")
 		Expect(instanceK8SNames).NotTo(BeNil())
 
 		By("Waiting for ServiceInstance with k8s names to be ready")
-		err = util.WaitForInstanceCondition(f.ServiceCatalogClientSet.ServicecatalogV1beta1(),
+		err = util.WaitForInstanceCondition(f.ServiceCatalogClientSet.Servicecatalogv1(),
 			testnamespace.Name,
 			instanceNameK8sNames,
-			v1beta1.ServiceInstanceCondition{
-				Type:   v1beta1.ServiceInstanceConditionReady,
-				Status: v1beta1.ConditionTrue,
+			v1.ServiceInstanceCondition{
+				Type:   v1.ServiceInstanceConditionReady,
+				Status: v1.ConditionTrue,
 			},
 		)
 		Expect(err).NotTo(HaveOccurred(), "failed to wait for instance with k8s names to be ready")
 
 		// Deprovisioning the ServiceInstance with k8s names
 		By("Deleting the ServiceInstance with k8s names")
-		err = f.ServiceCatalogClientSet.ServicecatalogV1beta1().ServiceInstances(testnamespace.Name).Delete(context.Background(), instanceNameK8sNames, metav1.DeleteOptions{})
+		err = f.ServiceCatalogClientSet.Servicecatalogv1().ServiceInstances(testnamespace.Name).Delete(context.Background(), instanceNameK8sNames, metav1.DeleteOptions{})
 		Expect(err).NotTo(HaveOccurred(), "failed to delete the instance with k8s names")
 
 		By("Waiting for ServiceInstance with k8s names to not exist")
-		err = util.WaitForInstanceToNotExist(f.ServiceCatalogClientSet.ServicecatalogV1beta1(), testnamespace.Name, instanceNameK8sNames)
+		err = util.WaitForInstanceToNotExist(f.ServiceCatalogClientSet.Servicecatalogv1(), testnamespace.Name, instanceNameK8sNames)
 		Expect(err).NotTo(HaveOccurred())
 
 		By("Creating a ServiceInstance using k8s name and default plan")
-		instanceK8SNamesDef := &v1beta1.ServiceInstance{
+		instanceK8SNamesDef := &v1.ServiceInstance{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      instanceNameK8sNamesDef,
 				Namespace: testnamespace.Name,
 			},
-			Spec: v1beta1.ServiceInstanceSpec{
-				PlanReference: v1beta1.PlanReference{
+			Spec: v1.ServiceInstanceSpec{
+				PlanReference: v1.PlanReference{
 					ClusterServiceClassName: serviceclassIDWithSinglePlan,
 				},
 			},
 		}
-		instance, err = f.ServiceCatalogClientSet.ServicecatalogV1beta1().ServiceInstances(testnamespace.Name).Create(context.Background(), instanceK8SNamesDef, metav1.CreateOptions{})
+		instance, err = f.ServiceCatalogClientSet.Servicecatalogv1().ServiceInstances(testnamespace.Name).Create(context.Background(), instanceK8SNamesDef, metav1.CreateOptions{})
 		Expect(err).NotTo(HaveOccurred(), "failed to create instance with K8S name and default plan")
 		Expect(instanceK8SNamesDef).NotTo(BeNil())
 
 		By("Waiting for ServiceInstance with k8s name and default plan to be ready")
-		err = util.WaitForInstanceCondition(f.ServiceCatalogClientSet.ServicecatalogV1beta1(),
+		err = util.WaitForInstanceCondition(f.ServiceCatalogClientSet.Servicecatalogv1(),
 			testnamespace.Name,
 			instanceNameK8sNamesDef,
-			v1beta1.ServiceInstanceCondition{
-				Type:   v1beta1.ServiceInstanceConditionReady,
-				Status: v1beta1.ConditionTrue,
+			v1.ServiceInstanceCondition{
+				Type:   v1.ServiceInstanceConditionReady,
+				Status: v1.ConditionTrue,
 			},
 		)
 		Expect(err).NotTo(HaveOccurred(), "failed to wait for instance with k8s name and default plan to be ready")
 
 		// Deprovisioning the ServiceInstance with k8s name and default plan
 		By("Deleting the ServiceInstance with k8s name and default plan")
-		err = f.ServiceCatalogClientSet.ServicecatalogV1beta1().ServiceInstances(testnamespace.Name).Delete(context.Background(), instanceNameK8sNamesDef, metav1.DeleteOptions{})
+		err = f.ServiceCatalogClientSet.Servicecatalogv1().ServiceInstances(testnamespace.Name).Delete(context.Background(), instanceNameK8sNamesDef, metav1.DeleteOptions{})
 		Expect(err).NotTo(HaveOccurred(), "failed to delete the instance with k8s name and default plan")
 
 		By("Waiting for ServiceInstance with k8s name and default plan to not exist")
-		err = util.WaitForInstanceToNotExist(f.ServiceCatalogClientSet.ServicecatalogV1beta1(), testnamespace.Name, instanceNameK8sNamesDef)
+		err = util.WaitForInstanceToNotExist(f.ServiceCatalogClientSet.Servicecatalogv1(), testnamespace.Name, instanceNameK8sNamesDef)
 		Expect(err).NotTo(HaveOccurred())
 
 		By("Deleting the test namespace")
@@ -348,15 +348,15 @@ var _ = framework.ServiceCatalogDescribe("walkthrough", func() {
 
 		// Deleting ClusterServiceBroker and ClusterServiceClass
 		By("Deleting the ClusterServiceBroker")
-		err = f.ServiceCatalogClientSet.ServicecatalogV1beta1().ClusterServiceBrokers().Delete(context.Background(), brokerName, metav1.DeleteOptions{})
+		err = f.ServiceCatalogClientSet.Servicecatalogv1().ClusterServiceBrokers().Delete(context.Background(), brokerName, metav1.DeleteOptions{})
 		Expect(err).NotTo(HaveOccurred(), "failed to delete the broker")
 
 		By("Waiting for ClusterServiceBroker to not exist")
-		err = util.WaitForBrokerToNotExist(f.ServiceCatalogClientSet.ServicecatalogV1beta1(), brokerName)
+		err = util.WaitForBrokerToNotExist(f.ServiceCatalogClientSet.Servicecatalogv1(), brokerName)
 		Expect(err).NotTo(HaveOccurred())
 
 		By("Waiting for ClusterServiceClass to not exist")
-		err = util.WaitForServiceClassToNotExist(f.ServiceCatalogClientSet.ServicecatalogV1beta1(), serviceclassID)
+		err = util.WaitForServiceClassToNotExist(f.ServiceCatalogClientSet.Servicecatalogv1(), serviceclassID)
 		Expect(err).NotTo(HaveOccurred())
 	})
 
@@ -368,82 +368,82 @@ var _ = framework.ServiceCatalogDescribe("walkthrough", func() {
 
 		// Broker and ServiceClass should become ready
 		By("Make sure the named ServiceBroker does not exist before create")
-		if _, err := f.ServiceCatalogClientSet.ServicecatalogV1beta1().ServiceBrokers(testnamespace.Name).Get(context.Background(), brokerName, metav1.GetOptions{}); err == nil {
-			err = f.ServiceCatalogClientSet.ServicecatalogV1beta1().ServiceBrokers(testnamespace.Name).Delete(context.Background(), brokerName, metav1.DeleteOptions{})
+		if _, err := f.ServiceCatalogClientSet.Servicecatalogv1().ServiceBrokers(testnamespace.Name).Get(context.Background(), brokerName, metav1.GetOptions{}); err == nil {
+			err = f.ServiceCatalogClientSet.Servicecatalogv1().ServiceBrokers(testnamespace.Name).Delete(context.Background(), brokerName, metav1.DeleteOptions{})
 			Expect(err).NotTo(HaveOccurred(), "failed to delete the broker")
 
 			By("Waiting for ServiceBroker to not exist")
-			err = util.WaitForBrokerToNotExist(f.ServiceCatalogClientSet.ServicecatalogV1beta1(), brokerName, testnamespace.Name)
+			err = util.WaitForBrokerToNotExist(f.ServiceCatalogClientSet.Servicecatalogv1(), brokerName, testnamespace.Name)
 			Expect(err).NotTo(HaveOccurred())
 		}
 
 		By("Creating a ServiceBroker")
 		url := "http://" + upsbrokername + "." + f.Namespace.Name + ".svc.cluster.local"
-		broker := &v1beta1.ServiceBroker{
+		broker := &v1.ServiceBroker{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      brokerName,
 				Namespace: testnamespace.Name,
 			},
-			Spec: v1beta1.ServiceBrokerSpec{
-				CommonServiceBrokerSpec: v1beta1.CommonServiceBrokerSpec{
+			Spec: v1.ServiceBrokerSpec{
+				CommonServiceBrokerSpec: v1.CommonServiceBrokerSpec{
 					URL: url,
 				},
 			},
 		}
-		broker, err = f.ServiceCatalogClientSet.ServicecatalogV1beta1().ServiceBrokers(testnamespace.Name).Create(context.Background(), broker, metav1.CreateOptions{})
+		broker, err = f.ServiceCatalogClientSet.Servicecatalogv1().ServiceBrokers(testnamespace.Name).Create(context.Background(), broker, metav1.CreateOptions{})
 		Expect(err).NotTo(HaveOccurred(), "failed to create ServiceBroker")
 
 		By("Waiting for ServiceBroker to be ready")
-		err = util.WaitForBrokerCondition(f.ServiceCatalogClientSet.ServicecatalogV1beta1(),
+		err = util.WaitForBrokerCondition(f.ServiceCatalogClientSet.Servicecatalogv1(),
 			broker.Name,
-			v1beta1.ServiceBrokerCondition{
-				Type:   v1beta1.ServiceBrokerConditionReady,
-				Status: v1beta1.ConditionTrue,
+			v1.ServiceBrokerCondition{
+				Type:   v1.ServiceBrokerConditionReady,
+				Status: v1.ConditionTrue,
 			},
 			testnamespace.Name,
 		)
 		Expect(err).NotTo(HaveOccurred(), "failed to wait for ServiceBroker to be ready")
 
 		By("Waiting for ServiceClass to be ready")
-		err = util.WaitForServiceClassToExist(f.ServiceCatalogClientSet.ServicecatalogV1beta1(), serviceclassID, testnamespace.Name)
+		err = util.WaitForServiceClassToExist(f.ServiceCatalogClientSet.Servicecatalogv1(), serviceclassID, testnamespace.Name)
 		Expect(err).NotTo(HaveOccurred(), "failed to wait for ServiceClass to be ready")
 
 		By("Waiting for ServicePlan to be ready")
-		err = util.WaitForServicePlanToExist(f.ServiceCatalogClientSet.ServicecatalogV1beta1(), serviceplanID, testnamespace.Name)
+		err = util.WaitForServicePlanToExist(f.ServiceCatalogClientSet.Servicecatalogv1(), serviceplanID, testnamespace.Name)
 		Ω(err).ShouldNot(HaveOccurred(), "serviceplan never became ready")
 
 		// Provisioning a ServiceInstance and binding to it
 		By("Creating a ServiceInstance")
-		instance := &v1beta1.ServiceInstance{
+		instance := &v1.ServiceInstance{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      instanceName,
 				Namespace: testnamespace.Name,
 			},
-			Spec: v1beta1.ServiceInstanceSpec{
-				PlanReference: v1beta1.PlanReference{
+			Spec: v1.ServiceInstanceSpec{
+				PlanReference: v1.PlanReference{
 					ServiceClassExternalName: serviceclassName,
 					ServicePlanExternalName:  "default",
 				},
 			},
 		}
-		instance, err = f.ServiceCatalogClientSet.ServicecatalogV1beta1().ServiceInstances(testnamespace.Name).Create(context.Background(), instance, metav1.CreateOptions{})
+		instance, err = f.ServiceCatalogClientSet.Servicecatalogv1().ServiceInstances(testnamespace.Name).Create(context.Background(), instance, metav1.CreateOptions{})
 		Expect(err).NotTo(HaveOccurred(), "failed to create instance")
 		Expect(instance).NotTo(BeNil())
 
 		By("Waiting for ServiceInstance to be ready")
-		err = util.WaitForInstanceCondition(f.ServiceCatalogClientSet.ServicecatalogV1beta1(),
+		err = util.WaitForInstanceCondition(f.ServiceCatalogClientSet.Servicecatalogv1(),
 			testnamespace.Name,
 			instanceName,
-			v1beta1.ServiceInstanceCondition{
-				Type:   v1beta1.ServiceInstanceConditionReady,
-				Status: v1beta1.ConditionTrue,
+			v1.ServiceInstanceCondition{
+				Type:   v1.ServiceInstanceConditionReady,
+				Status: v1.ConditionTrue,
 			},
 		)
 		Expect(err).NotTo(HaveOccurred(), "failed to wait instance to be ready")
 
 		// Make sure references have been resolved
 		By("References should have been resolved before ServiceInstance is ready ")
-		sc, err := f.ServiceCatalogClientSet.ServicecatalogV1beta1().ServiceInstances(testnamespace.Name).Get(context.Background(), instanceName, metav1.GetOptions{})
+		sc, err := f.ServiceCatalogClientSet.Servicecatalogv1().ServiceInstances(testnamespace.Name).Get(context.Background(), instanceName, metav1.GetOptions{})
 		Expect(err).NotTo(HaveOccurred(), "failed to get ServiceInstance after binding")
 		Expect(sc.Spec.ServiceClassRef).NotTo(BeNil())
 		Expect(sc.Spec.ServicePlanRef).NotTo(BeNil())
@@ -452,29 +452,29 @@ var _ = framework.ServiceCatalogDescribe("walkthrough", func() {
 
 		// Binding to the ServiceInstance
 		By("Creating a ServiceBinding")
-		binding := &v1beta1.ServiceBinding{
+		binding := &v1.ServiceBinding{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      bindingName,
 				Namespace: testnamespace.Name,
 			},
-			Spec: v1beta1.ServiceBindingSpec{
-				InstanceRef: v1beta1.LocalObjectReference{
+			Spec: v1.ServiceBindingSpec{
+				InstanceRef: v1.LocalObjectReference{
 					Name: instanceName,
 				},
 				SecretName: "my-secret",
 			},
 		}
-		binding, err = f.ServiceCatalogClientSet.ServicecatalogV1beta1().ServiceBindings(testnamespace.Name).Create(context.Background(), binding, metav1.CreateOptions{})
+		binding, err = f.ServiceCatalogClientSet.Servicecatalogv1().ServiceBindings(testnamespace.Name).Create(context.Background(), binding, metav1.CreateOptions{})
 		Expect(err).NotTo(HaveOccurred(), "failed to create binding")
 		Expect(binding).NotTo(BeNil())
 
 		By("Waiting for ServiceBinding to be ready")
-		_, err = util.WaitForBindingCondition(f.ServiceCatalogClientSet.ServicecatalogV1beta1(),
+		_, err = util.WaitForBindingCondition(f.ServiceCatalogClientSet.Servicecatalogv1(),
 			testnamespace.Name,
 			bindingName,
-			v1beta1.ServiceBindingCondition{
-				Type:   v1beta1.ServiceBindingConditionReady,
-				Status: v1beta1.ConditionTrue,
+			v1.ServiceBindingCondition{
+				Type:   v1.ServiceBindingConditionReady,
+				Status: v1.ConditionTrue,
 			},
 		)
 		Expect(err).NotTo(HaveOccurred(), "failed to wait binding to be ready")
@@ -485,11 +485,11 @@ var _ = framework.ServiceCatalogDescribe("walkthrough", func() {
 
 		// Unbinding from the ServiceInstance
 		By("Deleting the ServiceBinding")
-		err = f.ServiceCatalogClientSet.ServicecatalogV1beta1().ServiceBindings(testnamespace.Name).Delete(context.Background(), bindingName, metav1.DeleteOptions{})
+		err = f.ServiceCatalogClientSet.Servicecatalogv1().ServiceBindings(testnamespace.Name).Delete(context.Background(), bindingName, metav1.DeleteOptions{})
 		Expect(err).NotTo(HaveOccurred(), "failed to delete the binding")
 
 		By("Waiting for ServiceBinding to not exist")
-		err = util.WaitForBindingToNotExist(f.ServiceCatalogClientSet.ServicecatalogV1beta1(), testnamespace.Name, bindingName)
+		err = util.WaitForBindingToNotExist(f.ServiceCatalogClientSet.Servicecatalogv1(), testnamespace.Name, bindingName)
 		Expect(err).NotTo(HaveOccurred())
 
 		By("Secret should been deleted after delete the binding")
@@ -498,120 +498,120 @@ var _ = framework.ServiceCatalogDescribe("walkthrough", func() {
 
 		// Deprovisioning the ServiceInstance
 		By("Deleting the ServiceInstance")
-		err = f.ServiceCatalogClientSet.ServicecatalogV1beta1().ServiceInstances(testnamespace.Name).Delete(context.Background(), instanceName, metav1.DeleteOptions{})
+		err = f.ServiceCatalogClientSet.Servicecatalogv1().ServiceInstances(testnamespace.Name).Delete(context.Background(), instanceName, metav1.DeleteOptions{})
 		Expect(err).NotTo(HaveOccurred(), "failed to delete the instance")
 
 		By("Waiting for ServiceInstance to not exist")
-		err = util.WaitForInstanceToNotExist(f.ServiceCatalogClientSet.ServicecatalogV1beta1(), testnamespace.Name, instanceName)
+		err = util.WaitForInstanceToNotExist(f.ServiceCatalogClientSet.Servicecatalogv1(), testnamespace.Name, instanceName)
 		Expect(err).NotTo(HaveOccurred())
 
 		By("Creating a ServiceInstance using a default plan")
-		instanceDef := &v1beta1.ServiceInstance{
+		instanceDef := &v1.ServiceInstance{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      instanceNameDef,
 				Namespace: testnamespace.Name,
 			},
-			Spec: v1beta1.ServiceInstanceSpec{
-				PlanReference: v1beta1.PlanReference{
+			Spec: v1.ServiceInstanceSpec{
+				PlanReference: v1.PlanReference{
 					ServiceClassExternalName: serviceclassNameWithSinglePlan,
 				},
 			},
 		}
-		instance, err = f.ServiceCatalogClientSet.ServicecatalogV1beta1().ServiceInstances(testnamespace.Name).Create(context.Background(), instanceDef, metav1.CreateOptions{})
+		instance, err = f.ServiceCatalogClientSet.Servicecatalogv1().ServiceInstances(testnamespace.Name).Create(context.Background(), instanceDef, metav1.CreateOptions{})
 		Expect(err).NotTo(HaveOccurred(), "failed to create instance with default plan")
 		Expect(instanceDef).NotTo(BeNil())
 
 		By("Waiting for ServiceInstance to be ready")
-		err = util.WaitForInstanceCondition(f.ServiceCatalogClientSet.ServicecatalogV1beta1(),
+		err = util.WaitForInstanceCondition(f.ServiceCatalogClientSet.Servicecatalogv1(),
 			testnamespace.Name,
 			instanceNameDef,
-			v1beta1.ServiceInstanceCondition{
-				Type:   v1beta1.ServiceInstanceConditionReady,
-				Status: v1beta1.ConditionTrue,
+			v1.ServiceInstanceCondition{
+				Type:   v1.ServiceInstanceConditionReady,
+				Status: v1.ConditionTrue,
 			},
 		)
 		Expect(err).NotTo(HaveOccurred(), "failed to wait instance with default plan to be ready")
 
 		// Deprovisioning the ServiceInstance with default plan
 		By("Deleting the ServiceInstance with default plan")
-		err = f.ServiceCatalogClientSet.ServicecatalogV1beta1().ServiceInstances(testnamespace.Name).Delete(context.Background(), instanceNameDef, metav1.DeleteOptions{})
+		err = f.ServiceCatalogClientSet.Servicecatalogv1().ServiceInstances(testnamespace.Name).Delete(context.Background(), instanceNameDef, metav1.DeleteOptions{})
 		Expect(err).NotTo(HaveOccurred(), "failed to delete the instance with default plan")
 
 		By("Waiting for ServiceInstance with default plan to not exist")
-		err = util.WaitForInstanceToNotExist(f.ServiceCatalogClientSet.ServicecatalogV1beta1(), testnamespace.Name, instanceNameDef)
+		err = util.WaitForInstanceToNotExist(f.ServiceCatalogClientSet.Servicecatalogv1(), testnamespace.Name, instanceNameDef)
 		Expect(err).NotTo(HaveOccurred())
 
 		By("Creating a ServiceInstance using k8s names plan")
-		instanceK8SNames := &v1beta1.ServiceInstance{
+		instanceK8SNames := &v1.ServiceInstance{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      instanceNameK8sNames,
 				Namespace: testnamespace.Name,
 			},
-			Spec: v1beta1.ServiceInstanceSpec{
-				PlanReference: v1beta1.PlanReference{
+			Spec: v1.ServiceInstanceSpec{
+				PlanReference: v1.PlanReference{
 					ServiceClassName: serviceclassID,
 					ServicePlanName:  serviceplanID,
 				},
 			},
 		}
-		instance, err = f.ServiceCatalogClientSet.ServicecatalogV1beta1().ServiceInstances(testnamespace.Name).Create(context.Background(), instanceK8SNames, metav1.CreateOptions{})
+		instance, err = f.ServiceCatalogClientSet.Servicecatalogv1().ServiceInstances(testnamespace.Name).Create(context.Background(), instanceK8SNames, metav1.CreateOptions{})
 		Expect(err).NotTo(HaveOccurred(), "failed to create instance with K8S names")
 		Expect(instanceK8SNames).NotTo(BeNil())
 
 		By("Waiting for ServiceInstance with k8s names to be ready")
-		err = util.WaitForInstanceCondition(f.ServiceCatalogClientSet.ServicecatalogV1beta1(),
+		err = util.WaitForInstanceCondition(f.ServiceCatalogClientSet.Servicecatalogv1(),
 			testnamespace.Name,
 			instanceNameK8sNames,
-			v1beta1.ServiceInstanceCondition{
-				Type:   v1beta1.ServiceInstanceConditionReady,
-				Status: v1beta1.ConditionTrue,
+			v1.ServiceInstanceCondition{
+				Type:   v1.ServiceInstanceConditionReady,
+				Status: v1.ConditionTrue,
 			},
 		)
 		Expect(err).NotTo(HaveOccurred(), "failed to wait instance with k8s names to be ready")
 
 		// Deprovisioning the ServiceInstance with k8s names
 		By("Deleting the ServiceInstance with k8s names")
-		err = f.ServiceCatalogClientSet.ServicecatalogV1beta1().ServiceInstances(testnamespace.Name).Delete(context.Background(), instanceNameK8sNames, metav1.DeleteOptions{})
+		err = f.ServiceCatalogClientSet.Servicecatalogv1().ServiceInstances(testnamespace.Name).Delete(context.Background(), instanceNameK8sNames, metav1.DeleteOptions{})
 		Expect(err).NotTo(HaveOccurred(), "failed to delete the instance with k8s names")
 
 		By("Waiting for ServiceInstance with k8s names to not exist")
-		err = util.WaitForInstanceToNotExist(f.ServiceCatalogClientSet.ServicecatalogV1beta1(), testnamespace.Name, instanceNameK8sNames)
+		err = util.WaitForInstanceToNotExist(f.ServiceCatalogClientSet.Servicecatalogv1(), testnamespace.Name, instanceNameK8sNames)
 		Expect(err).NotTo(HaveOccurred())
 
 		By("Creating a ServiceInstance using k8s name and default plan")
-		instanceK8SNamesDef := &v1beta1.ServiceInstance{
+		instanceK8SNamesDef := &v1.ServiceInstance{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      instanceNameK8sNamesDef,
 				Namespace: testnamespace.Name,
 			},
-			Spec: v1beta1.ServiceInstanceSpec{
-				PlanReference: v1beta1.PlanReference{
+			Spec: v1.ServiceInstanceSpec{
+				PlanReference: v1.PlanReference{
 					ServiceClassName: serviceclassIDWithSinglePlan,
 				},
 			},
 		}
-		instance, err = f.ServiceCatalogClientSet.ServicecatalogV1beta1().ServiceInstances(testnamespace.Name).Create(context.Background(), instanceK8SNamesDef, metav1.CreateOptions{})
+		instance, err = f.ServiceCatalogClientSet.Servicecatalogv1().ServiceInstances(testnamespace.Name).Create(context.Background(), instanceK8SNamesDef, metav1.CreateOptions{})
 		Expect(err).NotTo(HaveOccurred(), "failed to create instance with K8S name and default plan")
 		Expect(instanceK8SNamesDef).NotTo(BeNil())
 
 		By("Waiting for ServiceInstance with k8s name and default plan to be ready")
-		err = util.WaitForInstanceCondition(f.ServiceCatalogClientSet.ServicecatalogV1beta1(),
+		err = util.WaitForInstanceCondition(f.ServiceCatalogClientSet.Servicecatalogv1(),
 			testnamespace.Name,
 			instanceNameK8sNamesDef,
-			v1beta1.ServiceInstanceCondition{
-				Type:   v1beta1.ServiceInstanceConditionReady,
-				Status: v1beta1.ConditionTrue,
+			v1.ServiceInstanceCondition{
+				Type:   v1.ServiceInstanceConditionReady,
+				Status: v1.ConditionTrue,
 			},
 		)
 		Expect(err).NotTo(HaveOccurred(), "failed to wait instance with k8s name and default plan to be ready")
 
 		// Deprovisioning the ServiceInstance with k8s name and default plan
 		By("Deleting the ServiceInstance with k8s name and default plan")
-		err = f.ServiceCatalogClientSet.ServicecatalogV1beta1().ServiceInstances(testnamespace.Name).Delete(context.Background(), instanceNameK8sNamesDef, metav1.DeleteOptions{})
+		err = f.ServiceCatalogClientSet.Servicecatalogv1().ServiceInstances(testnamespace.Name).Delete(context.Background(), instanceNameK8sNamesDef, metav1.DeleteOptions{})
 		Expect(err).NotTo(HaveOccurred(), "failed to delete the instance with k8s name and default plan")
 
 		By("Waiting for ServiceInstance with k8s name and default plan to not exist")
-		err = util.WaitForInstanceToNotExist(f.ServiceCatalogClientSet.ServicecatalogV1beta1(), testnamespace.Name, instanceNameK8sNamesDef)
+		err = util.WaitForInstanceToNotExist(f.ServiceCatalogClientSet.Servicecatalogv1(), testnamespace.Name, instanceNameK8sNamesDef)
 		Expect(err).NotTo(HaveOccurred())
 
 		By("Deleting the test namespace")
@@ -620,15 +620,15 @@ var _ = framework.ServiceCatalogDescribe("walkthrough", func() {
 
 		// Deleting ServiceBroker and ServiceClass
 		By("Deleting the ServiceBroker")
-		err = f.ServiceCatalogClientSet.ServicecatalogV1beta1().ServiceBrokers(testnamespace.Name).Delete(context.Background(), brokerName, metav1.DeleteOptions{})
+		err = f.ServiceCatalogClientSet.Servicecatalogv1().ServiceBrokers(testnamespace.Name).Delete(context.Background(), brokerName, metav1.DeleteOptions{})
 		Expect(err).NotTo(HaveOccurred(), "failed to delete the broker")
 
 		By("Waiting for ServiceBroker to not exist")
-		err = util.WaitForBrokerToNotExist(f.ServiceCatalogClientSet.ServicecatalogV1beta1(), brokerName, testnamespace.Name)
+		err = util.WaitForBrokerToNotExist(f.ServiceCatalogClientSet.Servicecatalogv1(), brokerName, testnamespace.Name)
 		Expect(err).NotTo(HaveOccurred())
 
 		By("Waiting for ServiceClass to not exist")
-		err = util.WaitForServiceClassToNotExist(f.ServiceCatalogClientSet.ServicecatalogV1beta1(), serviceclassID, testnamespace.Name)
+		err = util.WaitForServiceClassToNotExist(f.ServiceCatalogClientSet.Servicecatalogv1(), serviceclassID, testnamespace.Name)
 		Expect(err).NotTo(HaveOccurred())
 	})
 })

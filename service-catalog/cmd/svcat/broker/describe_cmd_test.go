@@ -23,7 +23,7 @@ import (
 	. "github.com/kubernetes-sigs/service-catalog/cmd/svcat/broker"
 	"github.com/kubernetes-sigs/service-catalog/cmd/svcat/command"
 	"github.com/kubernetes-sigs/service-catalog/cmd/svcat/test"
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/svcat"
 	servicecatalog "github.com/kubernetes-sigs/service-catalog/pkg/svcat/service-catalog"
 	"github.com/kubernetes-sigs/service-catalog/pkg/svcat/service-catalog/service-catalogfakes"
@@ -62,36 +62,36 @@ var _ = Describe("Describe Command", func() {
 	Describe("Run", func() {
 		var (
 			brokerName               string
-			brokerToReturn           *v1beta1.ClusterServiceBroker
+			brokerToReturn           *v1.ClusterServiceBroker
 			brokerURL                string
 			namespace                string
-			namespacedBrokerToReturn *v1beta1.ServiceBroker
+			namespacedBrokerToReturn *v1.ServiceBroker
 		)
 		BeforeEach(func() {
 			brokerName = "foobarbroker"
 			brokerURL = "www.foobar.com"
 			namespace = "banana-namespace"
 
-			brokerToReturn = &v1beta1.ClusterServiceBroker{
+			brokerToReturn = &v1.ClusterServiceBroker{
 				ObjectMeta: v1.ObjectMeta{
 					Name: brokerName,
 				},
-				Spec: v1beta1.ClusterServiceBrokerSpec{
-					CommonServiceBrokerSpec: v1beta1.CommonServiceBrokerSpec{
+				Spec: v1.ClusterServiceBrokerSpec{
+					CommonServiceBrokerSpec: v1.CommonServiceBrokerSpec{
 						URL:                 brokerURL,
-						CatalogRestrictions: &v1beta1.CatalogRestrictions{},
+						CatalogRestrictions: &v1.CatalogRestrictions{},
 					},
 				},
 			}
-			namespacedBrokerToReturn = &v1beta1.ServiceBroker{
+			namespacedBrokerToReturn = &v1.ServiceBroker{
 				ObjectMeta: v1.ObjectMeta{
 					Name:      brokerName,
 					Namespace: namespace,
 				},
-				Spec: v1beta1.ServiceBrokerSpec{
-					CommonServiceBrokerSpec: v1beta1.CommonServiceBrokerSpec{
+				Spec: v1.ServiceBrokerSpec{
+					CommonServiceBrokerSpec: v1.CommonServiceBrokerSpec{
 						URL:                 brokerURL,
-						CatalogRestrictions: &v1beta1.CatalogRestrictions{},
+						CatalogRestrictions: &v1.CatalogRestrictions{},
 					},
 				},
 			}

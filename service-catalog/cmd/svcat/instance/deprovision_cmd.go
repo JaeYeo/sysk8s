@@ -23,7 +23,7 @@ import (
 	"strings"
 
 	"github.com/kubernetes-sigs/service-catalog/cmd/svcat/output"
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 
 	"github.com/kubernetes-sigs/service-catalog/cmd/svcat/command"
 	"github.com/spf13/cobra"
@@ -120,7 +120,7 @@ func (c *deprovisonCmd) deprovision() error {
 	if c.Wait {
 		fmt.Fprintln(c.Output, "Waiting for the instance to be deleted...")
 
-		var instance *v1beta1.ServiceInstance
+		var instance *v1.ServiceInstance
 		instance, err = c.App.WaitForInstanceToNotExist(c.Namespace, c.instanceName, c.Interval, c.Timeout)
 
 		// The instance failed to deprovision cleanly, dump out more information on why

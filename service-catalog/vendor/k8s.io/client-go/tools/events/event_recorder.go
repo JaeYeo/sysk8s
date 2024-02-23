@@ -28,7 +28,7 @@ import (
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/tools/reference"
 
-	"k8s.io/api/events/v1beta1"
+	"k8s.io/api/events/v1"
 	"k8s.io/client-go/tools/record/util"
 	"k8s.io/klog"
 )
@@ -64,13 +64,13 @@ func (recorder *recorderImpl) Eventf(regarding runtime.Object, related runtime.O
 	}()
 }
 
-func (recorder *recorderImpl) makeEvent(refRegarding *v1.ObjectReference, refRelated *v1.ObjectReference, timestamp metav1.MicroTime, eventtype, reason, message string, reportingController string, reportingInstance string, action string) *v1beta1.Event {
+func (recorder *recorderImpl) makeEvent(refRegarding *v1.ObjectReference, refRelated *v1.ObjectReference, timestamp metav1.MicroTime, eventtype, reason, message string, reportingController string, reportingInstance string, action string) *v1.Event {
 	t := metav1.Time{Time: recorder.clock.Now()}
 	namespace := refRegarding.Namespace
 	if namespace == "" {
 		namespace = metav1.NamespaceDefault
 	}
-	return &v1beta1.Event{
+	return &v1.Event{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      fmt.Sprintf("%v.%x", refRegarding.Name, t.UnixNano()),
 			Namespace: namespace,

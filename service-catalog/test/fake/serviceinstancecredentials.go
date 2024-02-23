@@ -18,8 +18,8 @@ package fake
 
 import (
 	"context"
-	v1beta1 "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
-	v1beta1typed "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/typed/servicecatalog/v1beta1"
+	v1 "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
+	v1typed "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/typed/servicecatalog/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -28,10 +28,10 @@ import (
 // being passed to UpdateStatus. This is a workaround until the generated fake
 // clientset does its own copying.
 type ServiceBindings struct {
-	v1beta1typed.ServiceBindingInterface
+	v1typed.ServiceBindingInterface
 }
 
-func (c *ServiceBindings) UpdateStatus(ctx context.Context, serviceBinding *v1beta1.ServiceBinding, opts v1.UpdateOptions) (*v1beta1.ServiceBinding, error) {
+func (c *ServiceBindings) UpdateStatus(ctx context.Context, serviceBinding *v1.ServiceBinding, opts v1.UpdateOptions) (*v1.ServiceBinding, error) {
 	instanceCopy := serviceBinding.DeepCopy()
 	_, err := c.ServiceBindingInterface.UpdateStatus(ctx, instanceCopy, opts)
 	return serviceBinding, err

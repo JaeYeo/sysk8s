@@ -5,7 +5,7 @@ import (
 
 	"context"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	apiErrors "k8s.io/apimachinery/pkg/api/errors"
@@ -33,7 +33,7 @@ func NewClusterBrokerSyncer(cli client.Client, clusterBrokerName string, log log
 func (r *ClusterSyncer) Sync() error {
 	r.log.Infof("- syncing ClusterServiceBroker %s", r.clusterBrokerName)
 	for i := 0; i < maxSyncRetries; i++ {
-		broker := &v1beta1.ClusterServiceBroker{}
+		broker := &v1.ClusterServiceBroker{}
 		err := r.client.Get(context.Background(), types.NamespacedName{Name: r.clusterBrokerName}, broker)
 		switch {
 		case apiErrors.IsNotFound(err):

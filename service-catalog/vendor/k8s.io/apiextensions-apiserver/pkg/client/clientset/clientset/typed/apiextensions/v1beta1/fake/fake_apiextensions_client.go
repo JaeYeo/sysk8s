@@ -19,22 +19,22 @@ limitations under the License.
 package fake
 
 import (
-	v1beta1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
+	v1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1"
 	rest "k8s.io/client-go/rest"
 	testing "k8s.io/client-go/testing"
 )
 
-type FakeApiextensionsV1beta1 struct {
+type FakeApiextensionsv1 struct {
 	*testing.Fake
 }
 
-func (c *FakeApiextensionsV1beta1) CustomResourceDefinitions() v1beta1.CustomResourceDefinitionInterface {
+func (c *FakeApiextensionsv1) CustomResourceDefinitions() v1.CustomResourceDefinitionInterface {
 	return &FakeCustomResourceDefinitions{c}
 }
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
-func (c *FakeApiextensionsV1beta1) RESTClient() rest.Interface {
+func (c *FakeApiextensionsv1) RESTClient() rest.Interface {
 	var ret *rest.RESTClient
 	return ret
 }

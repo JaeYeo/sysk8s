@@ -19,30 +19,30 @@ limitations under the License.
 package fake
 
 import (
-	v1beta1 "k8s.io/client-go/kubernetes/typed/apps/v1beta1"
+	v1 "k8s.io/client-go/kubernetes/typed/apps/v1"
 	rest "k8s.io/client-go/rest"
 	testing "k8s.io/client-go/testing"
 )
 
-type FakeAppsV1beta1 struct {
+type FakeAppsv1 struct {
 	*testing.Fake
 }
 
-func (c *FakeAppsV1beta1) ControllerRevisions(namespace string) v1beta1.ControllerRevisionInterface {
+func (c *FakeAppsv1) ControllerRevisions(namespace string) v1.ControllerRevisionInterface {
 	return &FakeControllerRevisions{c, namespace}
 }
 
-func (c *FakeAppsV1beta1) Deployments(namespace string) v1beta1.DeploymentInterface {
+func (c *FakeAppsv1) Deployments(namespace string) v1.DeploymentInterface {
 	return &FakeDeployments{c, namespace}
 }
 
-func (c *FakeAppsV1beta1) StatefulSets(namespace string) v1beta1.StatefulSetInterface {
+func (c *FakeAppsv1) StatefulSets(namespace string) v1.StatefulSetInterface {
 	return &FakeStatefulSets{c, namespace}
 }
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
-func (c *FakeAppsV1beta1) RESTClient() rest.Interface {
+func (c *FakeAppsv1) RESTClient() rest.Interface {
 	var ret *rest.RESTClient
 	return ret
 }

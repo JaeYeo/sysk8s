@@ -8,7 +8,7 @@ import (
 
 	"github.com/Masterminds/semver"
 	"github.com/kyma-project/helm-broker/internal"
-	"github.com/kyma-project/rafter/pkg/apis/rafter/v1beta1"
+	"github.com/kyma-project/rafter/pkg/apis/rafter/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -22,7 +22,7 @@ import (
 
 func TestDocsProvider_EnsureAssetGroup(t *testing.T) {
 	// given
-	err := v1beta1.AddToScheme(scheme.Scheme)
+	err := v1.AddToScheme(scheme.Scheme)
 	require.NoError(t, err)
 
 	for tn, tc := range map[string]struct {
@@ -41,7 +41,7 @@ func TestDocsProvider_EnsureAssetGroup(t *testing.T) {
 			require.NoError(t, err)
 
 			// then
-			result := v1beta1.AssetGroup{}
+			result := v1.AssetGroup{}
 			err = c.Get(context.Background(), client.ObjectKey{Namespace: "test", Name: "test"}, &result)
 			require.NoError(t, err)
 			assert.Equal(t, tc.givenAddon.Addon.Docs[0].Template, result.Spec.CommonAssetGroupSpec)
@@ -51,7 +51,7 @@ func TestDocsProvider_EnsureAssetGroup(t *testing.T) {
 
 func TestDocsProvider_EnsureAssetGroup_UpdateIfExist(t *testing.T) {
 	// given
-	err := v1beta1.AddToScheme(scheme.Scheme)
+	err := v1.AddToScheme(scheme.Scheme)
 	require.NoError(t, err)
 
 	dt := fixAssetGroup()
@@ -68,7 +68,7 @@ func TestDocsProvider_EnsureAssetGroup_UpdateIfExist(t *testing.T) {
 	require.NoError(t, err)
 
 	// then
-	result := v1beta1.AssetGroup{}
+	result := v1.AssetGroup{}
 	err = c.Get(context.Background(), client.ObjectKey{Namespace: dt.Namespace, Name: dt.Name}, &result)
 	require.NoError(t, err)
 	assert.Equal(t, addonWithEmptyDocsURL.Addon.Docs[0].Template, result.Spec.CommonAssetGroupSpec)
@@ -76,7 +76,7 @@ func TestDocsProvider_EnsureAssetGroup_UpdateIfExist(t *testing.T) {
 
 func TestDocsProvider_EnsureAssetGroupRemoved(t *testing.T) {
 	// given
-	err := v1beta1.AddToScheme(scheme.Scheme)
+	err := v1.AddToScheme(scheme.Scheme)
 	require.NoError(t, err)
 
 	dt := fixAssetGroup()
@@ -89,14 +89,14 @@ func TestDocsProvider_EnsureAssetGroupRemoved(t *testing.T) {
 	require.NoError(t, err)
 
 	// then
-	result := v1beta1.AssetGroup{}
+	result := v1.AssetGroup{}
 	err = c.Get(context.Background(), client.ObjectKey{Namespace: dt.Namespace, Name: dt.Name}, &result)
 	assert.True(t, errors.IsNotFound(err))
 }
 
 func TestDocsProvider_EnsureAssetGroupRemoved_NotExists(t *testing.T) {
 	// given
-	err := v1beta1.AddToScheme(scheme.Scheme)
+	err := v1.AddToScheme(scheme.Scheme)
 	require.NoError(t, err)
 
 	dt := fixAssetGroup()
@@ -109,13 +109,13 @@ func TestDocsProvider_EnsureAssetGroupRemoved_NotExists(t *testing.T) {
 	require.NoError(t, err)
 
 	// then
-	result := v1beta1.AssetGroup{}
+	result := v1.AssetGroup{}
 	err = c.Get(context.Background(), client.ObjectKey{Namespace: dt.Namespace, Name: dt.Name}, &result)
 	assert.True(t, errors.IsNotFound(err))
 }
 
-func fixAssetGroup() *v1beta1.AssetGroup {
-	return &v1beta1.AssetGroup{
+func fixAssetGroup() *v1.AssetGroup {
+	return &v1.AssetGroup{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      "test",
 			Namespace: "test",
@@ -143,8 +143,8 @@ func fixAddonWithDocsURL(id, name, url, docsURL string) internal.AddonWithCharts
 			},
 			Docs: []internal.AddonDocs{
 				{
-					Template: v1beta1.CommonAssetGroupSpec{
-						Sources: []v1beta1.Source{
+					Template: v1.CommonAssetGroupSpec{
+						Sources: []v1.Source{
 							{
 								URL: docsURL,
 							},
@@ -184,8 +184,8 @@ func fixAddonWithEmptyDocs(id, name, url string) internal.AddonWithCharts {
 			},
 			Docs: []internal.AddonDocs{
 				{
-					Template: v1beta1.CommonAssetGroupSpec{
-						Sources: []v1beta1.Source{
+					Template: v1.CommonAssetGroupSpec{
+						Sources: []v1.Source{
 							{},
 						},
 					},

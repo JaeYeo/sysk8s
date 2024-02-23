@@ -14,7 +14,7 @@ import (
 	"time"
 
 	osb "github.com/kubernetes-sigs/go-open-service-broker-client/v2"
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -46,7 +46,7 @@ import (
 	"github.com/kyma-project/helm-broker/internal/storage/testdata"
 	"github.com/kyma-project/helm-broker/pkg/apis"
 	"github.com/kyma-project/helm-broker/pkg/apis/addons/v1alpha1"
-	dtv1beta1 "github.com/kyma-project/rafter/pkg/apis/rafter/v1beta1"
+	dtv1 "github.com/kyma-project/rafter/pkg/apis/rafter/v1"
 )
 
 func init() {
@@ -101,9 +101,9 @@ func newTestSuite(t *testing.T, docsEnabled, httpBasicAuth bool) *testSuite {
 	sch, err := v1alpha1.SchemeBuilder.Build()
 	require.NoError(t, err)
 	require.NoError(t, apis.AddToScheme(sch))
-	require.NoError(t, v1beta1.AddToScheme(sch))
+	require.NoError(t, v1.AddToScheme(sch))
 	require.NoError(t, corev1.AddToScheme(sch))
-	require.NoError(t, dtv1beta1.AddToScheme(sch))
+	require.NoError(t, dtv1.AddToScheme(sch))
 
 	k8sClientset := kubernetes.NewSimpleClientset()
 
@@ -328,23 +328,23 @@ func (ts *testSuite) provisionInstanceFromServiceClass(prefix, namespace string)
 
 	// The controller checks if there is any Service Instance (managed by Service Catalog).
 	// The following code simulates Service Catalog actions
-	err = ts.dynamicClient.Create(context.TODO(), &v1beta1.ServiceClass{
+	err = ts.dynamicClient.Create(context.TODO(), &v1.ServiceClass{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      "a-class",
 			Namespace: namespace,
 		},
-		Spec: v1beta1.ServiceClassSpec{
+		Spec: v1.ServiceClassSpec{
 			ServiceBrokerName: broker2.NamespacedBrokerName,
 		},
 	})
 	require.NoError(ts.t, err)
-	err = ts.dynamicClient.Create(context.TODO(), &v1beta1.ServiceInstance{
+	err = ts.dynamicClient.Create(context.TODO(), &v1.ServiceInstance{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      "instance-001",
 			Namespace: namespace,
 		},
-		Spec: v1beta1.ServiceInstanceSpec{
-			ServiceClassRef: &v1beta1.LocalObjectReference{
+		Spec: v1.ServiceInstanceSpec{
+			ServiceClassRef: &v1.LocalObjectReference{
 				Name: "a-class",
 			},
 		},
@@ -375,22 +375,22 @@ func (ts *testSuite) provisionInstanceFromClusterServiceClass(prefix, namespace 
 
 	// The controller checks if there is any Service Instance (managed by Service Catalog).
 	// The following code simulates Service Catalog actions
-	err = ts.dynamicClient.Create(context.TODO(), &v1beta1.ClusterServiceClass{
+	err = ts.dynamicClient.Create(context.TODO(), &v1.ClusterServiceClass{
 		ObjectMeta: v1.ObjectMeta{
 			Name: "some-class",
 		},
-		Spec: v1beta1.ClusterServiceClassSpec{
+		Spec: v1.ClusterServiceClassSpec{
 			ClusterServiceBrokerName: clusterBrokerName,
 		},
 	})
 	require.NoError(ts.t, err)
-	err = ts.dynamicClient.Create(context.TODO(), &v1beta1.ServiceInstance{
+	err = ts.dynamicClient.Create(context.TODO(), &v1.ServiceInstance{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      "instance-001",
 			Namespace: namespace,
 		},
-		Spec: v1beta1.ServiceInstanceSpec{
-			ClusterServiceClassRef: &v1beta1.ClusterObjectReference{
+		Spec: v1.ServiceInstanceSpec{
+			ClusterServiceClassRef: &v1.ClusterObjectReference{
 				Name: "some-class",
 			},
 		},
@@ -413,13 +413,13 @@ func (ts *testSuite) deprovisionInstance(prefix, namespace string) {
 
 	// The controller checks if there is any Service Instance (managed by Service Catalog).
 	// The following code simulates Service Catalog actions
-	err = ts.dynamicClient.Delete(context.TODO(), &v1beta1.ServiceInstance{
+	err = ts.dynamicClient.Delete(context.TODO(), &v1.ServiceInstance{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      "instance-001",
 			Namespace: namespace,
 		},
-		Spec: v1beta1.ServiceInstanceSpec{
-			ServiceClassRef: &v1beta1.LocalObjectReference{
+		Spec: v1.ServiceInstanceSpec{
+			ServiceClassRef: &v1.LocalObjectReference{
 				Name: "a-class",
 			},
 		},
@@ -533,7 +533,7 @@ func (ts *testSuite) waitForPhase(obj runtime.Object, status *v1alpha1.CommonAdd
 func (ts *testSuite) waitForServiceBrokerRegistered(namespace string) {
 	timeoutCh := time.After(3 * time.Second)
 	for {
-		var obj v1beta1.ServiceBroker
+		var obj v1.ServiceBroker
 		err := ts.dynamicClient.Get(context.TODO(), types.NamespacedName{Namespace: namespace, Name: broker2.NamespacedBrokerName}, &obj)
 		if err == nil {
 			return
@@ -551,7 +551,7 @@ func (ts *testSuite) waitForServiceBrokerRegistered(namespace string) {
 func (ts *testSuite) waitForClusterServiceBrokerRegistered() {
 	timeoutCh := time.After(3 * time.Second)
 	for {
-		var obj v1beta1.ClusterServiceBroker
+		var obj v1.ClusterServiceBroker
 		err := ts.dynamicClient.Get(context.TODO(), types.NamespacedName{Name: clusterBrokerName}, &obj)
 		if err == nil {
 			return
@@ -569,7 +569,7 @@ func (ts *testSuite) waitForClusterServiceBrokerRegistered() {
 func (ts *testSuite) waitForServiceBrokerNotRegistered(namespace string) {
 	timeoutCh := time.After(3 * time.Second)
 	for {
-		var obj v1beta1.ServiceBroker
+		var obj v1.ServiceBroker
 		err := ts.dynamicClient.Get(context.TODO(), types.NamespacedName{Namespace: namespace, Name: broker2.NamespacedBrokerName}, &obj)
 		if apierrors.IsNotFound(err) {
 			return
@@ -587,7 +587,7 @@ func (ts *testSuite) waitForServiceBrokerNotRegistered(namespace string) {
 func (ts *testSuite) waitForClusterServiceBrokerNotRegistered() {
 	timeoutCh := time.After(3 * time.Second)
 	for {
-		var obj v1beta1.ClusterServiceBroker
+		var obj v1.ClusterServiceBroker
 		err := ts.dynamicClient.Get(context.TODO(), types.NamespacedName{Name: clusterBrokerName}, &obj)
 		if apierrors.IsNotFound(err) {
 			return
@@ -745,7 +745,7 @@ func (ts *testSuite) updateClusterAddonsConfigurationRepositories(name string, u
 }
 
 func (ts *testSuite) assertAssetGroupExist(namespace, name string) {
-	var assetGroup dtv1beta1.AssetGroup
+	var assetGroup dtv1.AssetGroup
 
 	err := wait.Poll(1*time.Second, 30*time.Second, func() (done bool, err error) {
 		key := types.NamespacedName{Name: name, Namespace: namespace}
@@ -765,7 +765,7 @@ func (ts *testSuite) assertAssetGroupExist(namespace, name string) {
 }
 
 func (ts *testSuite) assertClusterAssetGroupExist(name string) {
-	var clusterAssetGroup dtv1beta1.ClusterAssetGroup
+	var clusterAssetGroup dtv1.ClusterAssetGroup
 
 	err := wait.Poll(1*time.Second, 30*time.Second, func() (done bool, err error) {
 		key := types.NamespacedName{Name: name}
@@ -785,7 +785,7 @@ func (ts *testSuite) assertClusterAssetGroupExist(name string) {
 }
 
 func (ts *testSuite) assertAssetGroupListIsEmpty() {
-	var assetGroupList dtv1beta1.AssetGroupList
+	var assetGroupList dtv1.AssetGroupList
 
 	err := wait.Poll(1*time.Second, 30*time.Second, func() (done bool, err error) {
 		err = ts.dynamicClient.List(context.TODO(), &assetGroupList)
@@ -804,7 +804,7 @@ func (ts *testSuite) assertAssetGroupListIsEmpty() {
 }
 
 func (ts *testSuite) assertClusterAssetGroupListIsEmpty() {
-	var clusterAssetGroupList dtv1beta1.ClusterAssetGroupList
+	var clusterAssetGroupList dtv1.ClusterAssetGroupList
 
 	err := wait.Poll(1*time.Second, 30*time.Second, func() (done bool, err error) {
 		err = ts.dynamicClient.List(context.TODO(), &clusterAssetGroupList)

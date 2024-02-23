@@ -19,22 +19,22 @@ limitations under the License.
 package fake
 
 import (
-	v1beta1 "k8s.io/client-go/kubernetes/typed/certificates/v1beta1"
+	v1 "k8s.io/client-go/kubernetes/typed/certificates/v1"
 	rest "k8s.io/client-go/rest"
 	testing "k8s.io/client-go/testing"
 )
 
-type FakeCertificatesV1beta1 struct {
+type FakeCertificatesv1 struct {
 	*testing.Fake
 }
 
-func (c *FakeCertificatesV1beta1) CertificateSigningRequests() v1beta1.CertificateSigningRequestInterface {
+func (c *FakeCertificatesv1) CertificateSigningRequests() v1.CertificateSigningRequestInterface {
 	return &FakeCertificateSigningRequests{c}
 }
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
-func (c *FakeCertificatesV1beta1) RESTClient() rest.Interface {
+func (c *FakeCertificatesv1) RESTClient() rest.Interface {
 	var ret *rest.RESTClient
 	return ret
 }

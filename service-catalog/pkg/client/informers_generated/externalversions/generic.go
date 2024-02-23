@@ -1,5 +1,5 @@
 /*
-Copyright 2020 The Kubernetes Authors.
+Copyright 2021 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ package externalversions
 import (
 	"fmt"
 
-	v1beta1 "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	v1 "github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	v1alpha1 "github.com/kubernetes-sigs/service-catalog/pkg/apis/settings/v1alpha1"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	cache "k8s.io/client-go/tools/cache"
@@ -53,23 +53,23 @@ func (f *genericInformer) Lister() cache.GenericLister {
 // TODO extend this to unknown resources with a client pool
 func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource) (GenericInformer, error) {
 	switch resource {
-	// Group=servicecatalog.k8s.io, Version=v1beta1
-	case v1beta1.SchemeGroupVersion.WithResource("clusterservicebrokers"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Servicecatalog().V1beta1().ClusterServiceBrokers().Informer()}, nil
-	case v1beta1.SchemeGroupVersion.WithResource("clusterserviceclasses"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Servicecatalog().V1beta1().ClusterServiceClasses().Informer()}, nil
-	case v1beta1.SchemeGroupVersion.WithResource("clusterserviceplans"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Servicecatalog().V1beta1().ClusterServicePlans().Informer()}, nil
-	case v1beta1.SchemeGroupVersion.WithResource("servicebindings"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Servicecatalog().V1beta1().ServiceBindings().Informer()}, nil
-	case v1beta1.SchemeGroupVersion.WithResource("servicebrokers"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Servicecatalog().V1beta1().ServiceBrokers().Informer()}, nil
-	case v1beta1.SchemeGroupVersion.WithResource("serviceclasses"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Servicecatalog().V1beta1().ServiceClasses().Informer()}, nil
-	case v1beta1.SchemeGroupVersion.WithResource("serviceinstances"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Servicecatalog().V1beta1().ServiceInstances().Informer()}, nil
-	case v1beta1.SchemeGroupVersion.WithResource("serviceplans"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Servicecatalog().V1beta1().ServicePlans().Informer()}, nil
+	// Group=servicecatalog.k8s.io, Version=v1
+	case v1.SchemeGroupVersion.WithResource("clusterservicebrokers"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Servicecatalog().v1().ClusterServiceBrokers().Informer()}, nil
+	case v1.SchemeGroupVersion.WithResource("clusterserviceclasses"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Servicecatalog().v1().ClusterServiceClasses().Informer()}, nil
+	case v1.SchemeGroupVersion.WithResource("clusterserviceplans"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Servicecatalog().v1().ClusterServicePlans().Informer()}, nil
+	case v1.SchemeGroupVersion.WithResource("servicebindings"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Servicecatalog().v1().ServiceBindings().Informer()}, nil
+	case v1.SchemeGroupVersion.WithResource("servicebrokers"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Servicecatalog().v1().ServiceBrokers().Informer()}, nil
+	case v1.SchemeGroupVersion.WithResource("serviceclasses"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Servicecatalog().v1().ServiceClasses().Informer()}, nil
+	case v1.SchemeGroupVersion.WithResource("serviceinstances"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Servicecatalog().v1().ServiceInstances().Informer()}, nil
+	case v1.SchemeGroupVersion.WithResource("serviceplans"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Servicecatalog().v1().ServicePlans().Informer()}, nil
 
 		// Group=settings.servicecatalog.k8s.io, Version=v1alpha1
 	case v1alpha1.SchemeGroupVersion.WithResource("podpresets"):

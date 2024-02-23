@@ -20,7 +20,7 @@ import (
 	"fmt"
 
 	admissionv1 "k8s.io/api/admission/v1"
-	admissionv1beta1 "k8s.io/api/admission/v1beta1"
+	admissionv1 "k8s.io/api/admission/v1"
 	authenticationv1 "k8s.io/api/authentication/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -95,19 +95,19 @@ func VerifyAdmissionResponse(uid types.UID, mutating bool, review runtime.Object
 			Result:           r.Response.Result,
 		}, nil
 
-	case *admissionv1beta1.AdmissionReview:
+	case *admissionv1.AdmissionReview:
 		if r.Response == nil {
 			return nil, fmt.Errorf("webhook response was absent")
 		}
 
-		// Response GVK and response.uid were not verified in v1beta1 handling, allow any
+		// Response GVK and response.uid were not verified in v1 handling, allow any
 
 		patch := []byte(nil)
 		patchType := admissionv1.PatchType("")
 		if mutating {
 			patch = r.Response.Patch
 			if len(r.Response.Patch) > 0 {
-				// patch type was not verified in v1beta1 admissionreview handling. pin to only supported version if a patch is provided.
+				// patch type was not verified in v1 admissionreview handling. pin to only supported version if a patch is provided.
 				patchType = admissionv1.PatchTypeJSONPatch
 			}
 		}
@@ -136,15 +136,15 @@ func CreateAdmissionObjects(versionedAttributes *generic.VersionedAttributes, in
 			response := &admissionv1.AdmissionReview{}
 			return uid, request, response, nil
 
-		case admissionv1beta1.SchemeGroupVersion.Version:
+		case admissionv1.SchemeGroupVersion.Version:
 			uid := types.UID(uuid.NewUUID())
-			request := CreateV1beta1AdmissionReview(uid, versionedAttributes, invocation)
-			response := &admissionv1beta1.AdmissionReview{}
+			request := Createv1AdmissionReview(uid, versionedAttributes, invocation)
+			response := &admissionv1.AdmissionReview{}
 			return uid, request, response, nil
 
 		}
 	}
-	return "", nil, nil, fmt.Errorf("webhook does not accept known AdmissionReview versions (v1, v1beta1)")
+	return "", nil, nil, fmt.Errorf("webhook does not accept known AdmissionReview versions (v1, v1)")
 }
 
 // CreateV1AdmissionReview creates an AdmissionReview for the provided admission.Attributes
@@ -213,8 +213,8 @@ func CreateV1AdmissionReview(uid types.UID, versionedAttributes *generic.Version
 	}
 }
 
-// CreateV1beta1AdmissionReview creates an AdmissionReview for the provided admission.Attributes
-func CreateV1beta1AdmissionReview(uid types.UID, versionedAttributes *generic.VersionedAttributes, invocation *generic.WebhookInvocation) *admissionv1beta1.AdmissionReview {
+// Createv1AdmissionReview creates an AdmissionReview for the provided admission.Attributes
+func Createv1AdmissionReview(uid types.UID, versionedAttributes *generic.VersionedAttributes, invocation *generic.WebhookInvocation) *admissionv1.AdmissionReview {
 	attr := versionedAttributes.Attributes
 	gvk := invocation.Kind
 	gvr := invocation.Resource
@@ -236,8 +236,8 @@ func CreateV1beta1AdmissionReview(uid types.UID, versionedAttributes *generic.Ve
 		userInfo.Extra[key] = authenticationv1.ExtraValue(val)
 	}
 
-	return &admissionv1beta1.AdmissionReview{
-		Request: &admissionv1beta1.AdmissionRequest{
+	return &admissionv1.AdmissionReview{
+		Request: &admissionv1.AdmissionRequest{
 			UID: uid,
 			Kind: metav1.GroupVersionKind{
 				Group:   gvk.Group,
@@ -263,7 +263,7 @@ func CreateV1beta1AdmissionReview(uid types.UID, versionedAttributes *generic.Ve
 			RequestSubResource: requestSubResource,
 			Name:               attr.GetName(),
 			Namespace:          attr.GetNamespace(),
-			Operation:          admissionv1beta1.Operation(attr.GetOperation()),
+			Operation:          admissionv1.Operation(attr.GetOperation()),
 			UserInfo:           userInfo,
 			Object: runtime.RawExtension{
 				Object: versionedAttributes.VersionedObject,

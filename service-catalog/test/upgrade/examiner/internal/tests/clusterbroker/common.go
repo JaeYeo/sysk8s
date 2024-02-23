@@ -18,8 +18,8 @@ package clusterbroker
 
 import (
 	"context"
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
-	scClientset "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/typed/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
+	scClientset "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/typed/servicecatalog/v1"
 	"github.com/pkg/errors"
 	apiErr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,7 +28,7 @@ import (
 )
 
 type common struct {
-	sc        scClientset.ServicecatalogV1beta1Interface
+	sc        scClientset.Servicecatalogv1Interface
 	namespace string
 }
 
@@ -105,9 +105,9 @@ func (c *common) assertServiceInstanceIsReady() error {
 			return false, err
 		}
 
-		condition := v1beta1.ServiceInstanceCondition{
-			Type:    v1beta1.ServiceInstanceConditionReady,
-			Status:  v1beta1.ConditionTrue,
+		condition := v1.ServiceInstanceCondition{
+			Type:    v1.ServiceInstanceConditionReady,
+			Status:  v1.ConditionTrue,
 			Message: successProvisionMessage,
 		}
 		for _, cond := range instance.Status.Conditions {
@@ -133,9 +133,9 @@ func (c *common) assertServiceBindingIsReady() error {
 			return false, err
 		}
 
-		condition := v1beta1.ServiceBindingCondition{
-			Type:    v1beta1.ServiceBindingConditionReady,
-			Status:  v1beta1.ConditionTrue,
+		condition := v1.ServiceBindingCondition{
+			Type:    v1.ServiceBindingConditionReady,
+			Status:  v1.ConditionTrue,
 			Message: successInjectedBindResultMessage,
 		}
 		for _, cond := range binding.Status.Conditions {

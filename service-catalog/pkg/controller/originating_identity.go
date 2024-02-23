@@ -20,14 +20,14 @@ import (
 	"encoding/json"
 
 	osb "github.com/kubernetes-sigs/go-open-service-broker-client/v2"
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 )
 
 const (
 	originatingIdentityPlatform = "kubernetes"
 )
 
-func buildOriginatingIdentity(userInfo *v1beta1.UserInfo) (*osb.OriginatingIdentity, error) {
+func buildOriginatingIdentity(userInfo *v1.UserInfo) (*osb.OriginatingIdentity, error) {
 	if userInfo == nil {
 		return nil, nil
 	}

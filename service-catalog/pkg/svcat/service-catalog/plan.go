@@ -23,7 +23,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/go-multierror"
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	"github.com/kubernetes-sigs/service-catalog/pkg/util"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -131,7 +131,7 @@ func (sdk *SDK) RetrievePlanByName(name string, opts ScopeOptions) (Plan, error)
 
 	listOpts := metav1.ListOptions{
 		LabelSelector: labels.SelectorFromSet(labels.Set{
-			v1beta1.GroupName + "/" + v1beta1.FilterSpecExternalName: util.GenerateSHA(name),
+			v1.GroupName + "/" + v1.FilterSpecExternalName: util.GenerateSHA(name),
 		}).String(),
 	}
 
@@ -152,18 +152,18 @@ func (sdk *SDK) RetrievePlanByClassAndName(className, planName string, opts Scop
 	var classRefSet labels.Set
 	if opts.Scope.Matches(ClusterScope) {
 		classRefSet = labels.Set{
-			v1beta1.GroupName + "/" + v1beta1.FilterSpecClusterServiceClassRefName: util.GenerateSHA(class.GetName()),
+			v1.GroupName + "/" + v1.FilterSpecClusterServiceClassRefName: util.GenerateSHA(class.GetName()),
 		}
 	} else {
 		classRefSet = labels.Set{
-			v1beta1.GroupName + "/" + v1beta1.FilterSpecServiceClassRefName: util.GenerateSHA(class.GetName()),
+			v1.GroupName + "/" + v1.FilterSpecServiceClassRefName: util.GenerateSHA(class.GetName()),
 		}
 	}
 
 	listOpts := metav1.ListOptions{
 		LabelSelector: labels.Merge(classRefSet,
 			labels.Set{
-				v1beta1.GroupName + "/" + v1beta1.FilterSpecExternalName: util.GenerateSHA(planName),
+				v1.GroupName + "/" + v1.FilterSpecExternalName: util.GenerateSHA(planName),
 			}).String(),
 	}
 
@@ -183,12 +183,12 @@ func (sdk *SDK) RetrievePlanByClassIDAndName(classKubeName, planName string, sco
 	//we run through both of these to support AllScope (i.e. we don't know if its a cluster or namespaced plan)
 	if scopeOpts.Scope.Matches(ClusterScope) {
 		classRefSet = labels.Set{
-			v1beta1.GroupName + "/" + v1beta1.FilterSpecClusterServiceClassRefName: util.GenerateSHA(classKubeName),
+			v1.GroupName + "/" + v1.FilterSpecClusterServiceClassRefName: util.GenerateSHA(classKubeName),
 		}
 		listOpts := metav1.ListOptions{
 			LabelSelector: labels.Merge(classRefSet,
 				labels.Set{
-					v1beta1.GroupName + "/" + v1beta1.FilterSpecExternalName: util.GenerateSHA(planName),
+					v1.GroupName + "/" + v1.FilterSpecExternalName: util.GenerateSHA(planName),
 				}).String(),
 		}
 
@@ -202,12 +202,12 @@ func (sdk *SDK) RetrievePlanByClassIDAndName(classKubeName, planName string, sco
 	}
 	if scopeOpts.Scope.Matches(NamespaceScope) {
 		classRefSet = labels.Set{
-			v1beta1.GroupName + "/" + v1beta1.FilterSpecServiceClassRefName: util.GenerateSHA(classKubeName),
+			v1.GroupName + "/" + v1.FilterSpecServiceClassRefName: util.GenerateSHA(classKubeName),
 		}
 		listOpts := metav1.ListOptions{
 			LabelSelector: labels.Merge(classRefSet,
 				labels.Set{
-					v1beta1.GroupName + "/" + v1beta1.FilterSpecExternalName: util.GenerateSHA(planName),
+					v1.GroupName + "/" + v1.FilterSpecExternalName: util.GenerateSHA(planName),
 				}).String(),
 		}
 

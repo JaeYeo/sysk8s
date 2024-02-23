@@ -23,15 +23,15 @@ import (
 
 	clientgotesting "k8s.io/client-go/testing"
 
-	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kubernetes-sigs/service-catalog/pkg/apis/servicecatalog/v1"
 	servicecatalogclientset "github.com/kubernetes-sigs/service-catalog/pkg/client/clientset_generated/clientset/fake"
 )
 
 func TestClientsetStoresServiceInstanceClone(t *testing.T) {
 	clientset := Clientset{&servicecatalogclientset.Clientset{}}
-	instance := &v1beta1.ServiceInstance{}
+	instance := &v1.ServiceInstance{}
 	instance.Name = "test-instance"
-	returnedInstance, err := clientset.ServicecatalogV1beta1().ServiceInstances("test-namespace").UpdateStatus(context.Background(), instance, v1.UpdateOptions{})
+	returnedInstance, err := clientset.Servicecatalogv1().ServiceInstances("test-namespace").UpdateStatus(context.Background(), instance, v1.UpdateOptions{})
 	if err != nil {
 		t.Fatalf("unexpected error from UpdateStatus: %v", err)
 	}
@@ -48,7 +48,7 @@ func TestClientsetStoresServiceInstanceClone(t *testing.T) {
 	}
 
 	storedObject := updateAction.GetObject()
-	storedInstance, ok := storedObject.(*v1beta1.ServiceInstance)
+	storedInstance, ok := storedObject.(*v1.ServiceInstance)
 	if !ok {
 		t.Fatalf("unexpected object in action; failed to convert action object %+v to ServiceInstance", storedObject)
 	}
@@ -66,9 +66,9 @@ func TestClientsetStoresServiceInstanceClone(t *testing.T) {
 
 func TestClientsetStoresServiceBindingClone(t *testing.T) {
 	clientset := Clientset{&servicecatalogclientset.Clientset{}}
-	binding := &v1beta1.ServiceBinding{}
+	binding := &v1.ServiceBinding{}
 	binding.Name = "test-instance"
-	returnedBinding, err := clientset.ServicecatalogV1beta1().ServiceBindings("test-namespace").UpdateStatus(context.Background(), binding, v1.UpdateOptions{})
+	returnedBinding, err := clientset.Servicecatalogv1().ServiceBindings("test-namespace").UpdateStatus(context.Background(), binding, v1.UpdateOptions{})
 	if err != nil {
 		t.Fatalf("unexpected error from UpdateStatus: %v", err)
 	}
@@ -85,7 +85,7 @@ func TestClientsetStoresServiceBindingClone(t *testing.T) {
 	}
 
 	storedObject := updateAction.GetObject()
-	storedBinding, ok := storedObject.(*v1beta1.ServiceBinding)
+	storedBinding, ok := storedObject.(*v1.ServiceBinding)
 	if !ok {
 		t.Fatalf("unexpected object in action; failed to convert action object %+v to ServiceBinding", storedObject)
 	}
