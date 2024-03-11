@@ -1,5 +1,5 @@
 name: apache
-version: 0.1.1
+version: 0.1.0
 id: dbb4666a-904c-4403-b43e-eb1f0f49f9e1
 description: "Apache by Helm Broker. "
 displayName: "Apache"
