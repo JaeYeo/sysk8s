@@ -1,0 +1,12 @@
+name: minio 
+version: 0.1.1
+id: 3af2b49c-ac3b-11ed-afa1-0242ac120001
+description: "minio by Helm Broker. "
+displayName: "minio"
+tags: minio, sysmasterk8s 
+providerDisplayName: bitnami
+longDescription: "https://github.com/bitnami/charts/tree/master/bitnami/minio/#installing-the-chart"
+documentationURL: https://github.com/bitnami/bitnami-docker-minio
+supportURL: https://bitnami.com/support
+imageURL: https://bitnami.com/assets/stacks/minio/img/minio-stack-220x234.png
+bindable: true

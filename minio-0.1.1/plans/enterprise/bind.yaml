@@ -1,0 +1,44 @@
+credential:
+  - name: MINIO_USERNAME 
+    valueFrom:
+      secretKeyRef:
+        name: {{ template "common.names.fullname" . }} 
+        key: root-user
+  - name: MINIO_PASSWORD 
+    valueFrom:
+      secretKeyRef:
+        name: {{ template "common.names.fullname" . }} 
+        key: root-password 
+{{- if .Values.ingress.enabled }}
+  - name: INGRESS_HOSTNAME
+    value: {{ .Values.ingress.hostname }} 
+{{- end }}
+  - name: HTTP_API_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }}
+        jsonpath: '{ .spec.ports[?(@.name=="minio-api")].port }'
+{{- if (eq .Values.service.type "NodePort") }}
+  - name: HTTP_API_NODE_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }}
+        jsonpath: '{ .spec.ports[?(@.name=="minio-api")].nodePort }'
+{{- end }}
+  - name: HTTP_CONSOLE_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }}
+        jsonpath: '{ .spec.ports[?(@.name=="minio-console")].port }'
+{{- if (eq .Values.service.type "NodePort") }}
+  - name: HTTP_CONSOLE_NODE_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }}
+        jsonpath: '{ .spec.ports[?(@.name=="minio-console")].nodePort }'
+{{- end }}
+  - name: CLUSTER_IP
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }}
+        jsonpath: '{ .spec.clusterIP }'

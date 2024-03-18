@@ -1,0 +1,12 @@
+name: kong 
+version: 0.1.2
+id: cf575086-d1ab-11ec-9d64-0242ac120001 
+description: "Kong by Helm Broker."
+displayName: "Kong"
+tags: msa, apigateway, sysmasterk8s 
+providerDisplayName: bitnami
+longDescription: "https://github.com/bitnami/charts/tree/master/bitnami/kong/#installing-the-chart"
+documentationURL: https://github.com/bitnami/bitnami-docker-kong 
+supportURL: https://bitnami.com/support
+imageURL: https://bitnami.com/assets/stacks/kong/img/kong-stack-220x234.png 
+bindable: true

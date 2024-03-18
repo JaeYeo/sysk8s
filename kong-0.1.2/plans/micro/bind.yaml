@@ -1,0 +1,74 @@
+credential:
+  - name: HOST
+    value: {{ include "common.names.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}
+  - name: PROXY_HTTP_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }} 
+        jsonpath: '{ .spec.ports[?(@.name=="http-proxy")].port }'
+  - name: PROXY_HTTPS_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }} 
+        jsonpath: '{ .spec.ports[?(@.name=="https-proxy")].port }'
+  - name: ADMIN_HTTP_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }} 
+        jsonpath: '{ .spec.ports[?(@.name=="http-admin")].port }'
+  - name: ADMIN_HTTPS_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }} 
+        jsonpath: '{ .spec.ports[?(@.name=="https-admin")].port }'
+{{- if (eq .Values.service.type "NodePort") }}
+  - name: PROXY_HTTP_NODE_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }} 
+        jsonpath: '{ .spec.ports[?(@.name=="http-proxy")].nodePort }'
+  - name: PROXY_HTTPS_NODE_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }} 
+        jsonpath: '{ .spec.ports[?(@.name=="https-proxy")].nodePort }'
+  - name: ADMIN_HTTP_NODE_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }} 
+        jsonpath: '{ .spec.ports[?(@.name=="http-admin")].nodePort }'
+  - name: ADMIN_HTTPS_NODE_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }} 
+        jsonpath: '{ .spec.ports[?(@.name=="https-admin")].nodePort }'
+{{- end }}
+  - name: CLUSTER_IP
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }} 
+        jsonpath: '{ .spec.clusterIP }'
+{{- if .Values.adminPassword }}
+  - name: KONG_PASSWORD 
+    valueFrom:
+      secretKeyRef:
+        name: {{ include "common.names.fullname" . }}-admin 
+        key: kong-admin-password
+{{- end }}
+{{- if and .Values.konga.enabled .Values.konga.kongaAdminPassword }}
+  - name: KONGA_PASSWORD 
+    valueFrom:
+      secretKeyRef:
+        name: {{ include "common.names.fullname" . }}-konga-admin 
+        key: konga-admin-password
+{{- end }}
+{{- if .Values.ingress.enabled }}
+  - name: KONG_INGRESS_HOSTNAME
+    value: {{ .Values.ingress.hostname }}
+{{- end }}
+{{- if and .Values.konga.enabled .Values.konga.ingress.enabled }}
+  {{- with (index .Values.konga.ingress.hosts 0) }}
+  - name: KONGA_INGRESS_HOSTNAME
+    value: {{ .host }} 
+  {{- end }}
+{{- end }}

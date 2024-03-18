@@ -1,0 +1,6 @@
+name: micro
+id: 3af2b49c-ac3b-11ed-afa1-0242ac120002
+description: "Minio micro plan, standalone."
+displayName: Micro
+
+bindable: true
