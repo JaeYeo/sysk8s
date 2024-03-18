@@ -1,0 +1,44 @@
+credential:
+  - name: HOST
+    value: {{ include "rabbitmq.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}
+  - name: PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "rabbitmq.fullname" . }} 
+        jsonpath: '{ .spec.ports[?(@.name=="amqp")].port }'
+  - name: RABBITMQ_USERNAME
+    value: {{ .Values.auth.username | quote }}
+  - name: RABBITMQ_PASSWORD 
+    valueFrom:
+      secretKeyRef:
+        name: {{ template "rabbitmq.secretPasswordName" . }} 
+        key: rabbitmq-password 
+{{- if .Values.ingress.enabled }}
+  - name: INGRESS_HOSTNAME
+    value: {{ .Values.ingress.hostname }}
+{{- end }}
+{{- if (eq .Values.service.type "NodePort") }}
+  - name: NODE_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "rabbitmq.fullname" . }} 
+        jsonpath: '{ .spec.ports[?(@.name=="amqp")].nodePort }'
+<<<<<<< HEAD
+=======
+  - name: EPMD_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "rabbitmq.fullname" . }}
+        jsonpath: '{ .spec.ports[?(@.name=="epmd")].nodePort }'
+  - name: HTTP_STATS_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "rabbitmq.fullname" . }}
+        jsonpath: '{ .spec.ports[?(@.name=="http-stats")].nodePort }'
+>>>>>>> 97d619e89623d1642e360da08ceeb841720d66ef
+{{- end }}
+  - name: CLUSTER_IP
+    valueFrom:
+      serviceRef:
+        name: {{ include "rabbitmq.fullname" . }}
+        jsonpath: '{ .spec.clusterIP }'
