@@ -1,0 +1,6 @@
+name: micro
+id: 7bc5e673-8b94-4acc-9041-6b164ad78342
+description: "WordPress micro plan which uses the HTTP Server Project."
+displayName: Micro
+
+bindable: true

@@ -1,0 +1,10 @@
+resources:
+  requests:
+    memory: 512Mi
+    cpu: 1000m
+  limits:
+    memory: 1024Mi
+    cpu: 1000m
+persistence:
+  size: 4G
+

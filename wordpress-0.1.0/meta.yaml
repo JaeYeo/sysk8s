@@ -1,0 +1,12 @@
+name: wordpress
+version: 0.1.0
+id: 7bc5e673-8b94-4acc-9041-6b164ad78341
+description: "WordPress by Helm Broker. "
+displayName: "WordPress"
+tags: wordpress, sysmasterk8s 
+providerDisplayName: bitnami
+longDescription: "https://github.com/bitnami/charts/tree/master/bitnami/wordpress/#installing-the-chart"
+documentationURL: https://github.com/bitnami/bitnami-docker-wordpress
+supportURL: https://bitnami.com/support
+imageURL: https://bitnami.com/assets/stacks/wordpress/img/wordpress-stack-220x234.png
+bindable: true
