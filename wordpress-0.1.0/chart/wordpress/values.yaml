@@ -80,7 +80,7 @@ diagnosticMode:
 ## @param image.debug Specify if debug values should be set
 ##
 image:
-  registry: docker.io
+  registry: 
   repository: bitnami/wordpress
   tag: 6.5.5-debian-12-r3
   digest: ""
