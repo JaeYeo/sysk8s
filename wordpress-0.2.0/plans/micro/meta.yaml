@@ -1,0 +1,6 @@
+name: micro
+id: 3901a606-fdb4-11ec-0000-0242ac120002
+description: "wordpress micro plan, standalone."
+displayName: Micro
+
+bindable: true
