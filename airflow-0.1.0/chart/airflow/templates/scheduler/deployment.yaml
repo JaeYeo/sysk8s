@@ -9,6 +9,7 @@ kind: Deployment
 metadata:
   name: {{ printf "%s-scheduler" (include "common.names.fullname" .) }}
   namespace: {{ .Release.Namespace | quote }}
+  {{- $labels := include "common.tplvalues.merge" ( dict "values" ( list .Values.commonLabels $versionLabel ) "context" . ) }}
   labels: {{- include "common.labels.standard" ( dict "customLabels" $labels "context" $ ) | nindent 4 }}
     app.kubernetes.io/component: scheduler
   {{- if .Values.commonAnnotations }}
