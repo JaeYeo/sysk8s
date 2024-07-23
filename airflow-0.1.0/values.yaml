@@ -1,19 +1,25 @@
+## Configure resource requests and limits
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+##
+
 kubeVersion: 1.20-11 
 
 
 podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
 resources:
   requests:
-    memory: 256Mi
-    cpu: 200m
+    memory: 2Gi
+    cpu: 1000m
   limits:
-    memory: 512Mi
-    cpu: 400m
-persistence:
-  size: 8G
+    memory: 4Gi
+    cpu: 2000m
 
 service:
   type: NodePort
+
+ingress:
+  enabled: true
+  hostname: airflow.saas.sysmasterk8s.com
 
 postgresql:
   enabled: true 
@@ -30,10 +36,8 @@ postgresql:
         cpu: 2000m
     persistence:
       size: 8G
-
 redis:
   enabled: true
-  podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
   master:
     resources:
       requests:
@@ -42,5 +46,3 @@ redis:
       limits:
         memory: 2Gi
         cpu: 1000m
-  persistence:
-    size: 8G
