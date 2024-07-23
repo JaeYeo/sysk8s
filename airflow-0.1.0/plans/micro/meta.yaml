@@ -1,0 +1,6 @@
+name: micro
+id: 2ea8d196-0ae4-4106-8391-0678a594f402
+description: "Airflow micro plan which uses the HTTP Server Project."
+displayName: Micro
+
+bindable: true

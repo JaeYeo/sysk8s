@@ -1,0 +1,12 @@
+name: airflow
+version: 0.1.0
+id: 2ea8d196-0ae4-4106-8391-0678a594f401
+description: "Airflow by Helm Broker. "
+displayName: "airflow"
+tags: airflow, sysmasterk8s 
+providerDisplayName: bitnami
+longDescription: "https://github.com/bitnami/charts/tree/master/bitnami/airflow/#installing-the-chart"
+documentationURL: https://github.com/bitnami/bitnami-docker-airflow
+supportURL: https://bitnami.com/support
+imageURL: https://bitnami.com/assets/stacks/airflow/img/airflow-stack-220x234.png
+bindable: true
