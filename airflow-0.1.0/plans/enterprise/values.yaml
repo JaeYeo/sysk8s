@@ -1,12 +1,68 @@
 kubeVersion: 1.20-11 
 
-resources:
-  requests:
-    memory: 256Mi
-    cpu: 200m
-  limits:
-    memory: 1024Mi
-    cpu: 800m
-persistence:
-  size: 16G
 
+podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
+
+service:
+  type: NodePort
+
+web:
+  podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
+  resources:
+    requests:
+      memory: 1024Mi
+      cpu: 1000m
+    limits:
+      memory: 2048Mi
+      cpu: 3000m
+
+scheduler:
+  podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
+  resources:
+    requests:
+      memory: 1024Mi
+      cpu: 1000m
+    limits:
+      memory: 2048Mi
+      cpu: 3000m
+
+worker:
+  podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: 1000m
+    limits:
+      memory: 2Gi
+      cpu: 3000m
+
+
+postgresql:
+  enabled: true 
+  podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
+  auth:
+    password: 'master77!!'
+  primary:
+    resources:
+      requests:
+        memory: 2Gi
+        cpu: 1000m
+      limits:
+        memory: 4Gi
+        cpu: 2000m
+    persistence:
+      size: 16G
+
+redis:
+  enabled: true
+  podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
+  master:
+    resources:
+      requests:
+        memory: 1Gi
+        cpu: 500m
+      limits:
+        memory: 2Gi
+        cpu: 1000m
+  persistence:
+    size: 8G
