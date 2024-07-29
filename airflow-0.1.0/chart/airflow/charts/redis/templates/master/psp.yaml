@@ -1,5 +1,4 @@
 
-{{- if and $pspAvailable .Values.podSecurityPolicy.create }}
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
@@ -43,4 +42,4 @@ spec:
     - 'secret'
     - 'emptyDir'
     - 'persistentVolumeClaim'
-{{- end }}
+
