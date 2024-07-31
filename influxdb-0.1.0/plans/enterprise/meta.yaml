@@ -1,0 +1,6 @@
+name: enterprise
+id: ddb7933a-64d6-494e-8638-3f13939fd323
+description: "Enterprise plan, 1 master and 3 replications"
+displayName: Enterprise
+
+bindable: true

@@ -1,0 +1,12 @@
+name: influxdb
+version: 0.1.0
+id: ddb7933a-64d6-494e-8638-3f13939fd321
+description: "InfluxDB by Helm Broker. "
+displayName: "InfluxDB"
+tags: influxdb, sysmasterk8s 
+providerDisplayName: bitnami
+longDescription: "https://github.com/bitnami/charts/tree/master/bitnami/influxdb/#installing-the-chart"
+documentationURL: https://github.com/bitnami/bitnami-docker-influxdb
+supportURL: https://bitnami.com/support
+imageURL: https://bitnami.com/assets/stacks/influxdb/img/influxdb-stack-220x234.png
+bindable: true

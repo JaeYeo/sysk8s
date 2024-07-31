@@ -1,0 +1,6 @@
+name: micro
+id: ddb7933a-64d6-494e-8638-3f13939fd322
+description: "InfluxDB micro plan which uses the HTTP Server Project."
+displayName: Micro
+
+bindable: true
