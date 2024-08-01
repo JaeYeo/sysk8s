@@ -9,7 +9,7 @@ kind: Service
 metadata:
   name: {{ include "common.names.fullname" . }}-metrics
   namespace: {{ include "common.names.namespace" . | quote }}
-  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
     app.kubernetes.io/component: influxdb-metrics
   {{- if or .Values.metrics.service.annotations .Values.commonAnnotations }}
   {{- $annotations := include "common.tplvalues.merge" ( dict "values" ( list .Values.metrics.service.annotations .Values.commonAnnotations ) "context" . ) }}
