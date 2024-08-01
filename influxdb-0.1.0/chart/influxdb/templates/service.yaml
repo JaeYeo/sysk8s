@@ -56,6 +56,5 @@ spec:
     {{- if .Values.influxdb.service.extraPorts }}
     {{- include "common.tplvalues.render" (dict "value" .Values.influxdb.service.extraPorts "context" $) | nindent 4 }}
     {{- end }}
-  {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list .Values.influxdb.podLabels .Values.commonLabels ) "context" . ) }}
-  selector: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 4 }}
+  selector: {{- include "common.labels.matchLabels" . | nindent 4 }}
     app.kubernetes.io/component: influxdb
