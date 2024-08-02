@@ -58,7 +58,7 @@ spec:
       tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.influxdb.tolerations "context" $) | nindent 8 }}
       {{- end }}
       {{- if .Values.influxdb.podSecurityContext.enabled }}
-      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.influxdb.podSecurityContext "context" $) | nindent 8 }}
+      securityContext: {{- omit .Values.influxdb.podSecurityContext "enabled" | toYaml | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "influxdb.serviceAccountName" . }}
       initContainers:
