@@ -40,9 +40,9 @@ spec:
       affinity: {{- include "common.tplvalues.render" ( dict "value" .Values.influxdb.affinity "context" $) | nindent 8 }}
       {{- else }}
       affinity:
-        podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.podAffinityPreset "context" $) | nindent 10 }}
-        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.podAntiAffinityPreset "context" $) | nindent 10 }}
-        nodeAffinity: {{- include "common.affinities.nodes" (dict "type" .Values.nodeAffinityPreset.type "key" .Values.nodeAffinityPreset.key "values" .Values.nodeAffinityPreset.values) | nindent 10 }}
+        podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.influxdb.podAffinityPreset "context" $) | nindent 10 }}
+        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.influxdb.podAntiAffinityPreset "context" $) | nindent 10 }}
+        nodeAffinity: {{- include "common.affinities.nodes" (dict "type" .Values.influxdb.nodeAffinityPreset.type "key" .Values.influxdb.nodeAffinityPreset.key "values" .Values.influxdb.nodeAffinityPreset.values) | nindent 10 }}
       {{- end }}
       {{- if .Values.influxdb.schedulerName }}
       schedulerName: {{ .Values.influxdb.schedulerName }}
