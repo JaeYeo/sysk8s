@@ -6,6 +6,6 @@ influxdb:
     limits:
       memory: 2048Mi
       cpu: 4000m
-  persistence:
-    size: 16G
+persistence:
+  size: 16G
 
