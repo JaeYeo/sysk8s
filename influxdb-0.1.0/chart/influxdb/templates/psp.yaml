@@ -2,8 +2,7 @@
 Copyright Broadcom, Inc. All Rights Reserved.
 SPDX-License-Identifier: APACHE-2.0
 */}}
-{{- $pspAvailable := (semverCompare "<1.25-0" (include "common.capabilities.kubeVersion" .)) -}}
-{{- if and $pspAvailable .Values.psp.create }}
+{{- if .Values.psp.create }}
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
