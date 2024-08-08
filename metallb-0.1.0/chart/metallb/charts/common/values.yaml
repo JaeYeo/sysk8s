@@ -1,0 +1,7 @@
+## bitnami/common
+## It is required by CI/CD tools and processes.
+## @skip exampleValue
+##
+exampleValue: common-chart
+
+kubeVersion: 1.20-11

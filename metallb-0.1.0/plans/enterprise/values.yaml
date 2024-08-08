@@ -1,0 +1,29 @@
+
+controller:
+  podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "demand_backend_metallb_controller" }
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 2000m
+    limits:
+      memory: 2048Mi
+      cpu: 4000m
+  service:
+    type: NodePort
+    
+speaker:
+  podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "demand_backend_metallb_speaker" }
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 2000m
+    limits:
+      memory: 2048Mi
+      cpu: 4000m
+  service:
+    type: NodePort
+
+
+
+
+

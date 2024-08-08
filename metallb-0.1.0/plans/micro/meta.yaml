@@ -1,0 +1,6 @@
+name: micro
+id: 3c13a8c0-3dfe-4ba6-a11a-c1cf189f0b92
+description: "MetalLB micro plan, standalone."
+displayName: Micro
+
+bindable: true

@@ -1,0 +1,12 @@
+name: metallb
+version: 0.1.0
+id: 3c13a8c0-3dfe-4ba6-a11a-c1cf189f0b91
+description: "metallb by Helm Broker. "
+displayName: "metallb"
+tags: metallb, sysmasterk8s
+providerDisplayName: bitnami
+longDescription: "https://github.com/bitnami/charts/tree/master/bitnami/metallb/#installing-the-chart"
+documentationURL: https://github.com/bitnami/bitnami-docker-metallb
+supportURL: https://bitnami.com/support
+imageURL: https://bitnami.com/assets/stacks/metallb/img/metallb-stack-220x234.png 
+bindable: true
