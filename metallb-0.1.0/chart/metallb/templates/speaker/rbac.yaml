@@ -62,7 +62,7 @@ apiVersion: {{ include "common.capabilities.rbac.apiVersion" . }}
 kind: Role
 metadata:
   name: {{ printf "%s-pod-lister" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" }}
-  namespace: {{ include "common.names.namespace" . | quote }}
+  namespace: {{ .Release.Namespace | quote }}
   labels: {{- include "common.labels.standard" . | nindent 4 }}
     app.kubernetes.io/component: speaker
   {{- if .Values.commonAnnotations }}
