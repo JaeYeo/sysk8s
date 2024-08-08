@@ -39,9 +39,9 @@ spec:
       affinity: {{- include "common.tplvalues.render" ( dict "value" .Values.speaker.affinity "context" $) | nindent 8 }}
       {{- else }}
       affinity:
-        podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.master.podAffinityPreset "component" "master" "context" $) | nindent 10 }}
-        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.master.podAntiAffinityPreset "component" "master" "context" $) | nindent 10 }}
-        nodeAffinity: {{- include "common.affinities.nodes" (dict "type" .Values.master.nodeAffinityPreset.type "key" .Values.master.nodeAffinityPreset.key "values" .Values.master.nodeAffinityPreset.values) | nindent 10 }}
+        podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.speaker.podAffinityPreset "component" "speaker" "context" $) | nindent 10 }}
+        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.speaker.podAntiAffinityPreset "component" "speaker" "context" $) | nindent 10 }}
+        nodeAffinity: {{- include "common.affinities.nodes" (dict "type" .Values.speaker.nodeAffinityPreset.type "key" .Values.speaker.nodeAffinityPreset.key "values" .Values.speaker.nodeAffinityPreset.values) | nindent 10 }}
       {{- end }}
       nodeSelector:
         {{- if .Values.speaker.nodeSelector }}
