@@ -11,7 +11,7 @@ kind: ConfigMap
 metadata:
   name: {{ printf "%s-speaker-frr-startup" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" }}
   namespace: {{ default .Release.Namespace .Values.speaker.metrics.serviceMonitor.namespace | quote }}
-  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
     app.kubernetes.io/component: speaker
 data:
   daemons: |
