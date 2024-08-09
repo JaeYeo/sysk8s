@@ -51,7 +51,7 @@ rules:
       - list
       - watch
       - get
-  {{- if and (include "common.capabilities.psp.supported" .) .Values.psp.create .Values.controller.psp.create -}}
+  {{- if and .Values.psp.create .Values.speaker.psp.create -}}
   - apiGroups:
       - policy
     resourceNames:
