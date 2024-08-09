@@ -4,7 +4,7 @@ SPDX-License-Identifier: APACHE-2.0
 */}}
 
 {{- if .Values.speaker.enabled }}
-{{- if and .Values.psp.create -}}
+{{- if .Values.psp.create -}}
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
