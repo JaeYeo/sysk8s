@@ -21,8 +21,7 @@ spec:
   {{- if or .Values.controller.pdb.maxUnavailable ( not .Values.controller.pdb.minAvailable ) }}
   maxUnavailable: {{ .Values.controller.pdb.maxUnavailable | default 1 }}
   {{- end  }}
-  {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list .Values.controller.podLabels .Values.commonLabels ) "context" . ) }}
   selector:
-    matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 6 }}
+    matchLabels: {{- include "common.labels.matchLabels" . | nindent 6 }}
       app.kubernetes.io/component: controller
 {{- end }}
