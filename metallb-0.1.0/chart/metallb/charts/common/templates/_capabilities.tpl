@@ -30,7 +30,7 @@ Return the appropriate apiVersion for poddisruptionbudget.
 Return the appropriate apiVersion for networkpolicy.
 */}}
 {{- define "common.capabilities.networkPolicy.apiVersion" -}}
-{{- if semverCompare "<1.7-0" (include "common.capabilities.kubeVersion" .) -}}
+{{- if semverCompare "<1.21-0" (include "common.capabilities.kubeVersion" .) -}}
 {{- print "extensions/v1beta1" -}}
 {{- else -}}
 {{- print "networking.k8s.io/v1" -}}
