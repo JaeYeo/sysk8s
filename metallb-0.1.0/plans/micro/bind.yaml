@@ -1,14 +1,14 @@
 credential:
   - name: HOST
     value: {{ include "common.names.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
-{{- if (eq .Values.controller.metrics.enabled) }}
+{{- if .Values.controller.metrics.enabled }}
   - name: CONTROLLER_PORT
     valueFrom:
       serviceRef:
         name: {{ include "common.names.fullname" . }}
         jsonpath: '{ .spec.ports[?(@.name=="metrics")].port }'
 {{- end }}
-{{- if (eq .Values.speaker.metrics.enabled) }}
+{{- if .Values.speaker.metrics.enabled }}
   - name: SPEAKER_PORT
     valueFrom:
       serviceRef:
