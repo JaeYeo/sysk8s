@@ -1,20 +1,18 @@
 credential:
   - name: HOST
     value: {{ include "common.names.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
-{{- if (eq .Values.service.type "NodePort") }}
-  - name: HTTP_NODE_PORT
+{{- if (eq .Values.controller.metrics.enabled) }}
+  - name: CONTROLLER_PORT
     valueFrom:
       serviceRef:
         name: {{ include "common.names.fullname" . }}
-        jsonpath: '{ .spec.ports[?(@.name=="http")].nodePort }'
-  - name: HTTPS_NODE_PORT
-    valueFrom:
-      serviceRef:
-        name: {{ include "common.names.fullname" . }}
-        jsonpath: '{ .spec.ports[?(@.name=="https")].nodePort }'
+        jsonpath: '{ .spec.ports[?(@.name=="metrics")].port }'
 {{- end }}
-  - name: CLUSTER_IP
+{{- if (eq .Values.speaker.metrics.enabled) }}
+  - name: SPEAKER_PORT
     valueFrom:
       serviceRef:
-        name: {{ printf "%s" (include "common.names.fullname" .) }} 
-        jsonpath: '{ .spec.clusterIP }'
+        name: {{ include "common.names.fullname" . }}
+        jsonpath: '{ .spec.ports[?(@.name=="metrics")].port }'
+{{- end }}
+
