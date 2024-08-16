@@ -1141,7 +1141,7 @@ proxy:
     public:
       ## @param proxy.service.public.type Public service type
       ##
-      type: LoadBalancer
+      type: NodePort
       # HTTP Port
       ## @param proxy.service.public.ports.http Public service HTTP port
       ##
