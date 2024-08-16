@@ -1041,7 +1041,7 @@ proxy:
     api:
       ## @param proxy.service.api.type API service type
       ##
-      type: ClusterIP
+      type: NodePort
       ## @param proxy.service.api.ports.http API service HTTP port
       ##
       ports:
