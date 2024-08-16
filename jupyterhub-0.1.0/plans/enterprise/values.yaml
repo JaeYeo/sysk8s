@@ -1,0 +1,46 @@
+kubeVersion: 1.20-11 
+
+hub:
+  podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
+  limits:
+    cpu: 750m
+    memory: 768Mi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+imagePuller:
+  podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
+  resources:
+    limits:
+      cpu: 150m
+      memory: 192Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+worker:
+  podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
+  resources:
+    limits:
+      cpu: 150m
+      memory: 192Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+
+postgresql:
+  enabled: true 
+  podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
+  auth:
+    password: 'master77!!'
+  primary:
+    limits:
+      cpu: 150m
+      memory: 192Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    persistence:
+      size: 16G

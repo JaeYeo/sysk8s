@@ -1,0 +1,6 @@
+name: micro
+id: 1775e441-153f-4192-b5f5-fed16bd65f92
+description: "Jupyterhub micro plan which uses the HTTP Server Project."
+displayName: Micro
+
+bindable: true

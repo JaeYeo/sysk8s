@@ -1,0 +1,6 @@
+name: enterprise
+id: 1775e441-153f-4192-b5f5-fed16bd65f93
+description: "Jupyterhub enterprise plan which uses the HTTP Server Project."
+displayName: Enterprise
+
+bindable: true
