@@ -8,12 +8,18 @@ credential:
       serviceRef:
         name: {{ include "common.names.fullname" . }}
         jsonpath: '{ .spec.ports[?(@.name=="http")].port }'
-{{- if (eq .Values.service.type "NodePort") }}
-  - name: NODE_PORT
+{{- if (eq .Values.proxy.service.api.type "NodePort") }}
+  - name: API_NODE_PORT
     valueFrom:
       serviceRef:
         name: {{ include "common.names.fullname" . }}
-        jsonpath: '{ .spec.ports[?(@.name=="http")].nodePort }'
+        jsonpath: '{ .spec.ports[?(@.name=="api")].nodePort }'
+{{- if (eq .Values.proxy.service.public.type "NodePort") }}
+  - name: HTTP_NODE_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }}
+        jsonpath: '{ .spec.ports[?(@.name=="http")].nodePort }'        
 {{- end }}
   - name: CLUSTER_IP
     valueFrom:
