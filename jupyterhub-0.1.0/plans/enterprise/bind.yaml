@@ -1,5 +1,5 @@
 credential:
-{{- if .Values.ingress.enabled }}
+{{- if .Values.proxy.ingress.enabled }}
   - name: INGRESS_HOSTNAME
     value: {{ .Values.ingress.hostname }} 
 {{- end }}
