@@ -3,25 +3,20 @@ credential:
   - name: INGRESS_HOSTNAME
     value: {{ .Values.ingress.hostname }} 
 {{- end }}
-#   - name: HTTP_PORT
-#     valueFrom:
-#       serviceRef:
-#         name: {{ include "common.names.fullname" . }}
-#         jsonpath: '{ .spec.ports[?(@.name=="http")].port }'
-#   - name: HTTPS_PORT
-#     valueFrom:
-#       serviceRef:
-#         name: {{ include "common.names.fullname" . }}
-#         jsonpath: '{ .spec.ports[?(@.name=="https")].port }'
-# {{- if (eq .Values.service.type "NodePort") }}
-#   - name: HTTP_NODE_PORT
-#     valueFrom:
-#       serviceRef:
-#         name: {{ include "common.names.fullname" . }}
-#         jsonpath: '{ .spec.ports[?(@.name=="http")].nodePort }'
-# {{- end }}
-#   - name: CLUSTER_IP
-#     valueFrom:
-#       serviceRef:
-#         name: {{ include "common.names.fullname" . }}
-#         jsonpath: '{ .spec.clusterIP }'
+  - name: HTTP_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }}
+        jsonpath: '{ .spec.ports[?(@.name=="http")].port }'
+{{- if (eq .Values.service.type "NodePort") }}
+  - name: NODE_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }}
+        jsonpath: '{ .spec.ports[?(@.name=="http")].nodePort }'
+{{- end }}
+  - name: CLUSTER_IP
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }}
+        jsonpath: '{ .spec.clusterIP }'
