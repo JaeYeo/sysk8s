@@ -3,8 +3,8 @@ kubeVersion: 1.20-11
 hub:
   podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
   limits:
-    cpu: 750m
-    memory: 768Mi
+    cpu: 1500m
+    memory: 1536Mi
   requests:
     cpu: 500m
     memory: 512Mi
@@ -13,8 +13,8 @@ imagePuller:
   podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
   resources:
     limits:
-      cpu: 150m
-      memory: 192Mi
+      cpu: 200m
+      memory: 256Mi
     requests:
       cpu: 100m
       memory: 128Mi
@@ -23,8 +23,8 @@ worker:
   podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
   resources:
     limits:
-      cpu: 150m
-      memory: 192Mi
+      cpu: 200m
+      memory: 256Mi
     requests:
       cpu: 100m
       memory: 128Mi
@@ -37,8 +37,8 @@ postgresql:
     password: 'master77!!'
   primary:
     limits:
-      cpu: 150m
-      memory: 192Mi
+      cpu: 200m
+      memory: 256Mi
     requests:
       cpu: 100m
       memory: 128Mi

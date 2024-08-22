@@ -2,19 +2,7 @@ credential:
 {{- if .Values.proxy.ingress.enabled }}
   - name: INGRESS_HOSTNAME
     value: {{ .Values.ingress.hostname }} 
-{{- end }}
-{{- if (eq .Values.proxy.service.api.type "NodePort") }}
-  - name: API_NODE_PORT
-    valueFrom:
-      serviceRef:
-        name: {{ include "common.names.fullname" . }}
-        jsonpath: '{ .spec.ports[?(@.name=="api")].nodePort }'
-  - name: API_PORT
-    valueFrom:
-      serviceRef:
-        name: {{ include "common.names.fullname" . }}
-        jsonpath: '{ .spec.ports[?(@.name=="api")].port }'        
-{{- end }}        
+{{- end }} 
 {{- if (eq .Values.proxy.service.public.type "NodePort") }}
   - name: HTTP_NODE_PORT
     valueFrom:
