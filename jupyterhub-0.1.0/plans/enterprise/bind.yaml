@@ -2,21 +2,33 @@ credential:
 {{- if .Values.proxy.ingress.enabled }}
   - name: INGRESS_HOSTNAME
     value: {{ .Values.ingress.hostname }} 
-{{- end }} 
+{{- end }}
+{{- if (eq .Values.proxy.service.api.type "NodePort") }}
+  - name: API_NODE_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }}-proxy-api
+        jsonpath: '{ .spec.ports[?(@.name=="api")].nodePort }'
+  - name: API_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "common.names.fullname" . }}-proxy-api
+        jsonpath: '{ .spec.ports[?(@.name=="api")].port }'        
+{{- end }}        
 {{- if (eq .Values.proxy.service.public.type "NodePort") }}
   - name: HTTP_NODE_PORT
     valueFrom:
       serviceRef:
-        name: {{ include "common.names.fullname" . }}
+        name: {{ include "common.names.fullname" . }}-proxy-public
         jsonpath: '{ .spec.ports[?(@.name=="http")].nodePort }'
   - name: HTTP_PORT
     valueFrom:
       serviceRef:
-        name: {{ include "common.names.fullname" . }}
+        name: {{ include "common.names.fullname" . }}-proxy-public
         jsonpath: '{ .spec.ports[?(@.name=="http")].port }'        
 {{- end }}
   - name: CLUSTER_IP
     valueFrom:
       serviceRef:
-        name: {{ include "common.names.fullname" . }}
+        name: {{ include "common.names.fullname" . }}-proxy-public
         jsonpath: '{ .spec.clusterIP }'
