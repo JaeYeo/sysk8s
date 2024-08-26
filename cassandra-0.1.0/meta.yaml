@@ -1,0 +1,12 @@
+name: cassandra
+version: 0.1.0
+id: 849d5165-7874-4f43-b14d-80c669efd1c1
+description: "Cassandra by Helm Broker. "
+displayName: "Cassandra"
+tags: nosql, database, sysmasterk8s 
+providerDisplayName: bitnami
+longDescription: "https://github.com/bitnami/charts/tree/master/bitnami/cassandra/#installing-the-chart"
+documentationURL: https://github.com/bitnami/bitnami-docker-cassandra
+supportURL: https://bitnami.com/support
+imageURL: https://bitnami.com/assets/stacks/cassandra/img/cassandra-stack-220x234.png 
+bindable: true

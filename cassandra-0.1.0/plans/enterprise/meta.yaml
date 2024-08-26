@@ -1,0 +1,6 @@
+name: enterprise
+id: 849d5165-7874-4f43-b14d-80c669efd1c3
+description: "Cassandra Enterprise plan"
+displayName: Enterprise
+
+bindable: true

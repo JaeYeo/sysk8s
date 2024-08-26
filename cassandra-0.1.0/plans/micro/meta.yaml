@@ -1,0 +1,6 @@
+name: micro
+id: 849d5165-7874-4f43-b14d-80c669efd1c2
+description: "Cassandra micro plan"
+displayName: Micro
+
+bindable: true
