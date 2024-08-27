@@ -1,40 +1,32 @@
 credential:
   - name: HOST
-    value: {{ include "mongodb.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}
+    value: {{ include "cassandra.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}
   - name: PORT
     valueFrom:
       serviceRef:
-        name: {{ include "mongodb.fullname" . }} 
-        jsonpath: '{ .spec.ports[?(@.name=="mongodb")].port }'
-  - name: MONGODB_ROOT_PASSWORD 
-    valueFrom:
-      secretKeyRef:
-        name: {{ include "mongodb.fullname" . }} 
-        key: mongodb-root-password 
+        name: {{ include "cassandra.fullname" . }} 
+        jsonpath: '{ .spec.ports[?(@.name=="cql")].port }'
 {{- if (eq .Values.service.type "NodePort") }}
   - name: NODE_PORT
     valueFrom:
       serviceRef:
-        name: {{ include "mongodb.fullname" . }} 
-        jsonpath: '{ .spec.ports[?(@.name=="mongodb")].nodePort }'
+        name: {{ include "cassandra.fullname" . }} 
+        jsonpath: '{ .spec.ports[?(@.name=="cql")].nodePort }'
 {{- end }}
   - name: CLUSTER_IP
     valueFrom:
       serviceRef:
-        name: {{ include "mongodb.fullname" . }} 
+        name: {{ include "cassandra.fullname" . }} 
         jsonpath: '{ .spec.clusterIP }'
-{{- if .Values.auth.username }}
-  - name: MONGODB_USERNAME
-    value: {{ .Values.auth.username | quote }}
+{{- if .Values.dbUser.user }}
+  - name: CASSANDRA_USERNAME
+    value: {{ .Values.dbUser.user | quote }}
 {{- end }}
-{{- if .Values.auth.password }}
-  - name: MONGODB_PASSWORD 
+{{- if .Values.dbUser.password }}
+  - name: CASSANDRA_PASSWORD 
     valueFrom:
       secretKeyRef:
-        name: {{ include "mongodb.fullname" . }} 
-        key: mongodb-passwords 
+        name: {{ include "cassandra.fullname" . }} 
+        key: cassandra-password 
 {{- end }}
-{{- if .Values.auth.database }}
-  - name: DATABASE
-    value: {{ .Values.auth.database | quote }}
-{{- end }}
+

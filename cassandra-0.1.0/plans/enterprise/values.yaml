@@ -13,7 +13,7 @@ resources:
     cpu: 1000m
   limits:
     memory: 4Gi
-    cpu: 2000m
+    cpu: 3000m
 persistence:
   size: 16Gi
 service:
