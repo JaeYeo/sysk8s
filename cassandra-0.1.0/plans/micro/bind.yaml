@@ -1,22 +1,22 @@
 credential:
   - name: HOST
-    value: {{ include "cassandra.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}
+    value: {{ include "common.names.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}
   - name: PORT
     valueFrom:
       serviceRef:
-        name: {{ include "cassandra.fullname" . }} 
+        name: {{ include "common.names.fullname" . }} 
         jsonpath: '{ .spec.ports[?(@.name=="cql")].port }'
 {{- if (eq .Values.service.type "NodePort") }}
   - name: NODE_PORT
     valueFrom:
       serviceRef:
-        name: {{ include "cassandra.fullname" . }} 
+        name: {{ include "common.names.fullname" . }} 
         jsonpath: '{ .spec.ports[?(@.name=="cql")].nodePort }'
 {{- end }}
   - name: CLUSTER_IP
     valueFrom:
       serviceRef:
-        name: {{ include "cassandra.fullname" . }} 
+        name: {{ include "common.names.fullname" . }} 
         jsonpath: '{ .spec.clusterIP }'
 {{- if .Values.dbUser.user }}
   - name: CASSANDRA_USERNAME
@@ -26,7 +26,7 @@ credential:
   - name: CASSANDRA_PASSWORD 
     valueFrom:
       secretKeyRef:
-        name: {{ include "cassandra.fullname" . }} 
+        name: {{ include "common.names.fullname" . }} 
         key: cassandra-password 
 {{- end }}
 
