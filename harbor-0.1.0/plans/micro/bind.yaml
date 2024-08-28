@@ -1,0 +1,20 @@
+credential:
+  - name: CLUSTER_IP
+    valueFrom:
+      serviceRef:
+        name: {{ include "harbor.fullname" . }}-harbor
+        jsonpath: '{ .spec.clusterIP }' 
+{{- if (eq .Values.expose.type "nodePort") }}
+  - name: NODE_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "harbor.fullname" . }}-harbor
+        jsonpath: '{ .spec.ports[?(@.name=="http")].nodePort }'
+{{- end }}
+  - name: userName
+    value: admin
+  - name: userPassWord
+    valueFrom:
+      secretKeyRef:
+        name: {{ template "harbor.fullname" . }}-core
+        key: HARBOR_ADMIN_PASSWORD

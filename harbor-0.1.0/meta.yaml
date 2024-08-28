@@ -1,0 +1,12 @@
+name: harbor
+version: 2.6.0
+id: b9509f90-e4c0-4f58-bdcd-8f4a99fcebea
+description: "Private Registry by Helm Broker."
+displayName: "Private Registry"
+tags: harbor
+providerDisplayName: infranics
+longDescription: "https://github.com/hyunkim13/harbor.git"
+documentationURL: ""
+supportURL: ""
+imageURL: ""
+bindable: true

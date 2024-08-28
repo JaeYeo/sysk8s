@@ -1,0 +1,133 @@
+persistence:
+  persistentVolumeClaim:
+    registry:
+      size: 10Gi
+    database:
+      size: 5Gi
+nginx:
+  resources:
+    requests:
+      cpu: 0.05
+      memory: 128Mi
+    limits:
+      cpu: 0.1
+      memory: 256Mi
+
+portal:
+  resources:
+    requests:
+      cpu: 0.05
+      memory: 128Mi
+    limits:
+      cpu: 0.1
+      memory: 256Mi
+
+core:
+  resources:
+    requests:
+      cpu: 0.05
+      memory: 128Mi
+    limits:
+      cpu: 0.1
+      memory: 256Mi
+
+jobservice:
+  resources:
+    requests:
+      cpu: 0.05
+      memory: 128Mi
+    limits:
+      cpu: 0.1
+      memory: 256Mi
+
+registry:
+  registry:
+    resources:
+      requests:
+        cpu: 0.05
+        memory: 2702Mi
+      limits:
+        cpu: 0.1
+        memory: 5404Mi
+  controller:
+    resources:
+      requests:
+        cpu: 0.05
+        memory: 2702Mi
+      limits:
+        cpu: 0.1
+        memory: 5404Mi
+ 
+chartmuseum:
+  resources:
+    requests:
+      cpu: 0.05
+      memory: 50Mi
+    limits:
+      cpu: 0.1
+      memory: 100Mi
+
+trivy:
+  resources:
+    requests:
+      cpu: 0.2
+      memory: 512Mi
+    limits:
+      cpu: 1
+      memory: 1Gi
+
+
+notary:
+  server:
+    resources:
+      requests:
+        cpu: 0.01
+        memory: 20Mi
+      limits:
+        cpu: 0.02
+        memory: 40Mi
+  signer:
+    resources:
+      requests:
+        cpu: 0.01
+        memory: 20Mi
+      limits:
+        cpu: 0.02
+        memory: 40Mi
+
+database:
+  internal:
+    initContainer:
+      migrator:
+        resources:
+          requests:
+            cpu: 0.005
+            memory: 50Mi
+          limits:
+            cpu: 0.01
+            memory: 100Mi
+      permissions:
+        resources:
+          requests:
+            cpu: 0.005
+            memory: 50Mi
+          limits:
+            cpu: 0.01
+            memory: 100Mi
+    resources:
+      requests:
+        cpu: 0.1
+        memory: 200Mi
+      limits:
+        cpu: 0.2
+        memory: 400Mi
+
+redis:
+  internal:
+    resources:
+      requests:
+        cpu: 0.01
+        memory: 15Mi
+      limits:
+        cpu: 0.02
+        memory: 30Mi

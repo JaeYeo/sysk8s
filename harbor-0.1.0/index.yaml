@@ -1,0 +1,6 @@
+apiVersion: v1
+entries:
+  harbor:
+    - name: harbor
+      description: "Harbor service"
+      version: 0.1.0
