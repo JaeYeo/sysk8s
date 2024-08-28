@@ -1,0 +1,12 @@
+name: memcached
+version: 0.1.0
+id: 89b0bc05-f4ba-4446-994f-27f9eab0ae01
+description: "Memcached by Helm Broker. "
+displayName: "Memcached"
+tags: memcached, keyvalue, database, sysmasterk8s 
+providerDisplayName: bitnami
+longDescription: "https://github.com/bitnami/charts/tree/master/bitnami/memcached/#installing-the-chart"
+documentationURL: https://github.com/bitnami/bitnami-docker-memcached
+supportURL: https://bitnami.com/support
+imageURL: https://bitnami.com/assets/stacks/memcached/img/memcached-stack-220x234.png
+bindable: true

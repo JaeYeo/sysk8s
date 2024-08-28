@@ -1,0 +1,21 @@
+## Configure resource requests and limits
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+##
+
+kubeVersion: 1.20-11 
+
+architecture : standalone
+
+
+podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
+resources:
+  requests:
+    memory: 128Mi
+    cpu: 100m
+  limits:
+    memory: 512Mi 
+    cpu: 500m
+
+service:
+  type: NodePort
+

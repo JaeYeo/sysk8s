@@ -1,0 +1,6 @@
+name: micro
+id: 89b0bc05-f4ba-4446-994f-27f9eab0ae02
+description: "Memcached micro plan which uses the in-memory persistence, standalone."
+displayName: Micro
+
+bindable: true
