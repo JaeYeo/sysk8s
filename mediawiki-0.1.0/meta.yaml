@@ -1,0 +1,12 @@
+name: mediawiki
+version: 0.1.0
+id: 5d6d8f5c-f2ef-4df4-85fc-017dac6b29e1
+description: "mediawiki by Helm Broker. "
+displayName: "mediawiki"
+tags: mediawiki, sysmasterk8s 
+providerDisplayName: bitnami
+longDescription: "https://github.com/bitnami/charts/tree/master/bitnami/mediawiki/#installing-the-chart"
+documentationURL: https://github.com/bitnami/bitnami-docker-mediawiki
+supportURL: https://bitnami.com/support
+imageURL: https://bitnami.com/assets/stacks/mediawiki/img/mediawiki-stack-220x234.png
+bindable: true

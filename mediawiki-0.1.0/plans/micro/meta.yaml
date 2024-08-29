@@ -1,0 +1,6 @@
+name: micro
+id: 5d6d8f5c-f2ef-4df4-85fc-017dac6b29e2
+description: "mediawiki micro plan, standalone."
+displayName: Micro
+
+bindable: true

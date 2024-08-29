@@ -1,0 +1,6 @@
+name: enterprise
+id: 5d6d8f5c-f2ef-4df4-85fc-017dac6b29e3
+description: "Enterprise plan"
+displayName: Enterprise
+
+bindable: true
