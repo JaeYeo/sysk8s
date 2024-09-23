@@ -33,10 +33,10 @@ mariadb:
   podLabels: { "platform":"demand_service", "taskse":"demand_service_catalog", "taskcl": "backend_service" }
   resources:
     requests:
-      memory: 2Gi
+      memory: 1Gi
       cpu: 1000m
     limits:
-      memory: 4Gi
+      memory: 2Gi
       cpu: 2000m
   persistence:
     size: 8G

@@ -39,5 +39,5 @@ mariadb:
       memory: 4Gi
       cpu: 2000m
   persistence:
-    size: 8G
+    size: 16G
 
