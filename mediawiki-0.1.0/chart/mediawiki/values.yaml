@@ -63,7 +63,7 @@ extraDeploy: []
 ## @param image.debug Enable MediaWiki image debug mode
 ##
 image:
-  registry: docker.io
+  registry: registry.sysmasterk8s-v3.com:9444
   repository: bitnami/mediawiki
   tag: 1.42.1-debian-12-r0
   digest: ""
