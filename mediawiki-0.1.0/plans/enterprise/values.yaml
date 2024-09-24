@@ -13,7 +13,7 @@ resources:
     memory: 1024Mi
     cpu: 1000m
 persistence:
-  size: 8G    
+  size: 8Gi    
   
 livenessProbe:
   failureThreshold: 50
@@ -37,5 +37,5 @@ mariadb:
       memory: 4Gi
       cpu: 2000m
   persistence:
-    size: 16G
+    size: 16Gi
 
