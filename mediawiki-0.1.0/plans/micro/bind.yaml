@@ -1,11 +1,17 @@
 credential:
-  - name: WORDPRESS_USERNAME 
-    value: {{ .Values.wordpressUsername | quote }}
-  - name: WORDPRESS_PASSWORD 
+  - name: MEDIAWIKI_USER
+    value: {{ .Values.mediawikiUser | quote }}
+  - name: MEDIAWIKI_PASSWORD 
     valueFrom:
      secretKeyRef:
-       name: {{ include "wordpress.secretName" . }}
-       key: wordpress-password
+       name: {{ include "mediawiki.secretName" . }}
+       key: mediawikiPassword
+  - name: MEDIAWIKI_EMAIL
+    value: {{ .Values.mediawikiEmail | quote }}
+  - name: MEDIAWIKI_NAME
+    value: {{ .Values.mediawikiName | quote }}           
+  - name: MEDIAWIKI_HOST
+    value: {{ .Values.mediawikiHost | quote }}    
 {{- if .Values.ingress.enabled }}
   - name: INGRESS_HOSTNAME
     value: {{ .Values.ingress.hostname }} 
