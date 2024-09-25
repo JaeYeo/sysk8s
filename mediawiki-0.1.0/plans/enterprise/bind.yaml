@@ -5,7 +5,7 @@ credential:
     valueFrom:
      secretKeyRef:
        name: {{ include "mediawiki.secretName" . }}
-       key: mediawikiPassword
+       key: mediawiki-password
   - name: MEDIAWIKI_EMAIL
     value: {{ .Values.mediawikiEmail | quote }}
   - name: MEDIAWIKI_NAME
