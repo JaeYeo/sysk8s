@@ -13,13 +13,13 @@ We truncate to 20 characters because this is used to set the node identifier in 
 */}}
 {{- define "keycloak.fullname" -}}
 {{- if .Values.fullnameOverride }}
-{{- .Values.fullnameOverride | trunc 20 | trimSuffix "-" }}
+{{- .Values.fullnameOverride | trunc 30 | trimSuffix "-" }}
 {{- else }}
 {{- $name := default .Chart.Name .Values.nameOverride }}
 {{- if contains $name .Release.Name }}
-{{- .Release.Name | trunc 20 | trimSuffix "-" }}
+{{- .Release.Name | trunc 30 | trimSuffix "-" }}
 {{- else }}
-{{- printf "%s-%s" .Release.Name $name | trunc 20 | trimSuffix "-" }}
+{{- printf "%s-%s" .Release.Name $name | trunc 30 | trimSuffix "-" }}
 {{- end }}
 {{- end }}
 {{- end }}
