@@ -1,11 +1,11 @@
 credential:
-  - name: KEYCLOAK_USER 
-    value: {{ .Values.jenkinsUser | quote }}
-  - name: KEYCLOAK_PASSWORD 
-    valueFrom:
-      secretKeyRef:
-        name: {{ template "common.names.fullname" . }} 
-        key: admin-password 
+  # - name: KEYCLOAK_USER 
+  #   value: {{ .Values.jenkinsUser | quote }}
+  # - name: KEYCLOAK_PASSWORD 
+  #   valueFrom:
+  #     secretKeyRef:
+  #       name: {{ template "common.names.fullname" . }} 
+  #       key: admin-password 
 {{- if .Values.ingress.enabled }}
   - name: INGRESS_HOSTNAME
     value: {{ .Values.ingress.hostname }} 
