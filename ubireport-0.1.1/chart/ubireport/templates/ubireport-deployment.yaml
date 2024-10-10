@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ubireport.fullnameOverride" . }}
+  {{- with .Values.ubireport.labels }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if not .Values.ubireport.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    {{- with .Values.ubireport.labels }}
+    matchLabels:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+  template:
+    metadata:
+      {{- with .Values.ubireport.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.ubireport.labels }}
+      labels:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- with .Values.ubireport.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.ubireport.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ include "ubireport.fullnameOverride" . }}
+          securityContext:
+            {{- toYaml .Values.ubireport.securityContext | nindent 12 }}
+          image: "{{ .Values.ubireport.image.repository }}:{{ .Values.ubireport.image.tag }}"
+          imagePullPolicy: {{ .Values.ubireport.image.pullPolicy }}
+          volumeMounts:
+          - mountPath: /usr/local/tomcat/webapps/ROOT/ubi4/license
+            name: ubi-license
+          - mountPath: /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/ubiserver.xml
+            subPath: ubiserver.xml
+            name: ubi-server
+          - mountPath: /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/ubiservice.xml
+            subPath: ubiservice.xml
+            name: ubi-service
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+         #livenessProbe:
+         #   httpGet:
+         #     path: /
+         #     port: 80
+         #     scheme: HTTP
+         # readinessProbe:
+         #   httpGet:
+         #     path: /
+         #     port: 80
+         #     scheme: HTTP
+          resources:
+            {{- toYaml .Values.ubireport.resources | nindent 12 }}
+      {{- with .Values.ubireport.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.ubireport.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.ubireport.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+      - name: ubi-license
+        configMap:
+          defaultMode: 420
+          name: {{ include "ubireport.fullnameOverride" . }}-license-configmap
+      - name: ubi-server
+        configMap:
+          name: {{ include "ubireport.fullnameOverride" . }}-ubiserver-configmap
+          items:
+            - key: ubiserver.xml
+              path: ubiserver.xml
+      - name: ubi-service
+        configMap:
+          name: {{ include "ubireport.fullnameOverride" . }}-ubiservice-configmap
+          items:
+            - key: ubiservice.xml
+              path: ubiservice.xml

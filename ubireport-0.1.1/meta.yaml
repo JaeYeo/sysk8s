@@ -1,0 +1,12 @@
+name: ubireport
+version: 0.1.1
+id: d460e81e-5146-11ee-be56-0242ac120002
+description: "UbiReport by Helm Broker."
+displayName: "UbiReport"
+tags: ubireport
+providerDisplayName: infranics
+longDescription: "https://github.com/juchan133/ubireport.git"
+documentationURL: ""
+supportURL: ""
+imageURL: ""
+bindable: true

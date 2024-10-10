@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<UbiService port="16996" connectionTime="600000">
+  <!-- Executor urfThreads="6" exportThreads="3" pageThreads="3" /-->
+  <!-- TaskInfo property value : MINUTE,HOUR,DAY,WEEK,MONTH,YEAR -->
+  <TaskInfo taskResId="UBIHTML" taskPeriod="30" taskPeriodType="MINUTE" delPeriod="30" delPeriodType="MINUTE" />
+	<LogInfo logPath=""
+		backupStyle="date"
+		backupPattern="yyyy-MM-dd"
+		backupSize="180" />
+	<S3Info useS3="false"
+		bucketName=""
+		accessKey=""
+		secretKey="" />
+	<!-- For Redbc
+	<Redbc configXml=""
+	   drmCopyProtectFileName=""
+	   drmBarcodeType="HTML"
+	   drmBarcodeCount="3" /> -->
+	<Resources>
+		<Resource id="UBIHTML"
+			isLocalFile="true"
+			jrfDir="/usr/local/tomcat/webapps/ROOT/ubi4/work/"
+			resultDir="/usr/local/UbiService/results/"
+			ubiserverUrl="http://localhost:8080/UbiServer"
+			servletRoot="http://localhost:8080/ubi4/"
+			fileUrl="http://localhost:8080/ubi4/"
+			resource="false"
+			dataSource="sysmaster"
+			useLog="true"
+			httpConnectionClassName=""
+			fileDrmClassName=""
+			voiceyeClassName="" />
+	</Resources>
+</UbiService>
+

@@ -1,0 +1,108 @@
+## Default values for Ubireport App.
+replicaCount: 1
+ubireport:
+  ##  fullname
+  fullnameOverride: "ubireport"
+  
+  ## labels & selectorLabels & matchLabels
+  labels:
+    app.kubernetes.io/instance: ubireport
+    app.kubernetes.io/name: ubireport
+    app: ubireport
+    app2: ubireport2
+
+  ## Custom pod annotations
+  podAnnotations: {}
+    # fsGroup: 2000
+
+  ## Specify an array of imagePullSecrets.
+  ## Secrets must be manually created in the namespace.
+  imagePullSecrets: []
+  
+
+  ## Image Info
+  ## image: repository+tag
+  ## pullPolicy: Specify a imagePullPolicy
+  image:
+    repository: harbor.spaasta.com/ubireport/ubireport
+    tag: "0.3"
+    pullPolicy: IfNotPresent
+
+  ## service
+  service:
+    type: ClusterIP
+    port: 8080
+
+  # ingress
+  # host: Enter the URL that can be connected to the velero web service.
+  ingress:
+    enabled: false
+    className: ""
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: /
+      ingress.kubernetes.io/path-is-regex: "true"
+      nginx.ingress.kubernetes.io/cors-allow-origin: '*'
+      nginx.ingress.kubernetes.io/enable-cors: "true"
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/proxy-redirect-from: http://
+      nginx.ingress.kubernetes.io/proxy-redirect-to: https://
+    hosts:
+      - host: ubireport.saas.sysmasterk8s.com
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls: []
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  ## Security Context
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  ## Node labels for pod assignment
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  nodeSelector: {}
+
+  ## Taints to tolerate on node assignment:
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  tolerations: []
+
+  ## Pod scheduling constraints
+  ## Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity
+  affinity: {}
+
+
+  ## The configmap is information 
+  datasource:
+    sysmaster:
+      vendor: "Postgres"
+      driverClassName: "org.postgresql.Driver"
+      url: "jdbc:postgresql://postgresql.ubireport.svc.cluster.local:5432/ubireport"
+      charset: "KSC5601"
+      username: "postgres"
+      password: "postgres"
+
+  # now only use enabled option
+  # Other options are features you need to add.
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+

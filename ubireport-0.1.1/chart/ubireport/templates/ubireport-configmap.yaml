@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "ubireport.fullnameOverride" . }}-license-configmap
+data:
+  License.xml: |-
+{{ .Files.Get "files/license.xml" | indent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "ubireport.fullnameOverride" . }}-ubiservice-configmap
+data:
+  ubiservice.xml: |-
+{{ .Files.Get "files/ubiservice.xml" | indent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "ubireport.fullnameOverride" . }}-ubiserver-configmap
+data:
+  ubiserver.xml: |-
+    <?xml version="1.0" encoding="EUC-KR"?>
+    <UbiServer version="4.0.0000.0000">
+        <Environment licensePath="{APP_ROOT}/ubi4/license"
+                admin="YWRtcEBzc3dkIQ=="
+                adminImgUri="./ubi4/js/images"
+                xslPath=""
+                osCharset="KSC5601" />
+        <LogInfo logPath="{APP_ROOT}/ubi4/logs"
+                timeZone="GMT+9"
+                rowSize="5"
+                backupStyle="date"
+                backupSize="30"
+                serverBackupSize="180"
+                backupPattern="yyyy-MM-dd"
+                useLog="true"
+                useDebug="true"
+                info="true" />
+        <Resources>
+              <DataSource id="demo" type="auto" dataSourceName="jdbc/demo" charset="KSC5601" />
+              <DataSource id="sysmaster"
+                type="direct"
+                vendor="{{ .Values.ubireport.datasource.sysmaster.vendor }}"
+                driverClassName="{{ .Values.ubireport.datasource.sysmaster.driverClassName }}"
+                url="{{ .Values.ubireport.datasource.sysmaster.url }}"
+                charset="{{ .Values.ubireport.datasource.sysmaster.charset }}"
+                username="{{ .Values.ubireport.datasource.sysmaster.username }}"
+                password="{{ .Values.ubireport.datasource.sysmaster.password }}" />
+        </Resources>
+        <UbiServiceInfo urftype="normal" connectionTime="6000000" exectype="was" myServiceid="Service1" >
+                <UbiService id="Service1" url="http://localhost:8080/UbiServer"/>
+        </UbiServiceInfo>
+      </UbiServer>

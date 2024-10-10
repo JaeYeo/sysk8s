@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ubireport.fullnameOverride" . }}-svc
+  {{- with .Values.ubireport.labels }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.ubireport.service.type }}
+  ports:
+    - port: {{ .Values.ubireport.service.port }}
+      targetPort: {{ .Values.ubireport.service.port }}
+      protocol: TCP
+      name: http
+  {{- with .Values.ubireport.labels }}
+  selector:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}

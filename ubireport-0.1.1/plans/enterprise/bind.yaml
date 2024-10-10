@@ -1,0 +1,13 @@
+credential:
+  - name: CLUSTER_IP
+    valueFrom:
+      serviceRef:
+        name: {{ include "ubireport.fullnameOverride" . }}-svc
+        jsonpath: '{ .spec.clusterIP }'
+{{- if (eq .Values.ubireport.service.type "NodePort") }}
+  - name: NODE_PORT
+    valueFrom:
+      serviceRef:
+        name: {{ include "ubireport.fullnameOverride" . }}-svc
+        jsonpath: '{ .spec.ports[?(@.name=="http")].nodePort }'
+{{- end }}
